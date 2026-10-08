@@ -1,0 +1,177 @@
+"use client";
+
+import NavigationLink from "@/components/ui/Preloader/NavigationLink";
+
+import { ArrowLeft, Search } from "lucide-react";
+
+import { NOT_FOUND_HERO } from "./notFound.constants";
+
+export default function NotFoundHero() {
+  return (
+    <section
+      className="
+        flex
+        min-h-[calc(100vh-80px)]
+        items-center
+        bg-[var(--services-hero-bg)]
+        px-3
+        py-12
+        transition-colors
+        duration-300
+        sm:px-5
+        sm:py-20
+      "
+    >
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-3xl
+          text-center
+        "
+      >
+        <p
+          className="
+            text-6xl
+            font-black
+            leading-none
+            text-[var(--primary)]
+            sm:text-8xl
+            lg:text-9xl
+          "
+        >
+          {NOT_FOUND_HERO.code}
+        </p>
+
+        <h1
+          className="
+            mt-5
+            text-2xl
+            font-bold
+            leading-tight
+            text-[var(--services-hero-title)]
+            transition-colors
+            duration-300
+            sm:mt-8
+            sm:text-5xl
+          "
+        >
+          {NOT_FOUND_HERO.title}
+        </h1>
+
+        <p
+          className="
+            mx-auto
+            mt-4
+            max-w-2xl
+            text-[13px]
+            leading-6
+            text-[var(--services-hero-text)]
+            transition-colors
+            duration-300
+            sm:mt-6
+            sm:text-lg
+            sm:leading-8
+          "
+        >
+          {NOT_FOUND_HERO.description}
+        </p>
+
+        <div
+          className="
+            mt-6
+            flex
+            flex-col
+            gap-2.5
+            sm:mt-10
+            sm:flex-row
+            sm:justify-center
+            sm:gap-4
+          "
+        >
+          <NavigationLink
+            href="/"
+            style={{
+              backgroundColor:
+                "var(--services-cta-primary-bg)",
+              color:
+                "var(--services-cta-primary-text)",
+            }}
+            className="
+              inline-flex
+              h-10
+              items-center
+              justify-center
+              gap-2
+              rounded-lg
+              px-5
+              text-[12px]
+              font-semibold
+              transition-all
+              duration-300
+              hover:opacity-90
+              hover:scale-[1.02]
+              sm:h-auto
+              sm:gap-3
+              sm:rounded-xl
+              sm:px-8
+              sm:py-4
+              sm:text-base
+            "
+          >
+            <ArrowLeft
+              className="
+                h-4
+                w-4
+                sm:h-5
+                sm:w-5
+              "
+            />
+
+            {NOT_FOUND_HERO.primaryButton}
+          </NavigationLink>
+
+          <NavigationLink
+            href="/shop"
+            className="
+              inline-flex
+              h-10
+              items-center
+              justify-center
+              gap-2
+              rounded-lg
+              border
+              border-[var(--border)]
+              bg-transparent
+              px-5
+              text-[12px]
+              font-semibold
+              text-[var(--foreground)]
+              transition-all
+              duration-300
+              hover:border-[var(--primary)]
+              hover:text-[var(--primary)]
+              sm:h-auto
+              sm:gap-3
+              sm:rounded-xl
+              sm:px-8
+              sm:py-4
+              sm:text-base
+            "
+          >
+            <Search
+              className="
+                h-4
+                w-4
+                sm:h-5
+                sm:w-5
+              "
+            />
+
+            {NOT_FOUND_HERO.secondaryButton}
+          </NavigationLink>
+        </div>
+      </div>
+    </section>
+  );
+}

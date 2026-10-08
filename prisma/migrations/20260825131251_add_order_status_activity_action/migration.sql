@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ActivityLogAction" ADD VALUE 'ORDER_STATUS_UPDATED';

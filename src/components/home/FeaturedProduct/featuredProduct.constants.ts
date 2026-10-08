@@ -1,0 +1,11 @@
+export const FEATURED_IMAGE_RADIUS = 20;
+
+export const FEATURED_IMAGE_MAX_WIDTH = 520;
+
+export const FEATURED_CONTENT_MAX_WIDTH = 580;
+
+export const FEATURED_PRICE_FONT_SIZE = 54;
+
+export const FEATURED_BUTTON_HEIGHT = 56;
+
+export const FEATURED_BUTTON_RADIUS = 10;

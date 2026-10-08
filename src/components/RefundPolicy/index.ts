@@ -1,0 +1,1 @@
+export { default as RefundPolicyPage } from "./RefundPolicyPage";

@@ -1,0 +1,3 @@
+export const PRELOADER_Z_INDEX = 9999;
+
+export const PRELOADER_OVERLAY_FADE_DURATION = 0.3;

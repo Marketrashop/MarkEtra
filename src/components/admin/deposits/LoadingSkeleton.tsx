@@ -1,0 +1,91 @@
+export default function LoadingSkeleton() {
+  return (
+    <div
+      className="
+        overflow-hidden
+        rounded-xl
+        border
+        border-[var(--admin-card-border)]
+        bg-[var(--admin-card-bg)]
+        shadow-[var(--admin-card-shadow)]
+      "
+    >
+      <div className="overflow-x-auto">
+        <table className="min-w-[1200px] w-full border-collapse">
+          <thead>
+            <tr
+              className="
+                border-b
+                border-[var(--admin-table-border)]
+                bg-[var(--admin-table-header-bg)]
+              "
+            >
+              {[
+                "Reference",
+                "User",
+                "Method",
+                "Amount",
+                "Status",
+                "Created",
+                "Actions",
+              ].map((label) => (
+                <th
+                  key={label}
+                  className="
+                    px-3
+                    py-2.5
+                    text-left
+                    text-[10px]
+                    font-semibold
+                    uppercase
+                    tracking-[0.08em]
+                    text-[var(--admin-table-header-text)]
+                    sm:px-4
+                    sm:py-3
+                  "
+                >
+                  {label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {Array.from({ length: 8 }).map((_, row) => (
+              <tr
+                key={row}
+                className="
+                  border-b
+                  border-[var(--admin-table-border)]
+                "
+              >
+                {Array.from({ length: 7 }).map((_, cell) => (
+                  <td
+                    key={cell}
+                    className="
+                      px-3
+                      py-3
+                      sm:px-4
+                      sm:py-3.5
+                    "
+                  >
+                    <div
+                      className="
+                        h-3
+                        w-full
+                        max-w-[140px]
+                        animate-pulse
+                        rounded
+                        bg-[var(--admin-table-header-bg)]
+                      "
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

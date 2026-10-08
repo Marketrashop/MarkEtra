@@ -1,0 +1,4660 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ==========================
+     Light Theme
+     ========================== */
+
+  /* Main Surfaces */
+  --surface: #f8f9fc;
+  --elevated: #ffffff;
+
+/* Scroll To Top */
+--scroll-top-bg: #5b5ef7;
+--scroll-top-border: #3133ca;
+--scroll-top-icon: #ffffff;
+--scroll-top-shadow: 0 12px 30px rgba(91, 94, 247, 0.3);
+
+  /* Header & Footer */
+  --surface-topbar: #dfdffc;
+  --surface-primary: #ffffff;
+  --surface-secondary: #e5e5fa;
+  --surface-footer: #dfdffc;
+  --surface-footer-bottom: #c2c3fa;
+  --breadcrumb-bg: #eef1ff;
+
+  /* Accent */
+  --accent-divider: #000000;
+
+  /* Brand */
+  --primary: oklch(0.205 0 0);
+  --primary-hover: #4847d4;
+
+  /* Typography */
+  --foreground-muted: rgba(0, 0, 0, 0.72);
+
+  /* Buttons & Icons */
+  --button-bg: #ffffff;
+  --button-text: #000000;
+  --icon-color: #000000;
+
+  /* UI */
+  --border: oklch(0.922 0 0);
+  --muted: oklch(0.97 0 0);
+
+  /* States */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
+
+  /* Motion */
+  --transition-fast: 150ms;
+  --transition-normal: 250ms;
+  --transition-slow: 400ms;
+
+/* ==========================================
+   Featured Product
+========================================== */
+
+--featured-bg: #ffffff;
+--featured-panel: #f8f0f0;
+--featured-panel-pattern: url("/assets/images/patterns/dotted-panel.png");
+
+--featured-title: #000000;
+--featured-text: rgba(0, 0, 0, 0.72);
+--featured-accent: #5B5EF7;
+
+--hero-fade-bg: #EEF0F8;
+
+/* ==========================================
+   Store Products
+========================================== */
+
+--store-products-bg: #F7F7FF;
+
+/* ==========================================
+   Experience Products
+========================================== */
+
+--experience-bg: #ffffff;
+--experience-text: #0A1233;
+
+/* ==========================================
+   Pricing Plans
+========================================== */
+--pricing-bg: #F7F7FF;
+
+/* ==========================================
+   FAQ
+========================================== */
+
+--faq-bg: #ffffff;
+
+/* ==========================================
+   Testimonial Card
+========================================== */
+
+--testimonials-bg: #F7F7FF;
+--testimonial-card-bg: #ffffff;
+
+/* ==========================================
+   Blog
+========================================== */
+--blog-section-bg: #ffffff;
+
+/* ==========================================
+   Blog Article
+========================================== */
+
+--blog-article-bg: #ffffff;
+
+/* ==========================================
+   Toast
+========================================== */
+
+--toast-bg: #5B5EF7;
+--toast-text: #FFFFFF;
+--toast-icon: #FFFFFF;
+
+/* ==========================================
+   Services Hero
+========================================== */
+
+--services-hero-bg: #F7F7FF;
+
+--services-hero-title: #000000;
+
+--services-hero-text: rgba(0, 0, 0, 0.72);
+
+--services-cta-bg: #F7F7FF;
+
+--services-cta-border: #E5E7EB;
+
+--services-cta-heading: #000000;
+
+--services-cta-text: rgba(0, 0, 0, 0.72);
+
+--services-cta-primary-bg: #575AEC;
+--services-cta-primary-hover: #4847D4;
+--services-cta-primary-text: #FFFFFF;
+
+--services-cta-secondary-bg: #FFFFFF;
+--services-cta-secondary-border: #D7DBE8;
+--services-cta-secondary-text: #000000;
+
+--surface-card: #ffffff;
+
+--dashboard-card: #F7F7FF;
+--dashboard-card-border: rgba(91, 92, 240, 0.14);
+--dashboard-card-glow: rgba(91, 92, 240, 0.18);
+
+/* ==========================
+   Profile Menu
+========================== */
+--profile-menu-bg: #ffffff;
+
+--profile-menu-border: rgba(16,24,40,.08);
+
+--profile-menu-card: #f7f9fc;
+
+--profile-menu-hover: #eef3ff;
+
+--profile-menu-avatar-bg: #eef3ff;
+
+--profile-menu-avatar-border: rgba(16,24,40,.08);
+
+--profile-menu-camera-bg: var(--primary);
+
+--profile-menu-camera-color: #ffffff;
+
+--profile-menu-divider: rgba(16,24,40,.08);
+
+--profile-menu-title: #111827;
+
+--profile-menu-text: #1f2937;
+
+--profile-menu-muted: #6b7280;
+
+--profile-menu-danger: #dc2626;
+
+--profile-menu-danger-hover: rgba(220,38,38,.08);
+
+--profile-menu-glow: rgba(91,92,240,.12);
+
+/* ==========================
+   Bottom Dock
+========================== */
+
+--dock-bg: #ffffff7d;
+
+--dock-border: rgba(15,23,42,.08);
+
+--dock-shadow: rgba(15,23,42,.12);
+
+--dock-hover: #eef2ff;
+
+--dock-icon: #6b7280;
+
+--dock-icon-hover: #111827;
+
+--dock-active-bg: #5b5cf0;
+
+--dock-active-text: #ffffff;
+
+--dock-active-shadow: rgba(91,92,240,.35);
+
+--dock-item-bg: var(--surface);
+
+--dock-item-border: rgba(15,23,42,.08);
+
+--dock-hover-border: rgba(91,92,240,.22);
+
+/* ==========================================================================
+   DASHBOARD BREADCRUMB
+   ========================================================================== */
+
+--dashboard-breadcrumb-bg: #ffffff;
+--dashboard-breadcrumb-border: color-mix(in srgb, var(--border) 45%, transparent);
+--dashboard-breadcrumb-margin-bottom: 2.5rem;
+--dashboard-breadcrumb-height: 3.5rem;
+--dashboard-breadcrumb-gap: 0.5rem;
+--dashboard-breadcrumb-font-size: 0.8125rem;
+--dashboard-breadcrumb-font-size-desktop: 0.875rem;
+--dashboard-breadcrumb-font-weight: 500;
+--dashboard-breadcrumb-text: var(--foreground-muted);
+--dashboard-breadcrumb-active: var(--foreground);
+--dashboard-breadcrumb-hover: var(--primary);
+--dashboard-breadcrumb-max-width: 220px;
+
+/* ==========================================================================
+   DEPOSIT BALANCE
+   ========================================================================== */
+
+--deposit-balance-bg: var(--surface-card);
+
+--deposit-balance-border: var(--border);
+
+--deposit-balance-radius: 1.5rem;
+
+--deposit-balance-padding: 1.5rem;
+
+--deposit-balance-shadow: var(--shadow-sm);
+
+--deposit-balance-title: var(--foreground-muted);
+
+--deposit-balance-amount: var(--foreground);
+
+--deposit-balance-text: var(--foreground-muted);
+
+--deposit-balance-icon-bg: #5b5cf0;
+
+--deposit-balance-icon-color: #ffffff;
+
+--deposit-balance-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT METHOD
+   ========================================================================== */
+
+--deposit-method-bg: var(--surface-card);
+
+--deposit-method-border: var(--border);
+
+--deposit-method-radius: 1.5rem;
+
+--deposit-method-padding: 1.5rem;
+
+--deposit-method-shadow: var(--shadow-sm);
+
+--deposit-method-title: var(--foreground);
+
+--deposit-method-text: var(--foreground-muted);
+
+--deposit-method-select-bg: var(--surface);
+
+--deposit-method-select-border: var(--border);
+
+--deposit-method-select-text: var(--foreground);
+
+--deposit-method-select-placeholder: var(--foreground-muted);
+
+--deposit-method-select-focus: var(--primary);
+
+--deposit-method-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT METHOD CARD
+   ========================================================================== */
+
+--deposit-method-card-bg: var(--surface-card);
+
+--deposit-method-card-border: var(--border);
+
+--deposit-method-card-radius: 1.5rem;
+
+--deposit-method-card-padding: 1.25rem;
+
+--deposit-method-card-shadow: var(--shadow-sm);
+
+--deposit-method-card-title: var(--foreground);
+
+--deposit-method-card-subtitle: var(--foreground-muted);
+
+--deposit-method-card-icon-bg: var(--surface);
+
+--deposit-method-card-icon-color: var(--primary);
+
+--deposit-method-card-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT QR CODE
+   ========================================================================== */
+
+--deposit-qr-bg: var(--surface-card);
+
+--deposit-qr-border: var(--border);
+
+--deposit-qr-radius: 1.5rem;
+
+--deposit-qr-padding: 1.25rem;
+
+--deposit-qr-shadow: var(--shadow-sm);
+
+--deposit-qr-title: var(--foreground);
+
+--deposit-qr-subtitle: var(--foreground-muted);
+
+--deposit-qr-image-size-mobile: 180px;
+
+--deposit-qr-image-size-desktop: 220px;
+
+--deposit-qr-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT METHOD ADDRESS
+   ========================================================================== */
+
+--deposit-address-bg: var(--surface-card);
+
+--deposit-address-border: var(--border);
+
+--deposit-address-radius: 1.5rem;
+
+--deposit-address-padding: 1.25rem;
+
+--deposit-address-shadow: var(--shadow-sm);
+
+--deposit-address-title: var(--foreground);
+
+--deposit-address-text: var(--foreground);
+
+--deposit-address-muted: var(--foreground-muted);
+
+--deposit-address-copy-bg: var(--surface-card);
+
+--deposit-address-copy-border: var(--primary);
+
+--deposit-address-copy-text: var(--primary);
+
+--deposit-address-copy-hover: var(--primary);
+
+--deposit-address-copy-hover-text: #ffffff;
+
+--deposit-address-copy-success-bg: #ffffff;
+
+--deposit-address-copy-success-border: #5b5cf0;
+
+--deposit-address-copy-success-text: #5b5cf0;
+
+--deposit-address-transition: 0.3s;
+
+/* ==========================================================================
+   DEPOSIT AMOUNT
+   ========================================================================== */
+
+--deposit-amount-bg: var(--surface-card);
+
+--deposit-amount-border: var(--border);
+
+--deposit-amount-radius: 1.5rem;
+
+--deposit-amount-padding: 1.5rem;
+
+--deposit-amount-shadow: var(--shadow-sm);
+
+--deposit-amount-title: var(--foreground);
+
+--deposit-amount-text: var(--foreground-muted);
+
+--deposit-amount-chip-bg: transparent;
+
+--deposit-amount-chip-border: var(--border);
+
+--deposit-amount-chip-text: var(--foreground);
+
+--deposit-amount-chip-hover-bg: color-mix(
+  in srgb,
+  var(--primary) 10%,
+  transparent
+);
+
+--deposit-amount-chip-hover-border: var(--primary);
+
+--deposit-amount-chip-active-bg: var(--primary);
+
+--deposit-amount-chip-active-border: var(--primary);
+
+--deposit-amount-chip-active-text: #ffffff;
+
+--deposit-amount-input-bg: var(--surface);
+
+--deposit-amount-input-border: var(--border);
+
+--deposit-amount-input-text: var(--foreground);
+
+--deposit-amount-input-placeholder: var(--foreground-muted);
+
+--deposit-amount-input-focus: var(--primary);
+
+--deposit-amount-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT SUMMARY
+   ========================================================================== */
+
+--deposit-summary-bg: var(--surface-card);
+
+--deposit-summary-border: var(--border);
+
+--deposit-summary-radius: 1.5rem;
+
+--deposit-summary-padding: 1.25rem;
+
+--deposit-summary-shadow: var(--shadow-sm);
+
+--deposit-summary-title: var(--foreground);
+
+--deposit-summary-label: var(--foreground-muted);
+
+--deposit-summary-value: var(--foreground);
+
+--deposit-summary-divider: var(--border);
+
+--deposit-summary-total: var(--primary);
+
+--deposit-summary-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT ACTION
+   ========================================================================== */
+
+--deposit-action-button-bg: var(--primary);
+
+--deposit-action-button-text: #ffffff;
+
+--deposit-action-button-hover: color-mix(
+  in srgb,
+  var(--primary) 90%,
+  black
+);
+
+--deposit-action-button-disabled-bg: var(--border);
+
+--deposit-action-button-disabled-text: var(--foreground-muted);
+
+--deposit-action-button-radius: 1rem;
+
+--deposit-action-button-padding-y: 0.95rem;
+
+--deposit-action-button-shadow: var(--shadow-md);
+
+--deposit-action-note: var(--foreground-muted);
+
+--deposit-action-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT RECEIPT MODAL
+   ========================================================================== */
+
+--deposit-modal-bg: var(--surface-card);
+
+--deposit-modal-border: var(--border);
+
+--deposit-modal-radius: 1.75rem;
+
+--deposit-modal-padding: 1.5rem;
+
+--deposit-modal-shadow: var(--shadow-xl);
+
+--deposit-modal-title: var(--foreground);
+
+--deposit-modal-text: var(--foreground-muted);
+
+--deposit-modal-summary-bg: var(--surface);
+
+--deposit-modal-summary-border: var(--border);
+
+--deposit-modal-divider: var(--border);
+
+--deposit-modal-upload-bg: var(--surface);
+
+--deposit-modal-upload-border: var(--border);
+
+--deposit-modal-upload-hover: var(--primary);
+
+--deposit-modal-submit-bg: var(--primary);
+
+--deposit-modal-submit-text: #ffffff;
+
+--deposit-modal-overlay: rgb(0 0 0 / 60%);
+
+--deposit-modal-submit-hover: color-mix(
+  in srgb,
+  var(--primary) 90%,
+  black
+);
+
+--deposit-modal-submit-disabled-bg: var(--border);
+
+--deposit-modal-submit-disabled-text: var(--foreground-muted);
+
+--deposit-modal-cancel-bg: var(--surface);
+
+--deposit-modal-cancel-text: var(--foreground);
+
+--deposit-modal-cancel-border: var(--border);
+
+--deposit-modal-cancel-hover: color-mix(
+  in srgb,
+  var(--foreground) 8%,
+  transparent
+);
+
+--deposit-modal-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT RECEIPT UPLOADER
+   ========================================================================== */
+
+--deposit-uploader-bg: var(--surface);
+
+--deposit-uploader-border: var(--border);
+
+--deposit-uploader-border-hover: var(--primary);
+
+--deposit-uploader-radius: 1.5rem;
+
+--deposit-uploader-padding: 2rem;
+
+--deposit-uploader-shadow: var(--shadow-sm);
+
+--deposit-uploader-icon: var(--primary);
+
+--deposit-uploader-title: var(--foreground);
+
+--deposit-uploader-text: var(--foreground-muted);
+
+--deposit-uploader-file-bg: var(--surface-card);
+
+--deposit-uploader-file-border: var(--border);
+
+--deposit-uploader-file-radius: 1rem;
+
+--deposit-uploader-file-text: var(--foreground);
+
+--deposit-uploader-replace-bg: var(--primary);
+
+--deposit-uploader-replace-text: #ffffff;
+
+--deposit-uploader-drag-bg: color-mix(
+  in srgb,
+  var(--primary) 8%,
+  var(--surface)
+);
+
+--deposit-uploader-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT HISTORY
+   ========================================================================== */
+
+--deposit-history-bg: var(--surface-card);
+
+--deposit-history-border: var(--border);
+
+--deposit-history-radius: 1.5rem;
+
+--deposit-history-padding: 1.5rem;
+
+--deposit-history-shadow: var(--shadow-sm);
+
+--deposit-history-title: var(--foreground);
+
+--deposit-history-text: var(--foreground-muted);
+
+--deposit-history-card-bg: var(--surface);
+
+--deposit-history-card-border: var(--border);
+
+--deposit-history-card-radius: 1rem;
+
+--deposit-history-tab-bg: var(--surface);
+
+--deposit-history-tab-border: var(--border);
+
+--deposit-history-tab-text: var(--foreground);
+
+--deposit-history-tab-hover-bg: color-mix(
+  in srgb,
+  var(--primary) 10%,
+  transparent
+);
+
+--deposit-history-tab-hover-text: var(--foreground);
+
+--deposit-history-tab-active-bg: var(--primary);
+
+--deposit-history-tab-active-text: #ffffff;
+
+--deposit-history-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT HISTORY CARD
+   ========================================================================== */
+
+--deposit-history-card-bg: var(--surface);
+
+--deposit-history-card-border: var(--border);
+
+--deposit-history-card-radius: 1rem;
+
+--deposit-history-card-padding: 1rem;
+
+--deposit-history-card-shadow: var(--shadow-sm);
+
+--deposit-history-card-title: var(--foreground);
+
+--deposit-history-card-text: var(--foreground-muted);
+
+--deposit-history-card-hover-border: var(--primary);
+
+--deposit-history-card-transition: 300ms;
+
+--deposit-history-status-pending-bg: #fef3c7;
+
+--deposit-history-status-pending-text: #92400e;
+
+--deposit-history-status-success-bg: #dcfce7;
+
+--deposit-history-status-success-text: #166534;
+
+--deposit-history-status-failed-bg: #fee2e2;
+
+--deposit-history-status-failed-text: #991b1b;
+
+/* ==========================================================================
+   DEPOSIT HISTORY EMPTY
+   ========================================================================== */
+
+--deposit-history-empty-bg: var(--surface);
+
+--deposit-history-empty-border: var(--border);
+
+--deposit-history-empty-radius: 1rem;
+
+--deposit-history-empty-padding: 2rem;
+
+--deposit-history-empty-shadow: var(--shadow-sm);
+
+--deposit-history-empty-icon-bg: var(--surface-card);
+
+--deposit-history-empty-icon-color: var(--primary);
+
+--deposit-history-empty-title: var(--foreground);
+
+--deposit-history-empty-text: var(--foreground-muted);
+
+--deposit-history-empty-transition: 300ms;
+
+
+
+
+
+--primary-contact: #000;
+--contact-button-text: #fff;
+
+
+
+
+/* ==========================================================================
+   WITHDRAW BALANCE
+   ========================================================================== */
+
+--withdraw-balance-bg: #ffffff;
+
+--withdraw-balance-border: #eceef7;
+
+--withdraw-balance-radius: 1.5rem;
+
+--withdraw-balance-padding: 1.5rem;
+
+--withdraw-balance-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-balance-label: #5c5c5c;
+
+--withdraw-balance-value: #000000;
+
+--withdraw-balance-text: #5c5c5c;
+
+--withdraw-balance-icon-bg: #575aec;
+
+--withdraw-balance-icon-color: #ffffff;
+
+--withdraw-balance-icon-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-balance-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW METHOD
+   ========================================================================== */
+
+--withdraw-method-bg: #ffffff;
+
+--withdraw-method-border: #eceef7;
+
+--withdraw-method-radius: 1.5rem;
+
+--withdraw-method-padding: 1.5rem;
+
+--withdraw-method-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-method-title: #000000;
+
+--withdraw-method-text: #5c5c5c;
+
+--withdraw-method-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW METHOD CARD
+   ========================================================================== */
+
+--withdraw-method-card-bg: #ffffff;
+
+--withdraw-method-card-border: #eceef7;
+
+--withdraw-method-card-radius: 1rem;
+
+--withdraw-method-card-padding: 1rem;
+
+--withdraw-method-card-text: #000000;
+
+--withdraw-method-card-icon-bg: #ffffff;
+
+--withdraw-method-card-icon-color: #575aec;
+
+--withdraw-method-card-hover-bg: #ffffff;
+
+--withdraw-method-card-hover-border: #575aec;
+
+--withdraw-method-card-hover-text: #000000;
+
+--withdraw-method-card-selected-bg: #575aec;
+
+--withdraw-method-card-selected-border: #575aec;
+
+--withdraw-method-card-selected-text: #ffffff;
+
+--withdraw-method-card-selected-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-method-card-check-bg: #ffffff;
+
+--withdraw-method-card-check-color: #575aec;
+
+--withdraw-method-card-focus: #575aec;
+
+--withdraw-method-card-focus-offset: #ffffff;
+
+--withdraw-method-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-method-card-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW DETAILS
+   ========================================================================== */
+
+--withdraw-details-bg: #ffffff;
+
+--withdraw-details-border: #eceef7;
+
+--withdraw-details-radius: 1.25rem;
+
+--withdraw-details-padding: 1.25rem;
+
+--withdraw-details-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-details-title: #000000;
+
+--withdraw-details-text: #5c5c5c;
+
+--withdraw-details-label: #000000;
+
+--withdraw-details-input-radius: 0.75rem;
+
+--withdraw-details-input-border: #eceef7;
+
+--withdraw-details-input-bg: #f8f9fc;
+
+--withdraw-details-input-text: #000000;
+
+--withdraw-details-input-placeholder: #5c5c5c;
+
+--withdraw-details-input-focus: #575aec;
+
+--withdraw-details-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW ADDRESS INPUT
+   ========================================================================== */
+
+--withdraw-address-label: #000000;
+
+--withdraw-address-bg: #f8f9fc;
+
+--withdraw-address-border: #eceef7;
+
+--withdraw-address-text: #000000;
+
+--withdraw-address-placeholder: #5c5c5c;
+
+--withdraw-address-focus: #575aec;
+
+--withdraw-address-copy-bg: #ffffff;
+
+--withdraw-address-copy-border: #eceef7;
+
+--withdraw-address-copy-text: #575aec;
+
+--withdraw-address-copy-hover: #575aec;
+
+--withdraw-address-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW AMOUNT
+   ========================================================================== */
+
+--withdraw-amount-label: #000000;
+
+--withdraw-amount-balance: #000000;
+
+--withdraw-amount-max-bg: #ffffff;
+
+--withdraw-amount-max-border: #eceef7;
+
+--withdraw-amount-max-text: #000000;
+
+--withdraw-amount-max-hover-bg: #575aec;
+
+--withdraw-amount-max-hover-border: #575aec;
+
+--withdraw-amount-max-hover-text: #ffffff;
+
+--withdraw-amount-currency: #5c5c5c;
+
+--withdraw-amount-input-bg: #f8f9fc;
+
+--withdraw-amount-input-border: #eceef7;
+
+--withdraw-amount-input-text: #000000;
+
+--withdraw-amount-input-placeholder: #5c5c5c;
+
+--withdraw-amount-input-focus: #575aec;
+
+--withdraw-amount-remaining-label: #5c5c5c;
+
+--withdraw-amount-remaining-value: #000000;
+
+--withdraw-amount-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW SUMMARY
+   ========================================================================== */
+
+--withdraw-summary-bg: #ffffff;
+
+--withdraw-summary-border: #eceef7;
+
+--withdraw-summary-radius: 1.25rem;
+
+--withdraw-summary-padding: 1.25rem;
+
+--withdraw-summary-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-summary-title: #000000;
+
+--withdraw-summary-label: #5c5c5c;
+
+--withdraw-summary-value: #000000;
+
+--withdraw-summary-divider: #eceef7;
+
+--withdraw-summary-receive-label: #000000;
+
+--withdraw-summary-receive-value: #575aec;
+
+--withdraw-summary-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW ACTION
+   ========================================================================== */
+
+--withdraw-action-bg: #575aec;
+
+--withdraw-action-text: #ffffff;
+
+--withdraw-action-hover-bg: #4847d4;
+
+--withdraw-action-hover-text: #ffffff;
+
+--withdraw-action-disabled-bg: #eceef7;
+
+--withdraw-action-disabled-text: #8a8a8a;
+
+--withdraw-action-radius: 0.9rem;
+
+--withdraw-action-padding-y: 0.8rem;
+
+--withdraw-action-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+--withdraw-action-note: #5c5c5c;
+
+--withdraw-action-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW HISTORY
+   ========================================================================== */
+
+--withdraw-history-bg: #ffffff;
+
+--withdraw-history-border: #eceef7;
+
+--withdraw-history-radius: 1.5rem;
+
+--withdraw-history-padding: 1.5rem;
+
+--withdraw-history-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-history-title: #000000;
+
+--withdraw-history-text: #5c5c5c;
+
+--withdraw-history-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW HISTORY FILTERS
+   ========================================================================== */
+
+--withdraw-history-filter-all-bg: #f8f9fc;
+
+--withdraw-history-filter-all-border: #eceef7;
+
+--withdraw-history-filter-all-text: #000000;
+
+--withdraw-history-filter-all-active-bg: #575aec;
+
+--withdraw-history-filter-all-active-border: #575aec;
+
+--withdraw-history-filter-all-active-text: #ffffff;
+
+--withdraw-history-filter-pending-bg: #fff7d6;
+
+--withdraw-history-filter-pending-border: #e5c45c;
+
+--withdraw-history-filter-pending-text: #8a6500;
+
+--withdraw-history-filter-pending-active-bg: #f5d76e;
+
+--withdraw-history-filter-pending-active-border: #f5d76e;
+
+--withdraw-history-filter-pending-active-text: #3d3214;
+
+--withdraw-history-filter-success-bg: #e9f9ee;
+
+--withdraw-history-filter-success-border: #70c98a;
+
+--withdraw-history-filter-success-text: #166534;
+
+--withdraw-history-filter-success-active-bg: #6ee58d;
+
+--withdraw-history-filter-success-active-border: #6ee58d;
+
+--withdraw-history-filter-success-active-text: #12351f;
+
+--withdraw-history-filter-rejected-bg: #fdebed;
+
+--withdraw-history-filter-rejected-border: #e58a93;
+
+--withdraw-history-filter-rejected-text: #991b1b;
+
+--withdraw-history-filter-rejected-active-bg: #f28b95;
+
+--withdraw-history-filter-rejected-active-border: #f28b95;
+
+--withdraw-history-filter-rejected-active-text: #3a171b;
+
+/* ==========================================================================
+   WITHDRAW HISTORY CARD
+   ========================================================================== */
+
+--withdraw-history-card-bg: #ffffff;
+
+--withdraw-history-card-border: #eceef7;
+
+--withdraw-history-card-radius: 1rem;
+
+--withdraw-history-card-padding: 1rem;
+
+--withdraw-history-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-history-card-title: #000000;
+
+--withdraw-history-card-text: #5c5c5c;
+
+--withdraw-history-card-muted: #5c5c5c;
+
+--withdraw-history-card-symbol: #5c5c5c;
+
+--withdraw-history-card-amount: #000000;
+
+--withdraw-history-card-crypto: #5c5c5c;
+
+--withdraw-history-card-icon-bg: #ffffff;
+
+--withdraw-history-card-icon-border: #eceef7;
+
+--withdraw-history-card-icon-color: #575aec;
+
+--withdraw-history-card-hover-border: #575aec;
+
+--withdraw-history-card-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW HISTORY STATUS
+   ========================================================================== */
+
+--withdraw-history-status-pending-bg: #fef3c7;
+
+--withdraw-history-status-pending-border: #92400e;
+
+--withdraw-history-status-pending-text: #92400e;
+
+--withdraw-history-status-success-bg: #dcfce7;
+
+--withdraw-history-status-success-border: #166534;
+
+--withdraw-history-status-success-text: #166534;
+
+--withdraw-history-status-rejected-bg: #fee2e2;
+
+--withdraw-history-status-rejected-border: #991b1b;
+
+--withdraw-history-status-rejected-text: #991b1b;
+
+/* ==========================================================================
+   WITHDRAW HISTORY EMPTY
+   ========================================================================== */
+
+--withdraw-history-empty-bg: #ffffff;
+
+--withdraw-history-empty-border: #eceef7;
+
+--withdraw-history-empty-radius: 1rem;
+
+--withdraw-history-empty-padding: 2rem;
+
+--withdraw-history-empty-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+--withdraw-history-empty-icon-bg: #ffffff;
+
+--withdraw-history-empty-icon-color: #575aec;
+
+--withdraw-history-empty-title: #000000;
+
+--withdraw-history-empty-text: #5c5c5c;
+
+--withdraw-history-empty-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW CONFIRMATION MODAL
+   ========================================================================== */
+
+--withdraw-modal-overlay: #00000099;
+
+--withdraw-modal-bg: #ffffff;
+
+--withdraw-modal-border: #eceef7;
+
+--withdraw-modal-radius: 1.25rem;
+
+--withdraw-modal-padding: 1.25rem;
+
+--withdraw-modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+
+--withdraw-modal-title: #000000;
+
+--withdraw-modal-text: #5c5c5c;
+
+--withdraw-modal-label: #5c5c5c;
+
+--withdraw-modal-value: #000000;
+
+--withdraw-modal-summary-bg: #f8f9fc;
+
+--withdraw-modal-summary-border: #eceef7;
+
+--withdraw-modal-divider: #eceef7;
+
+--withdraw-modal-receive-label: #000000;
+
+--withdraw-modal-receive-value: #575aec;
+
+--withdraw-modal-close-bg: #f8f9fc;
+
+--withdraw-modal-close-border: #eceef7;
+
+--withdraw-modal-close-text: #5c5c5c;
+
+--withdraw-modal-close-hover-bg: #eceef7;
+
+--withdraw-modal-cancel-bg: #f8f9fc;
+
+--withdraw-modal-cancel-border: #eceef7;
+
+--withdraw-modal-cancel-text: #000000;
+
+--withdraw-modal-cancel-hover-bg: #eceef7;
+
+--withdraw-modal-confirm-bg: #575aec;
+
+--withdraw-modal-confirm-text: #ffffff;
+
+--withdraw-modal-confirm-hover-bg: #4847d4;
+
+--withdraw-modal-confirm-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+--withdraw-modal-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW METHOD SELECT
+   ========================================================================== */
+
+--withdraw-method-select-bg: #ffffff;
+
+--withdraw-method-select-border: #eceef7;
+
+--withdraw-method-select-text: #000000;
+
+--withdraw-method-select-placeholder: #5c5c5c;
+
+--withdraw-method-select-icon: #5c5c5c;
+
+--withdraw-method-select-hover-bg: #ffffff;
+
+--withdraw-method-select-hover-border: #575aec;
+
+--withdraw-method-select-focus: #575aec;
+
+--withdraw-method-select-focus-offset: #ffffff;
+
+--withdraw-method-select-radius: 0.75rem;
+
+--withdraw-method-select-padding-x: 0.75rem;
+
+--withdraw-method-select-padding-y: 0.65rem;
+
+--withdraw-method-select-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+/* ==========================================================================
+   WITHDRAW METHOD DROPDOWN
+   ========================================================================== */
+
+--withdraw-method-dropdown-bg: #ffffff;
+
+--withdraw-method-dropdown-border: #eceef7;
+
+--withdraw-method-dropdown-radius: 0.75rem;
+
+--withdraw-method-dropdown-padding: 0.35rem;
+
+--withdraw-method-dropdown-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+/* ==========================================================================
+   WITHDRAW METHOD OPTION
+   ========================================================================== */
+
+--withdraw-method-option-radius: 0.6rem;
+
+--withdraw-method-option-padding-x: 0.65rem;
+
+--withdraw-method-option-padding-y: 0.55rem;
+
+--withdraw-method-option-text: #000000;
+
+--withdraw-method-option-hover-bg: #f8f9fc;
+
+--withdraw-method-option-hover-text: #000000;
+
+--withdraw-method-option-active-bg: #575aec;
+
+--withdraw-method-option-active-text: #ffffff;
+
+--withdraw-method-option-check: #ffffff;
+
+--withdraw-method-option-icon-bg: #f8f9fc;
+
+--withdraw-method-option-icon-color: #575aec;
+
+
+
+
+--product-gallery-bg: var(--surface);
+--product-gallery-card-bg: var(--surface-card);
+--product-gallery-border: var(--border);
+--product-gallery-image-bg: var(--muted);
+
+--product-gallery-accent: #5b5ef7;
+--product-gallery-category: var(--foreground-muted);
+--product-gallery-price: var(--foreground);
+--product-gallery-old-price: var(--foreground-muted);
+
+--product-gallery-card-shadow:
+  0 8px 24px rgba(0, 0, 0, 0.05);
+
+--product-gallery-card-shadow-hover:
+  0 14px 34px rgba(0, 0, 0, 0.09);
+
+--product-gallery-control-bg:
+  color-mix(in srgb, var(--surface-card) 88%, transparent);
+
+--product-gallery-control-hover:
+  var(--surface-card);
+
+--product-gallery-control-border:
+  var(--border);
+
+--product-gallery-control-icon:
+  var(--foreground);
+
+--product-gallery-control-shadow:
+  0 8px 24px rgba(0, 0, 0, 0.08);
+
+
+
+
+--hero-features-background-image:
+  url("/assets/images/home/hero-features-light.png");
+
+--hero-features-overlay:
+  linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--surface-hero) 82%, transparent),
+    color-mix(in srgb, var(--surface-hero) 72%, transparent)
+  );
+
+    --surface-hero-background-image:
+    url("/assets/images/home/hero-background-light.png");
+
+
+  --product-gallery-bg-image:
+    url("/assets/images/home/trending-background-light.png");
+
+  --product-gallery-image-overlay: 88%;
+
+
+  --store-products-bg-image:
+    url("/assets/images/home/featured-background-light.png");
+
+  --store-products-image-overlay: 83%;
+
+
+
+
+--home-category-bg: #f7f8fc;
+--home-category-background-image: url("/assets/images/home/category-explorer-light.png");
+--home-category-overlay: rgba(247, 248, 252, 0.72);
+
+--home-category-accent: #5658ec;
+
+--home-category-filter-bg: rgba(255, 255, 255, 0.72);
+--home-category-filter-border: rgba(0, 0, 0, 0.08);
+--home-category-filter-text: rgba(0, 0, 0, 0.68);
+
+--home-category-card-bg: var(--surface-card);
+--home-category-card-border: var(--border);
+--home-category-image-bg: var(--muted);
+--home-category-price: var(--foreground);
+--home-category-old-price: var(--foreground-muted);
+
+--home-category-card-shadow:
+  0 8px 24px rgba(0, 0, 0, 0.08);
+
+--home-category-card-shadow-hover:
+  0 14px 34px rgba(0, 0, 0, 0.13);
+
+--home-category-control-bg:
+  color-mix(
+    in srgb,
+    var(--surface-card) 88%,
+    transparent
+  );
+
+--home-category-control-hover:
+  var(--surface-card);
+
+--home-category-control-border:
+  var(--border);
+
+--home-category-control-text:
+  var(--foreground);
+
+--home-category-control-shadow:
+  0 8px 24px rgba(0, 0, 0, 0.14);
+
+--home-category-filter-icon:
+  var(--foreground-muted);
+
+
+
+/* ==========================================
+   Newsletter Popup
+========================================== */
+
+  --newsletter-backdrop: rgb(8 12 30 / 0.72);
+  --newsletter-blur: 14px;
+
+  --newsletter-bg: #ffffff;
+  --newsletter-surface: #f8faff;
+  --newsletter-border: #d8e4ff;
+  --newsletter-divider: #edf2ff;
+
+  --newsletter-title: #0f172a;
+  --newsletter-text: #64748b;
+  --newsletter-placeholder: #94a3b8;
+
+  --newsletter-input-bg: #ffffff;
+  --newsletter-input-border: #d8e4ff;
+  --newsletter-input-focus: #5b5ef7;
+
+  --newsletter-button-bg: #5b5ef7;
+  --newsletter-button-hover: #4c50ea;
+  --newsletter-button-text: #ffffff;
+
+  --newsletter-close-bg: #eef2ff;
+  --newsletter-close-hover: #e0e7ff;
+  --newsletter-close-icon: #5b5ef7;
+
+  --newsletter-checkbox: #5b5ef7;
+
+  --newsletter-shadow:
+    0 32px 80px rgb(15 23 42 / 0.22);
+
+  --newsletter-radius: 24px;
+
+  --newsletter-image-overlay:
+    linear-gradient(
+      180deg,
+      rgb(10 20 60 / 0.08),
+      rgb(10 20 60 / 0.28)
+    );
+
+--message-green: rgb(22, 163, 74);
+--message-blue: rgb(37, 99, 235);
+
+
+
+
+/* ========================================================================================================================================================================================================
+   AUTHENTICATED USER ENVIRONMENT
+   ======================================================================================================================================================================================================== */
+
+--auth-card-bg: #ffffff;
+
+--user-page-bg: var(--surface);
+
+--user-surface: var(--surface);
+--user-surface-secondary: var(--surface-secondary);
+--user-surface-tertiary: var(--surface-topbar);
+
+--user-card-bg: #ffffff;
+--user-card-hover: #f7f9fc;
+--user-card-border: rgba(16,24,40,.08);
+--user-card-shadow: var(--shadow-sm);
+
+--user-overlay: rgba(15,23,42,.30);
+
+--user-title: #111827;
+--user-text: #1F2937;
+--user-text-muted: #6B7280;
+--user-placeholder: rgba(107,114,128,.75);
+
+--user-link: var(--primary);
+--user-link-hover: var(--primary-hover);
+
+--user-divider: rgba(16,24,40,.08);
+
+--user-icon: #111827;
+--user-icon-muted: #6B7280;
+
+--user-avatar-bg: #EEF3FF;
+--user-avatar-border: rgba(16,24,40,.08);
+
+--user-badge-success-bg: rgba(34,197,94,.12);
+--user-badge-success-text: var(--success);
+
+--user-badge-warning-bg: rgba(245,158,11,.12);
+--user-badge-warning-text: var(--warning);
+
+--user-badge-danger-bg: rgba(239,68,68,.12);
+--user-badge-danger-text: var(--danger);
+
+--user-input-bg: #ffffff;
+--user-input-border: var(--border);
+--user-input-border-focus: #5B5EF7;
+--user-input-text: #111827;
+--user-input-placeholder: #9CA3AF;
+
+--user-select-bg: #ffffff;
+--user-select-border: var(--border);
+--user-select-text: #111827;
+
+--user-button-bg: #5B5EF7;
+--user-button-text: #FFFFFF;
+--user-button-hover: #4847D4;
+
+--user-button-secondary-bg: #FFFFFF;
+--user-button-secondary-border: rgba(16,24,40,.08);
+--user-button-secondary-text: #111827;
+--user-button-secondary-hover: #EEF3FF;
+
+--user-danger-bg: rgba(220,38,38,.08);
+--user-danger-border: rgba(220,38,38,.16);
+--user-danger-text: #DC2626;
+--user-danger-hover: rgba(220,38,38,.12);
+
+--user-success: var(--success);
+--user-warning: var(--warning);
+--user-danger: var(--danger);
+--user-info: #5B5EF7;
+
+--user-glow: rgba(91,92,240,.12);
+
+--user-radius-sm: var(--radius-sm);
+--user-radius-md: var(--radius-md);
+--user-radius-lg: var(--radius-lg);
+--user-radius-xl: var(--radius-xl);
+
+--user-transition-fast: var(--transition-fast);
+--user-transition: var(--transition-normal);
+--user-transition-slow: var(--transition-slow);
+
+
+/* ==========================================================================
+   PROFILE
+   ========================================================================== */
+
+--profile-avatar-size-mobile: 88px;
+--profile-avatar-size-desktop: 128px;
+
+--profile-avatar-camera-bg: var(--primary);
+--profile-avatar-camera-color: #FFFFFF;
+
+--profile-cover-height-mobile: 140px;
+--profile-cover-height-desktop: 200px;
+
+--profile-stat-gap: 1rem;
+
+/* ==========================================================================
+   USER PLAN SYSTEM (LIGHT MODE)
+   ========================================================================== */
+
+--user-plan-feature-icon-bg: rgba(15,23,42,.05);
+
+--user-plan-active-bg: rgba(34,197,94,.10);
+--user-plan-active-border: rgba(34,197,94,.22);
+
+--user-plan-popular-bg: rgba(59,130,246,.10);
+--user-plan-popular-border: rgba(59,130,246,.22);
+
+--user-plan-disabled-opacity: .55;
+
+--user-stat-bg: rgba(15,23,42,.03);
+--user-stat-border: rgba(15,23,42,.08);
+
+--user-progress-bg: rgba(15,23,42,.08);
+--user-progress-fill: var(--user-info);
+
+--user-table-row-hover: rgba(15,23,42,.04);
+
+--user-success-soft: rgba(34,197,94,.10);
+--user-warning-soft: rgba(245,158,11,.10);
+--user-danger-soft: rgba(239,68,68,.10);
+
+--user-progress-bg: rgba(15, 23, 42, 0.08);
+--user-progress-fill: var(--user-info);
+
+/* =======================================================
+   CART
+======================================================= */
+
+--cart-bg: var(--surface-primary);
+--cart-surface: var(--surface-secondary);
+--cart-surface-hover: var(--surface-tertiary);
+
+--cart-border: var(--border-primary);
+--cart-divider: var(--border-secondary);
+
+--cart-backdrop: rgb(255 255 255 / 0.52);
+--cart-blur: 20px;
+
+--cart-item-bg: transparent;
+--cart-item-hover: rgb(0 0 0 / 0.03);
+
+--cart-saved-bg: rgb(0 0 0 / 0.015);
+--cart-saved-border: var(--border-secondary);
+
+--cart-summary-bg: var(--surface-secondary);
+--cart-summary-border: var(--border-primary);
+
+--cart-quantity-bg: var(--surface-tertiary);
+--cart-quantity-border: var(--border-primary);
+
+--cart-button-primary-bg: var(--brand-primary);
+--cart-button-primary-hover: var(--brand-primary-hover);
+
+--cart-button-secondary-bg: transparent;
+--cart-button-secondary-hover: rgb(0 0 0 / 0.04);
+
+--cart-danger-bg: transparent;
+--cart-danger-hover: rgb(239 68 68 / 0.08);
+
+--cart-image-bg: var(--surface-tertiary);
+
+--cart-shadow:
+  0 18px 60px rgb(0 0 0 / 0.12);
+
+--cart-radius: 22px;
+
+--cart-item-radius: 18px;
+
+--cart-button-radius: 14px;
+
+--cart-transition:
+  180ms cubic-bezier(.2,.8,.2,1);
+
+--cart-badge-bg: #ffffff;
+--cart-badge-text: #5B5EF7;
+--cart-badge-border: #5B5EF7;
+
+
+/* ==========================================================================
+   SHARED DIVIDERS
+   ========================================================================== */
+
+--divider-color: rgba(255,255,255,.08);
+
+/* ==========================================================================
+   SHARED SCROLLBAR
+   ========================================================================== */
+
+--scrollbar-thumb: rgba(255,255,255,.18);
+
+--scrollbar-thumb-hover: rgba(255,255,255,.30);
+
+--scrollbar-track: transparent;
+
+/* ==========================================================================
+   PRODUCT
+   ========================================================================== */
+
+--product-price: var(--user-title);
+
+--product-compare-price: var(--user-text-muted);
+
+--product-sale: var(--success);
+
+--product-stock: var(--success);
+
+--product-out-of-stock: var(--danger);
+
+--product-rating: #fbbf24;
+
+--product-border: var(--user-card-border);
+
+--product-hover: var(--user-card-hover);
+
+--product-option-border: var(--user-input-border);
+
+--product-option-active: var(--primary);
+
+--product-option-hover: var(--user-button-secondary-hover);
+
+/* ==========================================================================
+   CART
+   ========================================================================== */
+
+
+/* =======================================================
+
+   SEARCH
+
+======================================================= */
+
+--search-bg: var(--surface-primary);
+
+--search-surface: var(--surface-secondary);
+
+--search-surface-hover: var(--surface-tertiary);
+
+--search-border: var(--border-primary);
+
+--search-divider: var(--border-secondary);
+
+--search-backdrop: rgb(15 23 42 / 0.18);
+
+--search-blur: 20px;
+
+--search-input-bg: var(--surface-secondary);
+
+--search-input-border: var(--border-primary);
+
+--search-input-focus: var(--brand-primary);
+
+--search-placeholder: var(--text-tertiary);
+
+--search-result-bg: transparent;
+
+--search-result-hover: rgb(15 23 42 / 0.04);
+
+--search-result-active: rgb(15 23 42 / 0.08);
+
+--search-category-bg: rgb(15 23 42 / 0.04);
+
+--search-category-hover: rgb(15 23 42 / 0.07);
+
+--search-product-bg: transparent;
+
+--search-product-hover: rgb(15 23 42 / 0.04);
+
+--search-empty-bg: rgb(15 23 42 / 0.02);
+
+--search-empty-border: var(--border-secondary);
+
+--search-icon: var(--text-secondary);
+
+--search-clear-hover: rgb(15 23 42 / 0.06);
+
+--search-loading: var(--brand-primary);
+
+--search-shadow:
+  0 18px 60px rgb(15 23 42 / 0.14);
+
+--search-radius: 22px;
+
+--search-item-radius: 18px;
+
+--search-input-radius: 14px;
+
+--search-transition:
+  180ms cubic-bezier(.2,.8,.2,1);
+
+
+
+--cart-summary-bg: var(--user-surface-secondary);
+
+/* ==========================================================================
+   ADMIN PRODUCTS
+   ========================================================================== */
+
+--admin-product-preview-bg: var(--admin-surface-bg);
+
+
+
+
+/* ==========================================================================
+   PREMIUM TOAST
+   ========================================================================== */
+--premium-toast-overlay: rgba(3, 7, 18, 0.72);
+
+--premium-toast-surface:
+  rgba(17, 24, 39, 0.82);
+
+--premium-toast-border:
+  rgba(255, 255, 255, 0.08);
+
+--premium-toast-accent:
+  var(--primary);
+
+--premium-toast-accent-soft:
+  color-mix(
+    in srgb,
+    var(--primary) 18%,
+    transparent
+  );
+
+--premium-toast-glow:
+  color-mix(
+    in srgb,
+    var(--primary) 22%,
+    transparent
+  );
+
+--premium-toast-progress-track:
+  rgba(255, 255, 255, 0.08);
+
+
+
+
+
+
+/* ========================================================================================================================================================================================================
+   WHOLE/ENTIRE ADMIN LAYOUT CONTROL
+   ======================================================================================================================================================================================================== */
+
+--admin-page-bg: #f8fafc;
+--admin-page-padding: 1.5rem;
+--admin-page-gap: 1.5rem;
+
+/* ==========================================================================
+   ADMIN CARD
+   ========================================================================== */
+
+--admin-card-bg: #ffffff;
+--admin-card-border: rgba(15, 23, 42, 0.08);
+--admin-card-radius: 1.5rem;
+--admin-card-padding: 1.5rem;
+--admin-card-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+--admin-card-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN SURFACE
+   ========================================================================== */
+
+--admin-surface-bg: #f8fafc;
+--admin-surface-border: rgba(15, 23, 42, 0.08);
+--admin-surface-radius: 1rem;
+
+/* ==========================================================================
+   ADMIN TYPOGRAPHY
+   ========================================================================== */
+
+--admin-title: #0f172a;
+--admin-text: #1e293b;
+--admin-muted: #64748b;
+
+/* ==========================================================================
+   ADMIN INPUT
+   ========================================================================== */
+
+--admin-input-bg: #ffffff;
+--admin-input-border: rgba(15, 23, 42, 0.08);
+--admin-input-text: #0f172a;
+--admin-input-placeholder: #94a3b8;
+--admin-input-focus: #2563eb;
+--admin-input-radius: 1rem;
+
+/* ==========================================================================
+   ADMIN BUTTON
+   ========================================================================== */
+
+--admin-button-primary-bg: #2563eb;
+--admin-button-primary-hover: #1d4ed8;
+--admin-button-primary-text: #ffffff;
+
+--admin-button-secondary-bg: #f8fafc;
+--admin-button-secondary-hover: #eef4ff;
+--admin-button-secondary-text: #0f172a;
+--admin-button-secondary-border: rgba(15, 23, 42, 0.08);
+
+--admin-button-danger-bg: #dc2626;
+--admin-button-danger-hover: #b91c1c;
+--admin-button-danger-text: #ffffff;
+
+/* ==========================================================================
+   ADMIN TABLE
+   ========================================================================== */
+
+--admin-table-bg: #ffffff;
+--admin-table-border: rgba(15, 23, 42, 0.08);
+--admin-table-header-bg: #f8fafc;
+--admin-table-header-text: #0f172a;
+--admin-table-title: #0f172a;
+--admin-table-text: #1e293b;
+--admin-table-muted: #64748b;
+--admin-table-row-hover: #f8fbff;
+
+/* ==========================================================================
+   ADMIN STATUS
+   ========================================================================== */
+
+--admin-status-pending-bg: #fef3c7;
+--admin-status-pending-text: #92400e;
+
+--admin-status-success-bg: #dcfce7;
+--admin-status-success-text: #166534;
+
+--admin-status-failed-bg: #fee2e2;
+--admin-status-failed-text: #991b1b;
+
+/* ==========================================================================
+   ADMIN EMPTY
+   ========================================================================== */
+
+--admin-empty-bg: #ffffff;
+--admin-empty-border: rgba(15, 23, 42, 0.08);
+--admin-empty-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+--admin-empty-icon-bg: #eff6ff;
+--admin-empty-icon-color: #2563eb;
+--admin-empty-title: #0f172a;
+--admin-empty-text: #64748b;
+
+/* ==========================================================================
+   ADMIN MODAL / DRAWER
+   ========================================================================== */
+
+--admin-modal-bg: #ffffff;
+--admin-modal-border: rgba(15, 23, 42, 0.08);
+--admin-modal-radius: 1.75rem;
+--admin-modal-shadow: 0 25px 60px rgba(15, 23, 42, 0.18);
+--admin-modal-overlay: rgb(15 23 42 / 55%);
+--admin-modal-header-bg: #f8fafc;
+--admin-modal-footer-bg: #f8fafc;
+
+/* ==========================================================================
+   ADMIN TRANSITIONS
+   ========================================================================== */
+
+--admin-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN ACCENT
+   ========================================================================== */
+
+--admin-primary: #2563eb;
+
+/* ==========================================================================
+   ADMIN PLAN SYSTEM (LIGHT MODE)
+   ========================================================================== */
+
+--admin-plan-feature-icon-bg: rgba(59,130,246,.10);
+
+--admin-stat-bg: #f8fafc;
+--admin-stat-border: rgba(15,23,42,.08);
+
+--admin-progress-bg: rgba(15,23,42,.08);
+--admin-progress-fill: var(--admin-primary);
+
+--admin-table-toolbar-bg: #f8fafc;
+
+--admin-plan-active-bg: rgba(34,197,94,.10);
+--admin-plan-active-border: rgba(34,197,94,.22);
+
+--admin-plan-disabled-bg: rgba(239,68,68,.08);
+--admin-plan-disabled-border: rgba(239,68,68,.18);
+
+
+
+
+/* ==========================================================================
+   SHARED SPACING
+   ========================================================================== */
+
+--space-xs: .25rem;
+--space-sm: .5rem;
+--space-md: .75rem;
+--space-lg: 1rem;
+--space-xl: 1.5rem;
+--space-2xl: 2rem;
+
+/* ==========================================================================
+   SHARED ICONS
+   ========================================================================== */
+
+--icon-xs: .875rem;
+--icon-sm: 1rem;
+--icon-md: 1.25rem;
+--icon-lg: 1.5rem;
+--icon-xl: 2rem;
+
+/* ==========================================================================
+   SHARED AVATARS
+   ========================================================================== */
+
+--avatar-xs: 1.75rem;
+--avatar-sm: 2.25rem;
+--avatar-md: 2.75rem;
+--avatar-lg: 3.5rem;
+--avatar-xl: 5rem;
+
+/* ==========================================================================
+   SHARED BADGES
+   ========================================================================== */
+
+--badge-radius: 999px;
+--badge-padding-x: .625rem;
+--badge-padding-y: .2rem;
+
+/* ==========================================================================
+   SHARED DIVIDERS
+   ========================================================================== */
+
+--divider-color: rgba(15,23,42,.08);
+
+/* ==========================================================================
+   SHARED SCROLLBAR
+   ========================================================================== */
+
+--scrollbar-thumb: rgba(15,23,42,.18);
+--scrollbar-thumb-hover: rgba(15,23,42,.28);
+--scrollbar-track: transparent;
+
+/* ==========================================================================
+   PRODUCT
+   ========================================================================== */
+
+--product-gallery-radius: var(--radius-xl);
+
+--product-thumbnail-size: 4.5rem;
+
+--product-thumbnail-radius: var(--radius-md);
+
+--product-price: var(--user-title);
+
+--product-compare-price: var(--user-text-muted);
+
+--product-sale: var(--success);
+
+--product-stock: var(--success);
+
+--product-out-of-stock: var(--danger);
+
+--product-rating: #f59e0b;
+
+--product-border: var(--user-card-border);
+
+--product-hover: var(--user-card-hover);
+
+--product-option-border: var(--user-input-border);
+
+--product-option-active: var(--primary);
+
+--product-option-hover: var(--user-button-secondary-hover);
+
+--product-option-radius: var(--radius-md);
+
+/* ==========================================================================
+   CART
+   ========================================================================== */
+
+--cart-width: 26rem;
+
+--cart-item-gap: .875rem;
+
+--cart-image-size: 5rem;
+
+--cart-footer-height: 6rem;
+
+--cart-summary-bg: var(--user-surface-secondary);
+
+/* ==========================================================================
+   WISHLIST
+   ========================================================================== */
+
+--wishlist-grid-gap: 1rem;
+
+/* ==========================================================================
+   ADMIN PRODUCTS
+   ========================================================================== */
+
+--admin-product-image-size: 3.5rem;
+
+--admin-product-gallery-gap: .75rem;
+
+--admin-product-option-gap: .5rem;
+
+--admin-product-preview-bg: var(--admin-surface-bg);
+
+
+
+
+
+
+/* ==========================================================================
+   ADMIN CARD
+   ========================================================================== */
+
+--admin-card-bg: var(--surface-card);
+
+--admin-card-border: var(--border);
+
+--admin-card-radius: 1.5rem;
+
+--admin-card-padding: 1.5rem;
+
+--admin-card-shadow: var(--shadow-sm);
+
+--admin-card-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN TYPOGRAPHY
+   ========================================================================== */
+
+--admin-title: var(--foreground);
+
+--admin-text: var(--foreground);
+
+--admin-muted: var(--foreground-muted);
+
+/* ==========================================================================
+   ADMIN INPUT
+   ========================================================================== */
+
+--admin-input-bg: var(--surface);
+
+--admin-input-border: var(--border);
+
+--admin-input-text: var(--foreground);
+
+--admin-input-placeholder: var(--foreground-muted);
+
+--admin-input-focus: var(--primary);
+
+--admin-input-radius: 1rem;
+
+/* ==========================================================================
+   ADMIN TABLE
+   ========================================================================== */
+
+--admin-table-bg: var(--surface-card);
+
+--admin-table-header-bg: var(--surface);
+
+--admin-table-border: var(--border);
+
+--admin-table-row-hover: color-mix(
+  in srgb,
+  var(--primary) 6%,
+  transparent
+);
+
+--admin-table-title: var(--foreground);
+
+--admin-table-text: var(--foreground);
+
+--admin-table-muted: var(--foreground-muted);
+
+/* ==========================================================================
+   ADMIN STATUS
+   ========================================================================== */
+
+--admin-status-pending-bg: #fef3c7;
+
+--admin-status-pending-text: #92400e;
+
+--admin-status-success-bg: #dcfce7;
+
+--admin-status-success-text: #166534;
+
+--admin-status-failed-bg: #fee2e2;
+
+--admin-status-failed-text: #991b1b;
+
+/* ==========================================================================
+   ADMIN EMPTY STATE
+   ========================================================================== */
+
+--admin-empty-bg: var(--surface);
+
+--admin-empty-border: var(--border);
+
+--admin-empty-radius: 1rem;
+
+--admin-empty-padding: 2rem;
+
+--admin-empty-shadow: var(--shadow-sm);
+
+--admin-empty-icon-bg: var(--surface-card);
+
+--admin-empty-icon-color: var(--primary);
+
+--admin-empty-title: var(--foreground);
+
+--admin-empty-text: var(--foreground-muted);
+
+/* ==========================================================================
+   ADMIN DRAWER
+   ========================================================================== */
+
+--admin-drawer-bg: var(--surface-card);
+
+--admin-drawer-border: var(--border);
+
+--admin-drawer-radius: 1.75rem;
+
+--admin-drawer-shadow: var(--shadow-xl);
+
+--admin-drawer-overlay: rgb(0 0 0 / 60%);
+
+--admin-drawer-header-bg: var(--surface-card);
+
+--admin-drawer-footer-bg: var(--surface-card);
+
+--admin-drawer-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN DIALOG
+   ========================================================================== */
+
+--admin-dialog-bg: var(--surface-card);
+
+--admin-dialog-border: var(--border);
+
+--admin-dialog-radius: 1.75rem;
+
+--admin-dialog-shadow: var(--shadow-xl);
+
+--admin-dialog-overlay: rgb(0 0 0 / 60%);
+
+
+/* ==========================================================================
+   ADMIN DEPOSIT METHODS
+   ========================================================================== */
+     --admin-deposit-methods-radius: 1.5rem;
+
+  --admin-deposit-methods-border: #262626;
+  --admin-deposit-methods-bg: #111111;
+  --admin-deposit-methods-shadow: rgba(0, 0, 0, 0.35);
+
+  --admin-deposit-methods-header-bg: #171717;
+  --admin-deposit-methods-header-border: #262626;
+  --admin-deposit-methods-heading: #ffffff;
+
+  --admin-deposit-methods-title: #ffffff;
+  --admin-deposit-methods-text: #a3a3a3;
+
+  --admin-deposit-methods-button-bg: #ffffff;
+  --admin-deposit-methods-button-hover: #f3f4f6;
+  --admin-deposit-methods-button-text: #111111;
+
+  --admin-deposit-methods-row-border: #262626;
+  --admin-deposit-methods-row-hover: #1a1a1a;
+  --admin-deposit-methods-row-text: #ffffff;
+
+  --admin-deposit-methods-icon-bg: #1a1a1a;
+  --admin-deposit-methods-icon-border: #2e2e2e;
+
+  --admin-deposit-methods-action: #d4d4d8;
+  --admin-deposit-methods-action-hover: #ffffff;
+  --admin-deposit-methods-action-hover-bg: rgba(255, 255, 255, 0.08);
+
+  --admin-deposit-methods-danger: #ef4444;
+  --admin-deposit-methods-danger-hover: #f87171;
+  --admin-deposit-methods-danger-bg: rgba(239, 68, 68, 0.12);
+
+  --admin-deposit-methods-active: #22c55e;
+  --admin-deposit-methods-inactive: #ef4444;
+
+
+/* ==========================================================================
+   ADMIN BUTTONS
+   ========================================================================== */
+
+--admin-button-primary-bg: var(--primary);
+
+--admin-button-primary-text: #ffffff;
+
+--admin-button-primary-hover: color-mix(
+  in srgb,
+  var(--primary) 90%,
+  black
+);
+
+--admin-button-secondary-bg: var(--surface);
+
+--admin-button-secondary-border: var(--border);
+
+--admin-button-secondary-text: var(--foreground);
+
+--admin-button-secondary-hover: color-mix(
+  in srgb,
+  var(--foreground) 8%,
+  transparent
+);
+
+
+
+--admin-button-warning-bg: #ff4d00;
+--admin-button-warning-text: #ffffff;
+
+--admin-button-success-bg: #16a34a;
+--admin-button-success-text: #ffffff;
+
+--user-device-badge-text: #6d28d9;
+
+
+  /* ==========================
+     Hero
+     ========================== */
+
+  --surface-hero: #eeeffd;
+
+  --hero-overlay: transparent;
+  --hero-glow: rgba(87, 90, 236, 0.45);
+
+  --hero-heading: #000000;
+  --hero-text: rgba(0, 0, 0, 0.8);
+
+  /* Brand Elements */
+  --hero-badge-bg: #575aec;
+  --hero-badge-text: #ffffff;
+
+  --hero-cta-bg: var(--hero-badge-bg);
+  --hero-cta-hover: #4b4edb;
+  --hero-cta-text: #ffffff;
+
+  /* ==========================
+     Navbar
+     ========================== */
+
+  --surface-navbar: var(--surface-hero);
+  --surface-navbar-sticky: #ffffff;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* ============================================================================================================================================================
+     Blue Theme
+     ============================================================================================================================================================ */
+
+[data-theme="blue"] {
+  /* ==========================
+     Blue Theme
+     ========================== */
+
+  /* Main Surfaces */
+  --background: #101946;
+  --surface: #191f53;
+  --surface-navbar: #101946;
+  --surface-navbar-sticky: #0a1233;
+  --elevated: #232a63;
+
+  --scroll-top-bg: #5b5ef7;
+  --scroll-top-border: #ffffff;
+  --scroll-top-icon: #ffffff;
+  --scroll-top-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+
+  /* Header & Footer */
+  --surface-topbar: #171f56;
+  --surface-primary: #0a1233;
+  --surface-secondary: #111845;
+  --surface-footer: #182058;
+  --surface-footer-bottom: #111845;
+  --breadcrumb-bg: #171f56;
+
+  /* Accent */
+  --accent-divider: #313693;
+
+  /* Brand */
+  --primary: #ffffff;
+  --primary-hover: #f2f2f2;
+
+  /* Typography */
+  --foreground: #ffffff;
+  --foreground-muted: rgba(255, 255, 255, 0.72);
+
+  /* Buttons & Icons */
+  --button-bg: #ffffff;
+  --button-text: #101946;
+  --icon-color: #ffffff;
+
+  /* UI */
+  --border: rgba(255, 255, 255, 0.12);
+  --muted: rgba(255, 255, 255, 0.06);
+
+  /* States */
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+
+/* ==========================================
+   Featured Product
+========================================== */
+
+--featured-bg: #0A1233;
+--featured-panel: #212A48;
+--featured-panel-pattern: none;
+
+--featured-title: #ffffff;
+--featured-text: rgba(255, 255, 255, 0.72);
+--featured-accent: #5B5EF7;
+
+--hero-fade-bg: #10193A;
+
+/* ==========================================
+   Store Products
+========================================== */
+
+--store-products-bg: #0E153C;
+
+/* ==========================================
+   Experience Products
+========================================== */
+
+--experience-bg: #0A1233;
+--experience-text: #DFDFFB;
+
+/* ==========================================
+   Pricing Plans
+========================================== */
+--pricing-bg: #0E153C;
+
+/* ==========================================
+   FAQ
+========================================== */
+
+--faq-bg: #0A1233;
+
+/* ==========================================
+   Testimonial Card
+========================================== */
+
+--testimonials-bg: #0E153C;
+--testimonial-card-bg: #0A1233;
+
+/* ==========================================
+   Blog
+========================================== */
+--blog-section-bg: #0A1233;
+
+/* ==========================================
+   Blog Article
+========================================== */
+
+--blog-article-bg: #0E153C;
+
+/* ==========================================
+   Services Hero
+========================================== */
+
+--services-hero-bg: #0E153C;
+
+--services-hero-title: #FFFFFF;
+
+--services-hero-text: rgba(255, 255, 255, 0.72);
+
+--services-cta-bg: #0E153C;
+
+--services-cta-border: rgba(255, 255, 255, 0.12);
+
+--services-cta-heading: #FFFFFF;
+
+--services-cta-text: rgba(255, 255, 255, 0.72);
+
+--services-cta-primary-bg: #FFFFFF;
+--services-cta-primary-hover: #F3F4F6;
+--services-cta-primary-text: #112cb4;
+
+--services-cta-secondary-bg: transparent;
+--services-cta-secondary-border: rgba(255,255,255,.12);
+--services-cta-secondary-text: #FFFFFF;
+
+--surface-card: #191f53;
+
+--dashboard-card: #0E153C;
+--dashboard-card-border: rgba(120, 130, 255, 0.18);
+--dashboard-card-glow: rgba(91, 92, 240, 0.35);
+
+/* ==========================
+   Profile Menu
+========================== */
+--profile-menu-bg: #101946;
+
+--profile-menu-border: rgba(255,255,255,.08);
+
+--profile-menu-card: rgba(255,255,255,.03);
+
+--profile-menu-hover: rgba(255,255,255,.06);
+
+--profile-menu-avatar-bg: rgba(255,255,255,.03);
+
+--profile-menu-avatar-border: rgba(255,255,255,.10);
+
+--profile-menu-camera-bg: var(--primary);
+
+--profile-menu-camera-color: #ffffff;
+
+--profile-menu-divider: rgba(255,255,255,.08);
+
+--profile-menu-title: #ffffff;
+
+--profile-menu-text: rgba(255,255,255,.92);
+
+--profile-menu-muted: rgba(255,255,255,.62);
+
+--profile-menu-danger: #ff5252;
+
+--profile-menu-danger-hover: rgba(255,82,82,.12);
+
+--profile-menu-glow: rgba(91,92,240,.35);
+
+/* ==========================
+   Bottom Dock
+========================== */
+
+--dock-bg: #1019467c;
+
+--dock-border: rgba(255,255,255,.08);
+
+--dock-shadow: rgba(0,0,0,.35);
+
+--dock-hover: rgba(255,255,255,.06);
+
+--dock-icon: rgba(255,255,255,.65);
+
+--dock-icon-hover: #ffffff;
+
+--dock-active-bg: #5b5cf0;
+
+--dock-active-text: #ffffff;
+
+--dock-active-shadow: rgba(91,92,240,.4);
+
+--dock-item-bg: rgba(255,255,255,.03);
+
+--dock-item-border: rgba(255,255,255,.08);
+
+--dock-hover-border: rgba(91,92,240,.45);
+
+/* ==========================================================================
+   DASHBOARD BREADCRUMB
+   ========================================================================== */
+
+--dashboard-breadcrumb-bg: #101946;
+--dashboard-breadcrumb-border: color-mix(in srgb, var(--border) 45%, transparent);
+--dashboard-breadcrumb-margin-bottom: 2.5rem;
+--dashboard-breadcrumb-height: 3.5rem;
+--dashboard-breadcrumb-gap: 0.5rem;
+--dashboard-breadcrumb-font-size: 0.8125rem;
+--dashboard-breadcrumb-font-size-desktop: 0.875rem;
+--dashboard-breadcrumb-font-weight: 500;
+--dashboard-breadcrumb-text: var(--foreground-muted);
+--dashboard-breadcrumb-active: var(--foreground);
+--dashboard-breadcrumb-hover: var(--primary);
+--dashboard-breadcrumb-max-width: 220px;
+
+/* ==========================================================================
+   DEPOSIT BALANCE
+   ========================================================================== */
+
+--deposit-balance-bg: #101946;
+
+--deposit-balance-border: var(--border);
+
+--deposit-balance-radius: 1.5rem;
+
+--deposit-balance-padding: 1.5rem;
+
+--deposit-balance-shadow: var(--shadow-sm);
+
+--deposit-balance-title: var(--foreground-muted);
+
+--deposit-balance-amount: var(--foreground);
+
+--deposit-balance-text: var(--foreground-muted);
+
+--deposit-balance-icon-bg: #5b5cf0;
+
+--deposit-balance-icon-color: #ffffff;
+
+--deposit-balance-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT METHOD
+   ========================================================================== */
+
+--deposit-method-bg: #101946;
+
+--deposit-method-border: var(--border);
+
+--deposit-method-radius: 1.5rem;
+
+--deposit-method-padding: 1.5rem;
+
+--deposit-method-shadow: var(--shadow-sm);
+
+--deposit-method-title: var(--foreground);
+
+--deposit-method-text: var(--foreground-muted);
+
+--deposit-method-select-bg: #101946;
+
+--deposit-method-select-border: var(--border);
+
+--deposit-method-select-text: var(--foreground);
+
+--deposit-method-select-placeholder: var(--foreground-muted);
+
+--deposit-method-select-focus: var(--primary);
+
+--deposit-method-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT METHOD CARD
+   ========================================================================== */
+
+--deposit-method-card-bg: #101946;
+
+--deposit-method-card-border: var(--border);
+
+--deposit-method-card-radius: 1.5rem;
+
+--deposit-method-card-padding: 1.25rem;
+
+--deposit-method-card-shadow: var(--shadow-sm);
+
+--deposit-method-card-title: var(--foreground);
+
+--deposit-method-card-subtitle: var(--foreground-muted);
+
+--deposit-method-card-icon-bg: #101946;
+
+--deposit-method-card-icon-color: var(--primary);
+
+--deposit-method-card-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT QR CODE
+   ========================================================================== */
+
+--deposit-qr-bg: #101946;
+
+--deposit-qr-border: var(--border);
+
+--deposit-qr-radius: 1.5rem;
+
+--deposit-qr-padding: 1.25rem;
+
+--deposit-qr-shadow: var(--shadow-sm);
+
+--deposit-qr-title: var(--foreground);
+
+--deposit-qr-subtitle: var(--foreground-muted);
+
+--deposit-qr-image-size-mobile: 180px;
+
+--deposit-qr-image-size-desktop: 220px;
+
+--deposit-qr-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT METHOD ADDRESS
+   ========================================================================== */
+
+--deposit-address-bg: #101946;
+
+--deposit-address-border: var(--border);
+
+--deposit-address-radius: 1.5rem;
+
+--deposit-address-padding: 1.25rem;
+
+--deposit-address-shadow: var(--shadow-sm);
+
+--deposit-address-title: var(--foreground);
+
+--deposit-address-text: var(--foreground);
+
+--deposit-address-muted: var(--foreground-muted);
+
+--deposit-address-copy-bg: #101946;
+
+--deposit-address-copy-border: #ffffff;
+
+--deposit-address-copy-text: #ffffff;
+
+--deposit-address-copy-hover: #ffffff;
+
+--deposit-address-copy-hover-text: #101946;
+
+--deposit-address-copy-success-bg: #101946;
+
+--deposit-address-copy-success-border: #ffffff;
+
+--deposit-address-copy-success-text: #ffffff;
+
+--deposit-address-transition: 0.3s;
+
+/* ==========================================================================
+   DEPOSIT AMOUNT
+   ========================================================================== */
+
+--deposit-amount-bg: #101946;
+
+--deposit-amount-border: #30375f;
+
+--deposit-amount-radius: 1.5rem;
+
+--deposit-amount-padding: 1.5rem;
+
+--deposit-amount-shadow: var(--shadow-sm);
+
+--deposit-amount-title: #ffffff;
+
+--deposit-amount-text: #b8bdd3;
+
+--deposit-amount-chip-bg: #101946;
+
+--deposit-amount-chip-border: #ffffff;
+
+--deposit-amount-chip-text: #ffffff;
+
+--deposit-amount-chip-hover-bg: #ffffff;
+
+--deposit-amount-chip-hover-border: #ffffff;
+
+--deposit-amount-chip-hover-text: #101946;
+
+--deposit-amount-chip-active-bg: #ffffff;
+
+--deposit-amount-chip-active-border: #ffffff;
+
+--deposit-amount-chip-active-text: #101946;
+
+--deposit-amount-input-bg: #101946;
+
+--deposit-amount-input-border: #ffffff;
+
+--deposit-amount-input-text: #ffffff;
+
+--deposit-amount-input-placeholder: #b8bdd3;
+
+--deposit-amount-input-focus: #ffffff;
+
+--deposit-amount-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT SUMMARY
+   ========================================================================== */
+
+--deposit-summary-bg: #101946;
+
+--deposit-summary-border: var(--border);
+
+--deposit-summary-radius: 1.5rem;
+
+--deposit-summary-padding: 1.25rem;
+
+--deposit-summary-shadow: var(--shadow-sm);
+
+--deposit-summary-title: var(--foreground);
+
+--deposit-summary-label: var(--foreground-muted);
+
+--deposit-summary-value: var(--foreground);
+
+--deposit-summary-divider: var(--border);
+
+--deposit-summary-total: var(--primary);
+
+--deposit-summary-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT ACTION
+   ========================================================================== */
+
+--deposit-action-button-bg: #ffffff;
+
+--deposit-action-button-text: #101946;
+
+--deposit-action-button-border: #ffffff;
+
+--deposit-action-button-hover: #101946;
+
+--deposit-action-button-hover-text: #ffffff;
+
+--deposit-action-button-hover-border: #ffffff;
+
+--deposit-action-button-disabled-bg: #2a3155;
+
+--deposit-action-button-disabled-text: #aeb4cc;
+
+--deposit-action-button-disabled-border: #2a3155;
+
+--deposit-action-button-radius: 1rem;
+
+--deposit-action-button-padding-y: 0.95rem;
+
+--deposit-action-button-shadow: var(--shadow-md);
+
+--deposit-action-note: var(--foreground-muted);
+
+--deposit-action-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT RECEIPT MODAL
+   ========================================================================== */
+
+--deposit-modal-bg: #101946;
+
+--deposit-modal-border: var(--border);
+
+--deposit-modal-radius: 1.75rem;
+
+--deposit-modal-padding: 1.5rem;
+
+--deposit-modal-shadow: var(--shadow-xl);
+
+--deposit-modal-title: var(--foreground);
+
+--deposit-modal-text: var(--foreground-muted);
+
+--deposit-modal-summary-bg: #101946;
+
+--deposit-modal-summary-border: var(--border);
+
+--deposit-modal-divider: var(--border);
+
+--deposit-modal-upload-bg: #101946;
+
+--deposit-modal-upload-border: var(--border);
+
+--deposit-modal-upload-hover: var(--primary);
+
+--deposit-modal-submit-bg: var(--primary);
+
+--deposit-modal-submit-text: #ffffff;
+
+--deposit-modal-overlay: rgb(0 0 0 / 60%);
+
+--deposit-modal-submit-hover: color-mix(
+  in srgb,
+  var(--primary) 90%,
+  black
+);
+
+--deposit-modal-submit-disabled-bg: var(--border);
+
+--deposit-modal-submit-disabled-text: var(--foreground-muted);
+
+--deposit-modal-cancel-bg: #101946;
+
+--deposit-modal-cancel-text: var(--foreground);
+
+--deposit-modal-cancel-border: var(--border);
+
+--deposit-modal-cancel-hover: color-mix(
+  in srgb,
+  var(--foreground) 8%,
+  transparent
+);
+
+--deposit-modal-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT RECEIPT UPLOADER
+   ========================================================================== */
+
+--deposit-uploader-bg: #101946;
+
+--deposit-uploader-border: var(--border);
+
+--deposit-uploader-border-hover: var(--primary);
+
+--deposit-uploader-radius: 1.5rem;
+
+--deposit-uploader-padding: 2rem;
+
+--deposit-uploader-shadow: var(--shadow-sm);
+
+--deposit-uploader-icon: var(--primary);
+
+--deposit-uploader-title: var(--foreground);
+
+--deposit-uploader-text: var(--foreground-muted);
+
+--deposit-uploader-file-bg: #101946;
+
+--deposit-uploader-file-border: var(--border);
+
+--deposit-uploader-file-radius: 1rem;
+
+--deposit-uploader-file-text: var(--foreground);
+
+--deposit-uploader-replace-bg: var(--primary);
+
+--deposit-uploader-replace-text: #ffffff;
+
+--deposit-uploader-drag-bg: color-mix(
+  in srgb,
+  var(--primary) 10%,
+  #101946
+);
+
+--deposit-uploader-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT HISTORY
+   ========================================================================== */
+
+--deposit-history-bg: #101946;
+
+--deposit-history-border: var(--border);
+
+--deposit-history-radius: 1.5rem;
+
+--deposit-history-padding: 1.5rem;
+
+--deposit-history-shadow: var(--shadow-sm);
+
+--deposit-history-title: #ffffff;
+
+--deposit-history-text: #b8bdd3;
+
+/* History Filter Tabs */
+
+--deposit-history-tab-bg: #101946;
+
+--deposit-history-tab-border: #ffffff;
+
+--deposit-history-tab-text: #ffffff;
+
+--deposit-history-tab-hover-bg: #ffffff;
+
+--deposit-history-tab-hover-border: #ffffff;
+
+--deposit-history-tab-hover-text: #101946;
+
+--deposit-history-tab-active-bg: #ffffff;
+
+--deposit-history-tab-active-border: #ffffff;
+
+--deposit-history-tab-active-text: #101946;
+
+--deposit-history-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT HISTORY CARD
+   ========================================================================== */
+
+--deposit-history-card-bg: #101946;
+
+--deposit-history-card-border: var(--border);
+
+--deposit-history-card-radius: 1rem;
+
+--deposit-history-card-padding: 1rem;
+
+--deposit-history-card-shadow: var(--shadow-sm);
+
+--deposit-history-card-title: #ffffff;
+
+--deposit-history-card-text: #b8bdd3;
+
+--deposit-history-card-hover-border: #ffffff;
+
+--deposit-history-card-transition: 300ms;
+
+--deposit-history-status-pending-bg: #fef3c7;
+
+--deposit-history-status-pending-text: #92400e;
+
+--deposit-history-status-success-bg: #dcfce7;
+
+--deposit-history-status-success-text: #166534;
+
+--deposit-history-status-failed-bg: #fee2e2;
+
+--deposit-history-status-failed-text: #991b1b;
+
+/* ==========================================================================
+   DEPOSIT HISTORY EMPTY
+   ========================================================================== */
+
+--deposit-history-empty-bg: #101946;
+
+--deposit-history-empty-border: var(--border);
+
+--deposit-history-empty-radius: 1rem;
+
+--deposit-history-empty-padding: 2rem;
+
+--deposit-history-empty-shadow: var(--shadow-sm);
+
+--deposit-history-empty-icon-bg: #101946;
+
+--deposit-history-empty-icon-color: #ffffff;
+
+--deposit-history-empty-title: #ffffff;
+
+--deposit-history-empty-text: #b8bdd3;
+
+--deposit-history-empty-transition: 300ms;
+
+/* ==========================================================================
+   DEPOSIT HISTORY FILTERS
+   ========================================================================== */
+
+--deposit-history-filter-all-bg: #101946;
+
+--deposit-history-filter-all-border: #30375f;
+
+--deposit-history-filter-all-text: #ffffff;
+
+--deposit-history-filter-all-active-bg: #ffffff;
+
+--deposit-history-filter-all-active-border: #ffffff;
+
+--deposit-history-filter-all-active-text: #101946;
+
+--deposit-history-filter-pending-bg: #3d3214;
+
+--deposit-history-filter-pending-border: #8f741f;
+
+--deposit-history-filter-pending-text: #f5d76e;
+
+--deposit-history-filter-pending-active-bg: #f5d76e;
+
+--deposit-history-filter-pending-active-border: #f5d76e;
+
+--deposit-history-filter-pending-active-text: #3d3214;
+
+--deposit-history-filter-successful-bg: #12351f;
+
+--deposit-history-filter-successful-border: #267a42;
+
+--deposit-history-filter-successful-text: #6ee58d;
+
+--deposit-history-filter-successful-active-bg: #6ee58d;
+
+--deposit-history-filter-successful-active-border: #6ee58d;
+
+--deposit-history-filter-successful-active-text: #12351f;
+
+--deposit-history-filter-failed-bg: #3a171b;
+
+--deposit-history-filter-failed-border: #8f303b;
+
+--deposit-history-filter-failed-text: #f28b95;
+
+--deposit-history-filter-failed-active-bg: #f28b95;
+
+--deposit-history-filter-failed-active-border: #f28b95;
+
+--deposit-history-filter-failed-active-text: #3a171b;
+
+--deposit-history-filter-transition: 300ms;
+
+
+
+
+--primary-contact: #fff;
+--contact-button-text: #111f5c;
+
+
+
+
+
+/* ==========================================================================
+   WITHDRAW BALANCE
+   ========================================================================== */
+
+--withdraw-balance-bg: #101946;
+
+--withdraw-balance-border: var(--border);
+
+--withdraw-balance-radius: 1.5rem;
+
+--withdraw-balance-padding: 1.5rem;
+
+--withdraw-balance-shadow: var(--shadow-sm);
+
+--withdraw-balance-label: #b8bdd3;
+
+--withdraw-balance-value: #ffffff;
+
+--withdraw-balance-text: #b8bdd3;
+
+--withdraw-balance-icon-bg: #5b5cf0;
+
+--withdraw-balance-icon-color: #ffffff;
+
+--withdraw-balance-icon-shadow: var(--shadow-sm);
+
+--withdraw-balance-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW METHOD
+   ========================================================================== */
+
+--withdraw-method-bg: #101946;
+
+--withdraw-method-border: var(--border);
+
+--withdraw-method-radius: 1.5rem;
+
+--withdraw-method-padding: 1.5rem;
+
+--withdraw-method-shadow: var(--shadow-sm);
+
+--withdraw-method-title: #ffffff;
+
+--withdraw-method-text: #b8bdd3;
+
+--withdraw-method-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW METHOD CARD
+   ========================================================================== */
+
+--withdraw-method-card-bg: #101946;
+
+--withdraw-method-card-border: var(--border);
+
+--withdraw-method-card-radius: 1rem;
+
+--withdraw-method-card-padding: 1rem;
+
+--withdraw-method-card-text: #ffffff;
+
+--withdraw-method-card-icon-bg: #101946;
+
+--withdraw-method-card-icon-color: var(--primary);
+
+--withdraw-method-card-hover-bg: #101946;
+
+--withdraw-method-card-hover-border: #ffffff;
+
+--withdraw-method-card-hover-text: #ffffff;
+
+--withdraw-method-card-selected-bg: #ffffff;
+
+--withdraw-method-card-selected-border: #ffffff;
+
+--withdraw-method-card-selected-text: #101946;
+
+--withdraw-method-card-selected-shadow: var(--shadow-sm);
+
+--withdraw-method-card-check-bg: #101946;
+
+--withdraw-method-card-check-color: #ffffff;
+
+--withdraw-method-card-focus: #ffffff;
+
+--withdraw-method-card-focus-offset: #101946;
+
+--withdraw-method-card-shadow: var(--shadow-sm);
+
+--withdraw-method-card-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW DETAILS
+   ========================================================================== */
+
+--withdraw-details-bg: #101946;
+
+--withdraw-details-border: #30375f;
+
+--withdraw-details-radius: 1.25rem;
+
+--withdraw-details-padding: 1.25rem;
+
+--withdraw-details-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+
+--withdraw-details-title: #ffffff;
+
+--withdraw-details-text: #b8bdd3;
+
+--withdraw-details-label: #ffffff;
+
+--withdraw-details-input-radius: 0.75rem;
+
+--withdraw-details-input-border: #30375f;
+
+--withdraw-details-input-bg: #101946;
+
+--withdraw-details-input-text: #ffffff;
+
+--withdraw-details-input-placeholder: #b8bdd3;
+
+--withdraw-details-input-focus: #ffffff;
+
+--withdraw-details-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW ADDRESS INPUT
+   ========================================================================== */
+
+--withdraw-address-label: #ffffff;
+
+--withdraw-address-bg: #191f53;
+
+--withdraw-address-border: #ffffff;
+
+--withdraw-address-text: #ffffff;
+
+--withdraw-address-placeholder: #b8bdd3;
+
+--withdraw-address-focus: #ffffff;
+
+--withdraw-address-copy-bg: #101946;
+
+--withdraw-address-copy-border: #ffffff;
+
+--withdraw-address-copy-text: #ffffff;
+
+--withdraw-address-copy-hover: #ffffff;
+
+--withdraw-address-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW AMOUNT
+   ========================================================================== */
+
+--withdraw-amount-label: #ffffff;
+
+--withdraw-amount-balance: #ffffff;
+
+--withdraw-amount-max-bg: #101946;
+
+--withdraw-amount-max-border: #ffffff;
+
+--withdraw-amount-max-text: #ffffff;
+
+--withdraw-amount-max-hover-bg: #ffffff;
+
+--withdraw-amount-max-hover-border: #ffffff;
+
+--withdraw-amount-max-hover-text: #101946;
+
+--withdraw-amount-currency: #b8bdd3;
+
+--withdraw-amount-input-bg: #191f53;
+
+--withdraw-amount-input-border: #ffffff;
+
+--withdraw-amount-input-text: #ffffff;
+
+--withdraw-amount-input-placeholder: #b8bdd3;
+
+--withdraw-amount-input-focus: #ffffff;
+
+--withdraw-amount-remaining-label: #b8bdd3;
+
+--withdraw-amount-remaining-value: #ffffff;
+
+--withdraw-amount-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW SUMMARY
+   ========================================================================== */
+
+--withdraw-summary-bg: #101946;
+
+--withdraw-summary-border: #30375f;
+
+--withdraw-summary-radius: 1.25rem;
+
+--withdraw-summary-padding: 1.25rem;
+
+--withdraw-summary-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+
+--withdraw-summary-title: #ffffff;
+
+--withdraw-summary-label: #b8bdd3;
+
+--withdraw-summary-value: #ffffff;
+
+--withdraw-summary-divider: #30375f;
+
+--withdraw-summary-receive-label: #ffffff;
+
+--withdraw-summary-receive-value: #ffffff;
+
+--withdraw-summary-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW ACTION
+   ========================================================================== */
+
+--withdraw-action-bg: #ffffff;
+
+--withdraw-action-text: #101946;
+
+--withdraw-action-hover-bg: #101946;
+
+--withdraw-action-hover-text: #ffffff;
+
+--withdraw-action-disabled-bg: #2a3155;
+
+--withdraw-action-disabled-text: #aeb4cc;
+
+--withdraw-action-radius: 0.9rem;
+
+--withdraw-action-padding-y: 0.8rem;
+
+--withdraw-action-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+--withdraw-action-note: #b8bdd3;
+
+--withdraw-action-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW HISTORY
+   ========================================================================== */
+
+--withdraw-history-bg: #101946;
+
+--withdraw-history-border: var(--border);
+
+--withdraw-history-radius: 1.5rem;
+
+--withdraw-history-padding: 1.5rem;
+
+--withdraw-history-shadow: var(--shadow-sm);
+
+--withdraw-history-title: #ffffff;
+
+--withdraw-history-text: #b8bdd3;
+
+--withdraw-history-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW HISTORY FILTERS
+   ========================================================================== */
+
+--withdraw-history-filter-all-bg: #101946;
+
+--withdraw-history-filter-all-border: var(--border);
+
+--withdraw-history-filter-all-text: #ffffff;
+
+--withdraw-history-filter-all-active-bg: #ffffff;
+
+--withdraw-history-filter-all-active-border: #ffffff;
+
+--withdraw-history-filter-all-active-text: #101946;
+
+--withdraw-history-filter-pending-bg: #3d3214;
+
+--withdraw-history-filter-pending-border: #8f741f;
+
+--withdraw-history-filter-pending-text: #f5d76e;
+
+--withdraw-history-filter-pending-active-bg: #f5d76e;
+
+--withdraw-history-filter-pending-active-border: #f5d76e;
+
+--withdraw-history-filter-pending-active-text: #3d3214;
+
+--withdraw-history-filter-success-bg: #12351f;
+
+--withdraw-history-filter-success-border: #267a42;
+
+--withdraw-history-filter-success-text: #6ee58d;
+
+--withdraw-history-filter-success-active-bg: #6ee58d;
+
+--withdraw-history-filter-success-active-border: #6ee58d;
+
+--withdraw-history-filter-success-active-text: #12351f;
+
+--withdraw-history-filter-rejected-bg: #3a171b;
+
+--withdraw-history-filter-rejected-border: #8f303b;
+
+--withdraw-history-filter-rejected-text: #f28b95;
+
+--withdraw-history-filter-rejected-active-bg: #f28b95;
+
+--withdraw-history-filter-rejected-active-border: #f28b95;
+
+--withdraw-history-filter-rejected-active-text: #3a171b;
+
+/* ==========================================================================
+   WITHDRAW HISTORY CARD
+   ========================================================================== */
+
+--withdraw-history-card-bg: #101946;
+
+--withdraw-history-card-border: var(--border);
+
+--withdraw-history-card-radius: 1rem;
+
+--withdraw-history-card-padding: 1rem;
+
+--withdraw-history-card-shadow: var(--shadow-sm);
+
+--withdraw-history-card-title: #ffffff;
+
+--withdraw-history-card-text: #b8bdd3;
+
+--withdraw-history-card-muted: #b8bdd3;
+
+--withdraw-history-card-symbol: #b8bdd3;
+
+--withdraw-history-card-amount: #ffffff;
+
+--withdraw-history-card-crypto: #b8bdd3;
+
+--withdraw-history-card-icon-bg: #101946;
+
+--withdraw-history-card-icon-border: var(--border);
+
+--withdraw-history-card-hover-border: #ffffff;
+
+--withdraw-history-card-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW HISTORY STATUS
+   ========================================================================== */
+
+--withdraw-history-status-pending-bg: #3d3214;
+
+--withdraw-history-status-pending-border: #8f741f;
+
+--withdraw-history-status-pending-text: #f5d76e;
+
+--withdraw-history-status-success-bg: #12351f;
+
+--withdraw-history-status-success-border: #267a42;
+
+--withdraw-history-status-success-text: #6ee58d;
+
+--withdraw-history-status-rejected-bg: #3a171b;
+
+--withdraw-history-status-rejected-border: #8f303b;
+
+--withdraw-history-status-rejected-text: #f28b95;
+
+/* ==========================================================================
+   WITHDRAW HISTORY EMPTY
+   ========================================================================== */
+
+--withdraw-history-empty-bg: #101946;
+
+--withdraw-history-empty-border: var(--border);
+
+--withdraw-history-empty-radius: 1rem;
+
+--withdraw-history-empty-padding: 2rem;
+
+--withdraw-history-empty-shadow: var(--shadow-sm);
+
+--withdraw-history-empty-icon-bg: #101946;
+
+--withdraw-history-empty-icon-color: #ffffff;
+
+--withdraw-history-empty-title: #ffffff;
+
+--withdraw-history-empty-text: #b8bdd3;
+
+--withdraw-history-empty-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW CONFIRMATION MODAL
+   ========================================================================== */
+
+--withdraw-modal-overlay: #00000099;
+
+--withdraw-modal-bg: #101946;
+
+--withdraw-modal-border: #30375f;
+
+--withdraw-modal-radius: 1.25rem;
+
+--withdraw-modal-padding: 1.25rem;
+
+--withdraw-modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+
+--withdraw-modal-title: #ffffff;
+
+--withdraw-modal-text: #b8bdd3;
+
+--withdraw-modal-label: #b8bdd3;
+
+--withdraw-modal-value: #ffffff;
+
+--withdraw-modal-summary-bg: #191f53;
+
+--withdraw-modal-summary-border: #30375f;
+
+--withdraw-modal-divider: #30375f;
+
+--withdraw-modal-receive-label: #ffffff;
+
+--withdraw-modal-receive-value: #ffffff;
+
+--withdraw-modal-close-bg: #191f53;
+
+--withdraw-modal-close-border: #30375f;
+
+--withdraw-modal-close-text: #b8bdd3;
+
+--withdraw-modal-close-hover-bg: #30375f;
+
+--withdraw-modal-cancel-bg: #191f53;
+
+--withdraw-modal-cancel-border: #30375f;
+
+--withdraw-modal-cancel-text: #ffffff;
+
+--withdraw-modal-cancel-hover-bg: #30375f;
+
+--withdraw-modal-confirm-bg: #ffffff;
+
+--withdraw-modal-confirm-text: #101946;
+
+--withdraw-modal-confirm-hover-bg: #101946;
+
+--withdraw-modal-confirm-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+--withdraw-modal-transition: 300ms;
+
+/* ==========================================================================
+   WITHDRAW METHOD SELECT
+   ========================================================================== */
+
+--withdraw-method-select-bg: #101946;
+
+--withdraw-method-select-border: var(--border);
+
+--withdraw-method-select-text: #ffffff;
+
+--withdraw-method-select-placeholder: #b8bdd3;
+
+--withdraw-method-select-icon: #b8bdd3;
+
+--withdraw-method-select-hover-bg: #101946;
+
+--withdraw-method-select-hover-border: #ffffff;
+
+--withdraw-method-select-focus: #ffffff;
+
+--withdraw-method-select-focus-offset: #101946;
+
+--withdraw-method-select-radius: 0.75rem;
+
+--withdraw-method-select-padding-x: 0.75rem;
+
+--withdraw-method-select-padding-y: 0.65rem;
+
+--withdraw-method-select-shadow: var(--shadow-sm);
+
+/* ==========================================================================
+   WITHDRAW METHOD DROPDOWN
+   ========================================================================== */
+
+--withdraw-method-dropdown-bg: #101946;
+
+--withdraw-method-dropdown-border: var(--border);
+
+--withdraw-method-dropdown-radius: 0.75rem;
+
+--withdraw-method-dropdown-padding: 0.35rem;
+
+--withdraw-method-dropdown-shadow: var(--shadow-sm);
+
+/* ==========================================================================
+   WITHDRAW METHOD OPTION
+   ========================================================================== */
+
+--withdraw-method-option-radius: 0.6rem;
+
+--withdraw-method-option-padding-x: 0.65rem;
+
+--withdraw-method-option-padding-y: 0.55rem;
+
+--withdraw-method-option-text: #ffffff;
+
+--withdraw-method-option-hover-bg: #191f53;
+
+--withdraw-method-option-hover-text: #ffffff;
+
+--withdraw-method-option-active-bg: #ffffff;
+
+--withdraw-method-option-active-text: #101946;
+
+--withdraw-method-option-check: #101946;
+
+--withdraw-method-option-icon-bg: #191f53;
+
+--withdraw-method-option-icon-color: #ffffff;
+
+--user-progress-bg: rgba(255, 255, 255, 0.08);
+--user-progress-fill: var(--user-info);
+
+
+
+
+
+
+--product-gallery-bg: #111A45;
+--product-gallery-card-bg: var(--surface-card);
+--product-gallery-border: var(--border);
+--product-gallery-image-bg: var(--muted);
+
+--product-gallery-accent: #5658FF;
+--product-gallery-category: var(--foreground-muted);
+--product-gallery-price: var(--foreground);
+--product-gallery-old-price: var(--foreground-muted);
+
+--product-gallery-card-shadow:
+  0 10px 30px rgba(0, 0, 0, 0.18);
+
+--product-gallery-card-shadow-hover:
+  0 16px 40px rgba(0, 0, 0, 0.26);
+
+--product-gallery-control-bg:
+  color-mix(in srgb, var(--surface-card) 88%, transparent);
+
+--product-gallery-control-hover:
+  var(--surface-card);
+
+--product-gallery-control-border:
+  var(--border);
+
+--product-gallery-control-icon:
+  var(--foreground);
+
+--product-gallery-control-shadow:
+  0 10px 28px rgba(0, 0, 0, 0.22);
+
+
+--hero-features-background-image:
+  url("/assets/images/home/hero-features-blue.png");
+
+--hero-features-overlay:
+  linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--surface-hero) 82%, transparent),
+    color-mix(in srgb, var(--surface-hero) 72%, transparent)
+  );
+
+
+  --surface-hero-background-image:
+    url("/assets/images/home/hero-background-blue.png");
+
+
+  --product-gallery-bg-image:
+    url("/assets/images/home/trending-background-blue.png");
+
+  --product-gallery-image-overlay: 88%;
+
+
+  --store-products-bg-image:
+    url("/assets/images/home/featured-background-blue.png");
+
+  --store-products-image-overlay: 85%;
+
+
+
+  --home-category-bg: #10183f;
+--home-category-background-image: url("/assets/images/home/category-explorer-blue.png");
+--home-category-overlay: rgba(16, 24, 63, 0.62);
+
+--home-category-accent: #7b7df8;
+
+--home-category-filter-bg:
+  rgba(255, 255, 255, 0.06);
+
+--home-category-filter-border:
+  rgba(255, 255, 255, 0.12);
+
+--home-category-filter-text:
+  rgba(255, 255, 255, 0.74);
+
+--home-category-card-bg:
+  var(--surface-card);
+
+--home-category-card-border:
+  var(--border);
+
+--home-category-image-bg:
+  var(--muted);
+
+--home-category-price:
+  var(--foreground);
+
+--home-category-old-price:
+  var(--foreground-muted);
+
+--home-category-card-shadow:
+  0 10px 30px rgba(0, 0, 0, 0.22);
+
+--home-category-card-shadow-hover:
+  0 16px 40px rgba(0, 0, 0, 0.3);
+
+--home-category-control-bg:
+  color-mix(
+    in srgb,
+    var(--surface-card) 88%,
+    transparent
+  );
+
+--home-category-control-hover:
+  var(--surface-card);
+
+--home-category-control-border:
+  var(--border);
+
+--home-category-control-text:
+  var(--foreground);
+
+--home-category-control-shadow:
+  0 10px 28px rgba(0, 0, 0, 0.24);
+
+
+--home-category-filter-icon:
+  rgba(255, 255, 255, 0.68);
+
+
+
+
+/* ==========================================
+   Newsletter Popup
+========================================== */
+
+  --newsletter-backdrop: rgb(2 6 23 / 0.82);
+  --newsletter-blur: 14px;
+
+  --newsletter-bg: #10152f;
+  --newsletter-surface: #141a39;
+  --newsletter-border: #2a3363;
+  --newsletter-divider: #222b55;
+
+  --newsletter-title: #ffffff;
+  --newsletter-text: #b8c1dc;
+  --newsletter-placeholder: #7d89b0;
+
+  --newsletter-input-bg: #171d40;
+  --newsletter-input-border: #303a71;
+  --newsletter-input-focus: #6d71ff;
+
+  --newsletter-button-bg: #5b5ef7;
+  --newsletter-button-hover: #7275ff;
+  --newsletter-button-text: #ffffff;
+
+  --newsletter-close-bg: #272f62;
+  --newsletter-close-hover: #313a77;
+  --newsletter-close-icon: #ffffff;
+
+  --newsletter-checkbox: #7b7eff;
+
+  --newsletter-shadow:
+    0 34px 90px rgb(0 0 0 / 0.55);
+
+  --newsletter-radius: 24px;
+
+  --newsletter-image-overlay:
+    linear-gradient(
+      180deg,
+      rgb(0 0 0 / 0.12),
+      rgb(0 0 0 / 0.42)
+    );
+
+
+--message-green: rgb(74, 222, 128);
+--message-blue: rgb(96, 165, 250);
+
+
+/* ========================================================================================================================================================================================================
+   AUTHENTICATED USER ENVIRONMENT
+   ======================================================================================================================================================================================================== */
+
+--auth-card-bg: #101946;
+
+--user-page-bg: #101946;
+
+--user-surface: #191f53;
+--user-surface-secondary: #0E153C;
+--user-surface-tertiary: #212A48;
+
+--user-card-bg: #101946;
+--user-card-hover: #151f52;
+--user-card-border: rgba(255,255,255,.12);
+--user-card-shadow: var(--shadow-sm);
+
+--user-overlay: rgba(0,0,0,.55);
+
+--user-title: #FFFFFF;
+--user-text: rgba(255,255,255,.92);
+--user-text-muted: rgba(255,255,255,.68);
+--user-placeholder: rgba(255,255,255,.45);
+
+--user-link: #FFFFFF;
+--user-link-hover: #F3F4F6;
+
+--user-divider: rgba(255,255,255,.08);
+
+--user-icon: #FFFFFF;
+--user-icon-muted: rgba(255,255,255,.65);
+
+--user-avatar-bg: rgba(255,255,255,.04);
+--user-avatar-border: rgba(255,255,255,.12);
+
+--user-badge-success-bg: rgba(74,222,128,.16);
+--user-badge-success-text: #4ADE80;
+
+--user-badge-warning-bg: rgba(251,191,36,.16);
+--user-badge-warning-text: #FBBF24;
+
+--user-badge-danger-bg: rgba(248,113,113,.16);
+--user-badge-danger-text: #F87171;
+
+--user-input-bg: #101946;
+--user-input-border: rgba(255,255,255,.12);
+--user-input-border-focus: #FFFFFF;
+--user-input-text: #FFFFFF;
+--user-input-placeholder: rgba(255,255,255,.55);
+
+--user-select-bg: #101946;
+--user-select-border: rgba(255,255,255,.12);
+--user-select-text: #FFFFFF;
+
+--user-button-bg: #FFFFFF;
+--user-button-text: #101946;
+--user-button-hover: #F3F4F6;
+
+--user-button-secondary-bg: transparent;
+--user-button-secondary-border: rgba(255,255,255,.12);
+--user-button-secondary-text: #FFFFFF;
+--user-button-secondary-hover: rgba(255,255,255,.06);
+
+--user-danger-bg: rgba(255,82,82,.10);
+--user-danger-border: rgba(255,82,82,.35);
+--user-danger-text: #FF5252;
+--user-danger-hover: rgba(255,82,82,.16);
+
+--user-success: #4ADE80;
+--user-warning: #FBBF24;
+--user-danger: #d73c3c;
+--user-info: #5B5EF7;
+
+--user-glow: rgba(91,92,240,.35);
+
+--user-radius-sm: .75rem;
+--user-radius-md: 1rem;
+--user-radius-lg: 1.5rem;
+--user-radius-xl: 2rem;
+
+--user-transition-fast: 180ms;
+--user-transition: 300ms;
+--user-transition-slow: 450ms;
+
+/* ==========================================================================
+   PROFILE
+   ========================================================================== */
+
+--profile-avatar-size-mobile: 88px;
+--profile-avatar-size-desktop: 128px;
+
+--profile-avatar-camera-bg: var(--primary);
+--profile-avatar-camera-color: #101946;
+
+--profile-cover-height-mobile: 140px;
+--profile-cover-height-desktop: 200px;
+
+--profile-stat-gap: 1rem;
+
+/* ==========================================================================
+   USER PLAN SYSTEM
+   ========================================================================== */
+
+--user-plan-feature-icon-bg: rgba(255,255,255,.06);
+
+--user-plan-active-bg: rgba(74,222,128,.12);
+--user-plan-active-border: rgba(74,222,128,.28);
+
+--user-plan-popular-bg: rgba(91,94,247,.12);
+--user-plan-popular-border: rgba(91,94,247,.28);
+
+--user-plan-disabled-opacity: .55;
+
+--user-stat-bg: rgba(255,255,255,.04);
+--user-stat-border: rgba(255,255,255,.08);
+
+--user-progress-bg: rgba(255,255,255,.08);
+--user-progress-fill: var(--user-info);
+
+--user-table-row-hover: rgba(255,255,255,.04);
+
+--user-success-soft: rgba(74,222,128,.12);
+--user-warning-soft: rgba(251,191,36,.12);
+--user-danger-soft: rgba(248,113,113,.12);
+
+/* =======================================================
+   CART
+======================================================= */
+
+--cart-bg: var(--surface-primary);
+--cart-surface: var(--surface-secondary);
+--cart-surface-hover: var(--surface-tertiary);
+
+--cart-border: var(--border-primary);
+--cart-divider: var(--border-secondary);
+
+--cart-backdrop: rgb(8 15 28 / 0.58);
+--cart-blur: 20px;
+
+--cart-item-bg: transparent;
+--cart-item-hover: rgb(255 255 255 / 0.04);
+
+--cart-saved-bg: rgb(255 255 255 / 0.02);
+--cart-saved-border: var(--border-secondary);
+
+--cart-summary-bg: var(--surface-secondary);
+--cart-summary-border: var(--border-primary);
+
+--cart-quantity-bg: var(--surface-tertiary);
+--cart-quantity-border: var(--border-primary);
+
+--cart-button-primary-bg: var(--brand-primary);
+--cart-button-primary-hover: var(--brand-primary-hover);
+
+--cart-button-secondary-bg: transparent;
+--cart-button-secondary-hover: rgb(255 255 255 / 0.05);
+
+--cart-danger-bg: transparent;
+--cart-danger-hover: rgb(239 68 68 / 0.12);
+
+--cart-image-bg: var(--surface-tertiary);
+
+--cart-shadow:
+  0 18px 60px rgb(0 0 0 / 0.28);
+
+--cart-radius: 22px;
+
+--cart-item-radius: 18px;
+
+--cart-button-radius: 14px;
+
+--cart-transition:
+  180ms cubic-bezier(.2,.8,.2,1);
+
+--cart-badge-bg: #5B5EF7;
+--cart-badge-text: #ffffff;
+--cart-badge-border: #ffffff;
+
+
+
+/* =======================================================
+   SEARCH
+======================================================= */
+
+--search-bg: var(--surface-primary);
+
+--search-surface: var(--surface-secondary);
+
+--search-surface-hover: var(--surface-tertiary);
+
+--search-border: var(--border-primary);
+
+--search-divider: var(--border-secondary);
+
+--search-backdrop: rgb(8 15 28 / 0.58);
+
+--search-blur: 20px;
+
+--search-input-bg: var(--surface-secondary);
+
+--search-input-border: var(--border-primary);
+
+--search-input-focus: var(--brand-primary);
+
+--search-placeholder: var(--text-tertiary);
+
+--search-result-bg: transparent;
+
+--search-result-hover: rgb(255 255 255 / 0.04);
+
+--search-result-active: rgb(255 255 255 / 0.08);
+
+--search-category-bg: rgb(255 255 255 / 0.04);
+
+--search-category-hover: rgb(255 255 255 / 0.07);
+
+--search-product-bg: transparent;
+
+--search-product-hover: rgb(255 255 255 / 0.04);
+
+--search-empty-bg: rgb(255 255 255 / 0.02);
+
+--search-empty-border: var(--border-secondary);
+
+--search-icon: var(--text-secondary);
+
+--search-clear-hover: rgb(255 255 255 / 0.06);
+
+--search-loading: var(--brand-primary);
+
+--search-shadow:
+  0 18px 60px rgb(0 0 0 / 0.28);
+
+--search-radius: 22px;
+
+--search-item-radius: 18px;
+
+--search-input-radius: 14px;
+
+--search-transition:
+  180ms cubic-bezier(.2,.8,.2,1);
+
+--search-result-active: rgb(255 255 255 / 0.08);
+
+
+
+
+
+
+
+/* ==========================================================================
+   PREMIUM TOAST
+   ========================================================================== */
+--premium-toast-overlay: rgba(3, 7, 18, 0.72);
+
+--premium-toast-surface:
+  rgba(17, 24, 39, 0.82);
+
+--premium-toast-border:
+  rgba(255, 255, 255, 0.08);
+
+--premium-toast-accent:
+  var(--primary);
+
+--premium-toast-accent-soft:
+  color-mix(
+    in srgb,
+    var(--primary) 18%,
+    transparent
+  );
+
+--premium-toast-glow:
+  color-mix(
+    in srgb,
+    var(--primary) 22%,
+    transparent
+  );
+
+--premium-toast-progress-track:
+  rgba(255, 255, 255, 0.08);
+
+
+
+
+
+
+/* ========================================================================================================================================================================================================
+   WHOLE/ENTIRE ADMIN LAYOUT CONTROL
+   ======================================================================================================================================================================================================== */
+
+--admin-page-bg: #101946
+--admin-page-padding: 1.5rem;
+--admin-page-gap: 1.5rem;
+
+/* ==========================================================================
+   ADMIN CARD
+   ========================================================================== */
+
+--admin-card-bg: #101946;
+--admin-card-border: rgba(59, 130, 246, 0.18);
+--admin-card-radius: 1.5rem;
+--admin-card-padding: 1.5rem;
+--admin-card-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+--admin-card-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN SURFACE
+   ========================================================================== */
+
+--admin-surface-bg: #202865;
+--admin-surface-border: rgba(59, 130, 246, 0.16);
+--admin-surface-radius: 1rem;
+
+/* ==========================================================================
+   ADMIN TYPOGRAPHY
+   ========================================================================== */
+
+--admin-title: #ffffff;
+--admin-text: #f8fafc;
+--admin-muted: #cbd5e1;
+
+/* ==========================================================================
+   ADMIN INPUT
+   ========================================================================== */
+
+--admin-input-bg: #202865;
+--admin-input-border: rgba(59, 130, 246, 0.18);
+--admin-input-text: #ffffff;
+--admin-input-placeholder: #94a3b8;
+--admin-input-focus: #3b82f6;
+--admin-input-radius: 1rem;
+
+/* ==========================================================================
+   ADMIN BUTTON
+   ========================================================================== */
+
+--admin-button-primary-bg: #2563eb;
+--admin-button-primary-hover: #1d4ed8;
+--admin-button-primary-text: #ffffff;
+
+--admin-button-secondary-bg: #202865;
+--admin-button-secondary-hover: #27316f;
+--admin-button-secondary-text: #ffffff;
+--admin-button-secondary-border: rgba(59, 130, 246, 0.18);
+
+--admin-button-danger-bg: #dc2626;
+--admin-button-danger-hover: #b91c1c;
+--admin-button-danger-text: #ffffff;
+
+/* ==========================================================================
+   ADMIN TABLE
+   ========================================================================== */
+
+--admin-table-bg: #191f53;
+--admin-table-border: rgba(59, 130, 246, 0.18);
+--admin-table-header-bg: #202865;
+--admin-table-header-text: #ffffff;
+--admin-table-title: #ffffff;
+--admin-table-text: #f8fafc;
+--admin-table-muted: #cbd5e1;
+--admin-table-row-hover: #25306d;
+
+/* ==========================================================================
+   ADMIN STATUS
+   ========================================================================== */
+
+--admin-status-pending-bg: rgba(245, 158, 11, 0.18);
+--admin-status-pending-text: #fbbf24;
+
+--admin-status-success-bg: rgba(34, 197, 94, 0.18);
+--admin-status-success-text: #4ade80;
+
+--admin-status-failed-bg: rgba(239, 68, 68, 0.18);
+--admin-status-failed-text: #f87171;
+
+/* ==========================================================================
+   ADMIN EMPTY
+   ========================================================================== */
+
+--admin-empty-bg: #191f53;
+--admin-empty-border: rgba(59, 130, 246, 0.18);
+--admin-empty-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+--admin-empty-icon-bg: #202865;
+--admin-empty-icon-color: #60a5fa;
+--admin-empty-title: #ffffff;
+--admin-empty-text: #cbd5e1;
+
+/* ==========================================================================
+   ADMIN MODAL / DRAWER
+   ========================================================================== */
+
+--admin-modal-bg: #191f53;
+--admin-modal-border: rgba(59, 130, 246, 0.18);
+--admin-modal-radius: 1.75rem;
+--admin-modal-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+--admin-modal-overlay: rgb(0 0 0 / 65%);
+--admin-modal-header-bg: #202865;
+--admin-modal-footer-bg: #202865;
+
+/* ==========================================================================
+   ADMIN TRANSITIONS
+   ========================================================================== */
+
+--admin-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN ACCENT
+   ========================================================================== */
+
+--admin-primary: #3b82f6;
+
+/* ==========================================================================
+   ADMIN PLAN SYSTEM
+   ========================================================================== */
+
+--admin-plan-feature-icon-bg: rgba(59,130,246,.12);
+
+--admin-stat-bg: #202865;
+--admin-stat-border: rgba(59,130,246,.16);
+
+--admin-progress-bg: rgba(255,255,255,.08);
+--admin-progress-fill: var(--admin-primary);
+
+--admin-table-toolbar-bg: #202865;
+
+--admin-plan-active-bg: rgba(34,197,94,.16);
+--admin-plan-active-border: rgba(34,197,94,.3);
+
+--admin-plan-disabled-bg: rgba(239,68,68,.12);
+--admin-plan-disabled-border: rgba(239,68,68,.25);
+
+
+
+
+/* ==========================================================================
+   ADMIN CARD
+   ========================================================================== */
+
+--admin-card-bg: var(--surface-card);
+
+--admin-card-border: var(--border);
+
+--admin-card-radius: 1.5rem;
+
+--admin-card-padding: 1.5rem;
+
+--admin-card-shadow: var(--shadow-sm);
+
+--admin-card-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN SURFACE
+   ========================================================================== */
+
+--admin-surface-bg: var(--surface);
+
+--admin-surface-border: var(--border);
+
+--admin-surface-radius: 1rem;
+
+/* ==========================================================================
+   ADMIN TYPOGRAPHY
+   ========================================================================== */
+
+--admin-title: var(--foreground);
+
+--admin-text: var(--foreground);
+
+--admin-muted: var(--foreground-muted);
+
+/* ==========================================================================
+   ADMIN INPUT
+   ========================================================================== */
+
+--admin-input-bg: var(--surface);
+
+--admin-input-border: var(--border);
+
+--admin-input-text: var(--foreground);
+
+--admin-input-placeholder: var(--foreground-muted);
+
+--admin-input-focus: var(--primary);
+
+--admin-input-radius: 1rem;
+
+/* ==========================================================================
+   ADMIN TABLE
+   ========================================================================== */
+
+--admin-table-bg: var(--surface-card);
+
+--admin-table-header-bg: color-mix(
+  in srgb,
+  var(--primary) 6%,
+  var(--surface-card)
+);
+
+--admin-table-border: var(--border);
+
+--admin-table-row-hover: color-mix(
+  in srgb,
+  var(--primary) 8%,
+  transparent
+);
+
+--admin-table-title: var(--foreground);
+
+--admin-table-text: var(--foreground);
+
+--admin-table-muted: var(--foreground-muted);
+
+/* ==========================================================================
+   ADMIN STATUS
+   ========================================================================== */
+
+--admin-status-pending-bg: #fef3c7;
+
+--admin-status-pending-text: #92400e;
+
+--admin-status-success-bg: #dcfce7;
+
+--admin-status-success-text: #166534;
+
+--admin-status-failed-bg: #fee2e2;
+
+--admin-status-failed-text: #991b1b;
+
+/* ==========================================================================
+   ADMIN EMPTY STATE
+   ========================================================================== */
+
+--admin-empty-bg: var(--surface-card);
+
+--admin-empty-border: var(--border);
+
+--admin-empty-radius: 1.5rem;
+
+--admin-empty-padding: 2rem;
+
+--admin-empty-shadow: var(--shadow-sm);
+
+--admin-empty-icon-bg: color-mix(
+  in srgb,
+  var(--primary) 10%,
+  var(--surface)
+);
+
+--admin-empty-icon-color: var(--primary);
+
+--admin-empty-title: var(--foreground);
+
+--admin-empty-text: var(--foreground-muted);
+
+/* ==========================================================================
+   ADMIN DRAWER
+   ========================================================================== */
+
+--admin-drawer-bg: var(--surface-card);
+
+--admin-drawer-border: var(--border);
+
+--admin-drawer-radius: 1.75rem;
+
+--admin-drawer-shadow: var(--shadow-xl);
+
+--admin-drawer-overlay: rgb(0 0 0 / 60%);
+
+--admin-drawer-header-bg: color-mix(
+  in srgb,
+  var(--primary) 5%,
+  var(--surface-card)
+);
+
+--admin-drawer-footer-bg: color-mix(
+  in srgb,
+  var(--primary) 3%,
+  var(--surface-card)
+);
+
+--admin-drawer-transition: 300ms;
+
+/* ==========================================================================
+   ADMIN DIALOG
+   ========================================================================== */
+
+--admin-dialog-bg: var(--surface-card);
+
+--admin-dialog-border: var(--border);
+
+--admin-dialog-radius: 1.75rem;
+
+--admin-dialog-shadow: var(--shadow-xl);
+
+--admin-dialog-overlay: rgb(0 0 0 / 60%);
+
+
+/* ==========================================================================
+   ADMIN DEPOSIT METHODS
+   ========================================================================== */
+
+--admin-deposit-methods-border: rgba(59, 130, 246, 0.18);
+
+--admin-deposit-methods-bg: #191f53;
+
+--admin-deposit-methods-shadow: rgba(37, 99, 235, 0.08);
+
+
+--admin-deposit-methods-header-bg: #191f53;
+
+--admin-deposit-methods-header-border: rgba(59, 130, 246, 0.18);
+
+/* Table headings */
+--admin-deposit-methods-heading: #ffffff;
+
+/* Page title */
+--admin-deposit-methods-title: #ffffff;
+
+/* Secondary text */
+--admin-deposit-methods-text: #ffffff;
+
+
+--admin-deposit-methods-button-bg: #2563eb;
+
+--admin-deposit-methods-button-hover: #1d4ed8;
+
+--admin-deposit-methods-button-text: #ffffff;
+
+
+--admin-deposit-methods-row-border: rgba(59, 130, 246, 0.14);
+
+/* Keep hover dark so white text remains readable */
+--admin-deposit-methods-row-hover: #232b6b;
+
+/* Main table text */
+--admin-deposit-methods-row-text: #ffffff;
+
+
+--admin-deposit-methods-icon-bg: #dbeafe;
+
+--admin-deposit-methods-icon-border: rgba(59, 130, 246, 0.16);
+
+
+--admin-deposit-methods-action: #60a5fa;
+
+--admin-deposit-methods-action-hover: #93c5fd;
+
+--admin-deposit-methods-action-hover-bg: rgba(96, 165, 250, 0.12);
+
+
+--admin-deposit-methods-danger: #f87171;
+
+--admin-deposit-methods-danger-hover: #fca5a5;
+
+--admin-deposit-methods-danger-bg: rgba(248, 113, 113, 0.12);
+
+
+--admin-deposit-methods-active: #4ade80;
+
+--admin-deposit-methods-inactive: #f87171;
+
+
+/* ==========================================================================
+   ADMIN BUTTONS
+   ========================================================================== */
+
+--admin-button-primary-bg: var(--primary);
+
+--admin-button-primary-text: #ffffff;
+
+--admin-button-primary-hover: color-mix(
+  in srgb,
+  var(--primary) 90%,
+  black
+);
+
+--admin-button-secondary-bg: color-mix(
+  in srgb,
+  var(--primary) 5%,
+  var(--surface)
+);
+
+--admin-button-secondary-border: color-mix(
+  in srgb,
+  var(--primary) 25%,
+  var(--border)
+);
+
+--admin-button-secondary-text: var(--foreground);
+
+--admin-button-secondary-hover: color-mix(
+  in srgb,
+  var(--primary) 12%,
+  var(--surface)
+);
+
+
+
+--admin-button-warning-bg: #ff4d00;
+--admin-button-warning-text: #ffffff;
+
+--admin-button-success-bg: #16a34a;
+--admin-button-success-text: #ffffff;
+
+
+--user-device-badge-text: #c084fc;
+
+
+  /* ==========================
+     Hero
+     ========================== */
+
+  --surface-hero:
+    radial-gradient(
+      circle at 9% 58%,
+      rgba(87, 90, 236, 0.12) 0%,
+      rgba(87, 90, 236, 0.07) 14%,
+      rgba(87, 90, 236, 0.03) 24%,
+      transparent 36%
+    ),
+    linear-gradient(
+      180deg,
+      #101946 0%,
+      #101946 100%
+    );
+
+  --hero-overlay: transparent;
+  --hero-glow: rgba(87, 90, 236, 0.22);
+
+  --hero-heading: #ffffff;
+  --hero-text: rgba(255, 255, 255, 0.82);
+
+  /* Brand Elements */
+  --hero-badge-bg: #575aec;
+  --hero-badge-text: #ffffff;
+
+  --hero-cta-bg: var(--hero-badge-bg);
+  --hero-cta-hover: #4b4edb;
+  --hero-cta-text: #ffffff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  font-family: var(--font-poppins);
+  transition:
+    background-color var(--transition-normal),
+    color var(--transition-normal);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ==========================================
+   Sonner Toast
+========================================== */
+
+[data-sonner-toaster] {
+  --normal-bg: var(--toast-bg) !important;
+  --normal-text: var(--toast-text) !important;
+  --normal-border: transparent !important;
+
+  --success-bg: var(--toast-bg) !important;
+  --success-text: var(--toast-text) !important;
+  --success-border: transparent !important;
+
+  --error-bg: var(--toast-bg) !important;
+  --error-text: var(--toast-text) !important;
+  --error-border: transparent !important;
+
+  --warning-bg: var(--toast-bg) !important;
+  --warning-text: var(--toast-text) !important;
+  --warning-border: transparent !important;
+}
+
+[data-sonner-toast] {
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+[data-sonner-toast] [data-icon] {
+  color: var(--toast-icon) !important;
+}
+
+[data-sonner-toast] button {
+  color: var(--toast-icon) !important;
+}
+
+main {
+  padding-bottom: 0px !important;
+}
+
+
+@keyframes buyer-details-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
