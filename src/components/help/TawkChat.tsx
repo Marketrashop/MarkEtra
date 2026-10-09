@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-
 import { usePathname } from "next/navigation";
 
 declare global {
@@ -31,21 +30,18 @@ declare global {
       hideWidget?: () => void;
       maximize?: () => void;
       minimize?: () => void;
-toggle?: () => void;
-
-isChatMinimized?: () => boolean;
-
-onLoad?: () => void;
+      toggle?: () => void;
+      isChatMinimized?: () => boolean;
+      onLoad?: () => void;
     };
 
     Tawk_LoadStart?: Date;
-
     __tawkReady?: boolean;
   }
 }
 
 const TAWK_SRC =
-  "https://embed.tawk.to/6a956a936c07cd3443eb15e2/1k1bqgkt9";
+  "https://embed.tawk.to/6ac90b61e6d88534c75f2aa2/1k4gl8u2l";
 
 export default function TawkChat() {
   const pathname = usePathname();
@@ -60,13 +56,11 @@ export default function TawkChat() {
           xOffset: 20,
           yOffset: 90,
         },
-
         mobile: {
           position: "br",
           xOffset: 0,
           yOffset: 90,
         },
-
         bubble: {
           rotate: "0deg",
           xOffset: 0,
@@ -77,7 +71,6 @@ export default function TawkChat() {
 
     window.Tawk_API.onLoad = () => {
       window.__tawkReady = true;
-
       window.Tawk_API?.hideWidget?.();
     };
 
@@ -87,22 +80,15 @@ export default function TawkChat() {
       );
 
     if (!existingScript) {
-      window.Tawk_LoadStart =
-        new Date();
+      window.Tawk_LoadStart = new Date();
 
-      const script =
-        document.createElement("script");
+      const script = document.createElement("script");
 
       script.async = true;
-
       script.src = TAWK_SRC;
-
       script.charset = "UTF-8";
 
-      script.setAttribute(
-        "crossorigin",
-        "*",
-      );
+      script.setAttribute("crossorigin", "*");
 
       document.body.appendChild(script);
     } else if (window.__tawkReady) {
