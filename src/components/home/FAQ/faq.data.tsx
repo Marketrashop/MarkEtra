@@ -14,7 +14,7 @@ export const faqItems: FAQItem[] = [
       complete details on eligibility, return conditions, and timelines,
       please see our{" "}
 <Link
-  href="/return-policy"
+  href="/Refund"
   className="
     !text-[#5b5ef7]
     !underline
