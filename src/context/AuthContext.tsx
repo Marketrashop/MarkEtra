@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import { useRouter } from "next/navigation";
+import { AUTH_CONSTANTS } from "@/lib/auth/constants";
 
 type AuthUser = {
   id: string;
@@ -39,8 +40,14 @@ type AuthProviderProps = {
   children: React.ReactNode;
 };
 
-const HEARTBEAT_INTERVAL = 60_000;
-const SESSION_VALIDATION_INTERVAL = 5 * 60_000;
+const HEARTBEAT_INTERVAL =
+  AUTH_CONSTANTS.SESSION_ACTIVITY_REFRESH_INTERVAL_MS;
+
+const SESSION_VALIDATION_INTERVAL =
+  AUTH_CONSTANTS.SESSION_ACTIVITY_REFRESH_INTERVAL_MS;
+
+const INACTIVITY_TIMEOUT =
+  AUTH_CONSTANTS.SESSION_IDLE_TIMEOUT_MS;
 
 export function AuthProvider({
   children,
@@ -53,11 +60,14 @@ export function AuthProvider({
   const [loading, setLoading] =
     useState(true);
 
-  const lastHeartbeat =
-    useRef(0);
+const lastActivityAt =
+  useRef(Date.now());
 
-  const validatingSession =
-    useRef(false);
+const lastHeartbeatAt =
+  useRef(0);
+
+const validatingSession =
+  useRef(false);
 
   const handleSessionInvalid = useCallback(() => {
     setUser(null);
@@ -140,10 +150,7 @@ export function AuthProvider({
 
         setUser(data.user);
       } catch {
-        /*
-         * Network failures should not log the user out.
-         * The session may still be completely valid.
-         */
+
       } finally {
         validatingSession.current = false;
       }
@@ -152,22 +159,24 @@ export function AuthProvider({
       handleSessionInvalid,
     ]);
 
-  const logout = useCallback(
-    async () => {
-      try {
-        await fetch(
-          "/api/auth/logout",
-          {
-            method: "POST",
-            credentials: "include",
-          },
-        );
-      } finally {
-        setUser(null);
-      }
-    },
-    [],
-  );
+const logout = useCallback(
+  async () => {
+    try {
+      await fetch(
+        "/api/auth/logout",
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
+    } finally {
+      lastActivityAt.current = 0;
+      lastHeartbeatAt.current = 0;
+      setUser(null);
+    }
+  },
+  [],
+);
 
   useEffect(() => {
     async function initializeAuth() {
@@ -181,159 +190,189 @@ export function AuthProvider({
     void initializeAuth();
   }, [refresh]);
 
-  const sendHeartbeat =
-    useCallback(async () => {
-      if (!user) {
-        return;
-      }
+const sendHeartbeat =
+  useCallback(async () => {
+    if (!user) {
+      return;
+    }
 
+    const now = Date.now();
+
+    if (
+      now - lastHeartbeatAt.current <
+      HEARTBEAT_INTERVAL
+    ) {
+      return;
+    }
+
+    if (
+      now - lastActivityAt.current >=
+      INACTIVITY_TIMEOUT
+    ) {
+      return;
+    }
+
+    lastHeartbeatAt.current = now;
+
+    try {
+      const response =
+        await fetch(
+          "/api/auth/activity",
+          {
+            method: "POST",
+            credentials: "include",
+            keepalive: true,
+          },
+        );
+
+      if (
+        response.status === 401
+      ) {
+        handleSessionInvalid();
+      }
+    } catch {
+
+    }
+  }, [
+    user,
+    handleSessionInvalid,
+  ]);
+
+useEffect(() => {
+  if (!user) {
+    return;
+  }
+
+  const interval =
+    window.setInterval(() => {
       const now = Date.now();
 
       if (
-        now - lastHeartbeat.current <
-        HEARTBEAT_INTERVAL
+        now - lastActivityAt.current >=
+        INACTIVITY_TIMEOUT
       ) {
         return;
       }
 
-      lastHeartbeat.current = now;
-
-      try {
-        const response =
-          await fetch(
-            "/api/auth/activity",
-            {
-              method: "POST",
-              credentials: "include",
-              keepalive: true,
-            },
-          );
-
-        if (response.status === 401) {
-          handleSessionInvalid();
-        }
-      } catch {
-        /*
-         * Network failures should not log the user out.
-         */
-      }
-    }, [
-      user,
-      handleSessionInvalid,
-    ]);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    const interval = window.setInterval(
-      () => {
-        void validateSession();
-      },
-      SESSION_VALIDATION_INTERVAL,
-    );
-
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [
-    user,
-    validateSession,
-  ]);
-
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    const handleVisibilityChange =
-      () => {
-        if (
-          document.visibilityState ===
-          "visible"
-        ) {
-          void validateSession();
-          void sendHeartbeat();
-        }
-      };
-
-    const handleFocus = () => {
       void validateSession();
-      void sendHeartbeat();
+    }, SESSION_VALIDATION_INTERVAL);
+
+  return () => {
+    window.clearInterval(
+      interval,
+    );
+  };
+}, [
+  user,
+  validateSession,
+]);
+
+useEffect(() => {
+  if (!user) {
+    return;
+  }
+
+  const markActivity =
+    () => {
+      lastActivityAt.current =
+        Date.now();
     };
 
-    document.addEventListener(
+  document.addEventListener(
+    "visibilitychange",
+    markActivity,
+  );
+
+  window.addEventListener(
+    "focus",
+    markActivity,
+  );
+
+  return () => {
+    document.removeEventListener(
       "visibilitychange",
-      handleVisibilityChange,
+      markActivity,
     );
 
-    window.addEventListener(
+    window.removeEventListener(
       "focus",
-      handleFocus,
+      markActivity,
     );
+  };
+}, [user]);
 
-    return () => {
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibilityChange,
-      );
+useEffect(() => {
+  if (!user) {
+    return;
+  }
 
-      window.removeEventListener(
-        "focus",
-        handleFocus,
-      );
-    };
-  }, [
-    user,
-    validateSession,
-    sendHeartbeat,
-  ]);
+  const handleActivity = () => {
+    lastActivityAt.current =
+      Date.now();
+  };
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
+  const events = [
+    "mousemove",
+    "mousedown",
+    "keydown",
+    "touchstart",
+    "scroll",
+    "click",
+    "pointerdown",
+  ] as const;
 
-    const handleActivity = () => {
-      void sendHeartbeat();
-    };
+  events.forEach((event) => {
+    window.addEventListener(
+      event,
+      handleActivity,
+      {
+        passive:
+          event === "mousemove" ||
+          event === "touchstart" ||
+          event === "scroll",
+      },
+    );
+  });
 
-    const events = [
-      "mousemove",
-      "mousedown",
-      "keydown",
-      "touchstart",
-      "scroll",
-      "click",
-      "pointerdown",
-    ] as const;
-
+  return () => {
     events.forEach((event) => {
-      window.addEventListener(
+      window.removeEventListener(
         event,
         handleActivity,
-        {
-          passive:
-            event === "mousemove" ||
-            event === "touchstart" ||
-            event === "scroll",
-        },
       );
     });
+  };
+}, [user]);
 
-    return () => {
-      events.forEach((event) => {
-        window.removeEventListener(
-          event,
-          handleActivity,
-        );
-      });
+useEffect(() => {
+  if (!user) {
+    return;
+  }
+
+  const checkInactivity =
+    () => {
+      const now = Date.now();
+
+      if (
+        now - lastActivityAt.current >=
+        INACTIVITY_TIMEOUT
+      ) {
+        void logout();
+      }
     };
-  }, [
-    user,
-    sendHeartbeat,
-  ]);
+
+  const interval =
+    window.setInterval(
+      checkInactivity,
+      60_000,
+    );
+
+  return () => {
+    window.clearInterval(
+      interval,
+    );
+  };
+}, [user, logout]);
 
   const value = useMemo(
     () => ({

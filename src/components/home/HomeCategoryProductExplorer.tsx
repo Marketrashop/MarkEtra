@@ -876,14 +876,22 @@ style={{
     w-full
     sm:mt-6
   "
-  onMouseEnter={() => {
-    setIsInteracting(true);
-    setIsRailHovered(true);
-  }}
-  onMouseLeave={() => {
-    setIsInteracting(false);
-    setIsRailHovered(false);
-  }}
+onPointerEnter={(event) => {
+  if (event.pointerType !== "mouse") {
+    return;
+  }
+
+  setIsInteracting(true);
+  setIsRailHovered(true);
+}}
+onPointerLeave={(event) => {
+  if (event.pointerType !== "mouse") {
+    return;
+  }
+
+  setIsInteracting(false);
+  setIsRailHovered(false);
+}}
   onTouchStart={handleTouchStart}
   onTouchEnd={handleTouchEnd}
   onTouchCancel={handleTouchCancel}
