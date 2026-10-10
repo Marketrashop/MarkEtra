@@ -37,47 +37,42 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    "https://marketra.shop",
-  ),
+  metadataBase: new URL("https://marketra.shop"),
 
   title: {
     default: "MarkEtra",
-    template:
-      "%s | MarkEtra",
+    template: "%s | MarkEtra",
   },
 
-  description:
-    SITE.description,
+  description: SITE.description,
 
   openGraph: {
     type: "website",
     url: "https://marketra.shop",
-    siteName:
-      "MarkEtra",
-    title:
-      "MarkEtra",
-    description:
-      SITE.description,
+    siteName: "MarkEtra",
+    locale: "en_NG",
+    title: "MarkEtra",
+    description: SITE.description,
     images: [
       {
         url: "/assets/images/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MarkEtra",
+        type: "image/png",
+        alt: "MarkEtra online marketplace",
       },
     ],
   },
 
   twitter: {
-    card:
-      "summary_large_image",
-    title:
-      "MarkEtra",
-    description:
-      SITE.description,
+    card: "summary_large_image",
+    title: "MarkEtra",
+    description: SITE.description,
     images: [
-      "/assets/images/og-image.png",
+      {
+        url: "/assets/images/og-image.png",
+        alt: "MarkEtra online marketplace",
+      },
     ],
   },
 };

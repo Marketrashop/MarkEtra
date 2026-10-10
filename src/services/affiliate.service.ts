@@ -226,6 +226,7 @@ export async function submitAffiliateProduct(
 
 
 
+
 export async function getAffiliateTestBuyerPresence() {
   const now = new Date();
 
@@ -233,38 +234,52 @@ export async function getAffiliateTestBuyerPresence() {
     now.getTime() - ACTIVE_SESSION_WINDOW_MS,
   );
 
-  const latestSession =
-    await prisma.session.findFirst({
-      where: {
-        user: {
-          role: "ADMIN",
-          status: "ACTIVE",
-        },
-        revokedAt: null,
-        expiresAt: {
-          gt: now,
-        },
-        lastActivityAt: {
-          gte: activeSince,
-        },
+  // 1. Find a recently active, valid admin session.
+  const activeSession = await prisma.session.findFirst({
+    where: {
+      user: {
+        role: "ADMIN",
+        status: "ACTIVE",
       },
+      revokedAt: null,
+      expiresAt: {
+        gt: now,
+      },
+      lastActivityAt: {
+        gte: activeSince,
+      },
+    },
+    select: {
+      id: true,
+    },
+    orderBy: {
+      lastActivityAt: "desc",
+    },
+  });
 
-      select: {
-        lastActivityAt: true,
+  const latestSession = await prisma.session.findFirst({
+    where: {
+      user: {
+        role: "ADMIN",
       },
+    },
+    select: {
+      lastActivityAt: true,
+    },
+    orderBy: {
+      lastActivityAt: "desc",
+    },
+  });
 
-      orderBy: {
-        lastActivityAt: "desc",
-      },
-    });
+  const lastActivityAt =
+    latestSession?.lastActivityAt ?? null;
 
   return {
-    active: latestSession !== null,
-    lastActiveAt:
-      latestSession?.lastActivityAt
-        .toISOString() ?? null,
+    active: activeSession !== null,
+    lastActiveAt: lastActivityAt?.toISOString() ?? null,
   };
 }
+
 
 
 

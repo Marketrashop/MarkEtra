@@ -1685,7 +1685,7 @@ useEffect(() => {
       () => {
         void checkBuyerPresence();
       },
-      60_000,
+      5_000,
     );
 
   return () => {
@@ -1808,39 +1808,42 @@ if (succeeded) {
           onClose();
         }
       }}
-      className="
-        fixed
-        inset-0
-        z-[150]
-        flex
-        items-center
-        justify-center
-        bg-black/45
-        p-2
-        backdrop-blur-sm
-        sm:p-4
-      "
-    >
-      <form
-        role="dialog"
-        aria-modal="true"
-        aria-label="Negotiate buyer offer"
-        onSubmit={
-          handleSubmit
-        }
-        className="
-          flex
-          max-h-[96vh]
-          w-full
-          max-w-sm
-          flex-col
-          overflow-hidden
-          rounded-lg
-          border
-          shadow-2xl
-          sm:max-h-[90vh]
-          sm:rounded-xl
-        "
+
+className="
+  fixed
+  inset-0
+  z-[150]
+  flex
+  items-center
+  justify-center
+  bg-black/45
+  p-0
+  backdrop-blur-sm
+  sm:p-4
+"
+
+>
+  <form
+    role="dialog"
+    aria-modal="true"
+    aria-label="Negotiate buyer offer"
+    onSubmit={handleSubmit}
+    className="
+      flex
+      h-[100dvh]
+      max-h-[100dvh]
+      w-full
+      max-w-sm
+      flex-col
+      overflow-hidden
+      rounded-lg
+      border
+      shadow-2xl
+      sm:h-[min(100vh,720px)]
+      sm:max-h-[100dvh]
+      sm:rounded-xl
+    "
+
         style={{
           background:
             "var(--user-card-bg)",
@@ -2273,41 +2276,47 @@ className="
           </button>
         </div>
 
-        <div
-          className="
-            min-h-0
-            overflow-y-auto
-            p-2.5
-            sm:p-3
-          "
-        >
-          <div
-            className="
-              overflow-hidden
-              rounded-lg
-              border
-            "
-            style={{
-              background:
-                "var(--user-surface-secondary)",
+<div
+  className="
+    flex
+    min-h-0
+    flex-1
+    flex-col
+    overflow-hidden
+    p-2.5
+    sm:p-3
+  "
+>
+<div
+  className="
+    flex
+    min-h-0
+    flex-1
+    flex-col
+    overflow-hidden
+    rounded-lg
+    border
+  "
+  style={{
+    background:
+      "var(--user-surface-secondary)",
 
-              borderColor:
-                "var(--user-divider)",
-            }}
-          >
-            <div
-              className="
-                max-h-52
-                min-h-[72px]
-                space-y-1.5
-                overflow-y-auto
-                p-2
-                sm:max-h-60
-                sm:space-y-2
-                sm:p-2.5
-              "
-            >
-              {!hasMessages ? (
+    borderColor:
+      "var(--user-divider)",
+  }}
+>
+<div
+  className="
+    min-h-0
+    flex-1
+    space-y-1.5
+    overflow-y-auto
+    p-2
+    sm:space-y-2
+    sm:p-2.5
+  "
+>
+{!hasMessages ? (
 <div
   className="
     flex

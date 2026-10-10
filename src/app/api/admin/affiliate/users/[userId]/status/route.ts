@@ -33,18 +33,19 @@ export async function GET(
       where: {
         id: userId,
       },
-      select: {
-        id: true,
-        sessions: {
-          orderBy: {
-            lastActivityAt: "desc",
-          },
-          take: 1,
-          select: {
-            lastActivityAt: true,
-          },
-        },
-      },
+select: {
+  id: true,
+  status: true,
+  sessions: {
+    orderBy: {
+      lastActivityAt: "desc",
+    },
+    take: 1,
+    select: {
+      lastActivityAt: true,
+    },
+  },
+},
     });
 
     if (!user) {
@@ -65,8 +66,9 @@ export async function GET(
         AUTH_CONSTANTS.SESSION_IDLE_TIMEOUT_MS,
     );
 
-    const activeSession =
-      await prisma.session.findFirst({
+const activeSession =
+  user.status === "ACTIVE"
+    ? await prisma.session.findFirst({
         where: {
           userId: user.id,
           revokedAt: null,
@@ -80,10 +82,13 @@ export async function GET(
         select: {
           id: true,
         },
-      });
+        orderBy: {
+          lastActivityAt: "desc",
+        },
+      })
+    : null;
 
-    const active =
-      activeSession !== null;
+const active = activeSession !== null;
 
     return NextResponse.json({
       success: true,

@@ -36,7 +36,8 @@ type OrderStatus =
 type OrderPaymentStatus =
   | "PENDING"
   | "PAID"
-  | "FAILED";
+  | "FAILED"
+  | "REFUNDED";
 
 type PaymentMethod =
   | "WALLET"
@@ -802,19 +803,23 @@ async function confirmCancelOrder() {
 
 {selectedOrder && (
   <OrderDetailsModal
-    order={selectedOrder}
+    order={{
+      ...selectedOrder,
+      paymentStatus:
+        selectedOrder.status === "CANCELLED" &&
+        selectedOrder.paymentStatus === "PAID"
+          ? "REFUNDED"
+          : selectedOrder.paymentStatus,
+    }}
     currentTime={currentTime}
     cancelling={
-      cancellingOrderId ===
-      selectedOrder.id
+      cancellingOrderId === selectedOrder.id
     }
     onClose={() =>
       setSelectedOrder(null)
     }
     onCancel={() =>
-      void cancelOrder(
-        selectedOrder,
-      )
+      void cancelOrder(selectedOrder)
     }
   />
 )}
@@ -918,23 +923,25 @@ function OrderCard({
               {order.orderNumber}
             </span>
 
-            <StatusPill
-              value={
-                order.status
-              }
-              tone={getOrderTone(
-                order.status,
-              )}
-            />
+<StatusPill
+  value={order.status}
+  tone={getOrderTone(order.status)}
+/>
 
-            <StatusPill
-              value={
-                order.paymentStatus
-              }
-              tone={getPaymentTone(
-                order.paymentStatus,
-              )}
-            />
+<StatusPill
+  value={
+    order.status === "CANCELLED" &&
+    order.paymentStatus === "PAID"
+      ? "REFUNDED"
+      : order.paymentStatus
+  }
+  tone={
+    order.status === "CANCELLED" &&
+    order.paymentStatus === "PAID"
+      ? "purple"
+      : getPaymentTone(order.paymentStatus)
+  }
+/>
           </div>
 
           <div
@@ -1133,10 +1140,14 @@ function OrderDetailsModal({
     </h2>
 
     <StatusPill value={order.status} tone={getOrderTone(order.status)} />
-    <StatusPill
-      value={order.paymentStatus}
-      tone={getPaymentTone(order.paymentStatus)}
-    />
+<StatusPill
+  value={order.paymentStatus}
+  tone={
+    order.paymentStatus === "REFUNDED"
+      ? "purple"
+      : getPaymentTone(order.paymentStatus)
+  }
+/>
   </div>
 
   <p className="mt-1 truncate text-[10px] text-[var(--user-text-muted)]">
@@ -1831,7 +1842,8 @@ type StatusTone =
   | "success"
   | "warning"
   | "danger"
-  | "neutral";
+  | "neutral"
+  | "purple";
 
 function StatusPill({
   value,
@@ -1856,6 +1868,9 @@ function StatusPill({
 
     neutral:
       "border-[var(--user-card-border)] bg-[var(--user-card-bg)] text-[var(--user-text-muted)]",
+
+    purple:
+      "border-[var(--user-badge-purple-border)] bg-[var(--user-badge-purple-bg)] text-[var(--user-badge-purple-text)]",
   };
 
   return (

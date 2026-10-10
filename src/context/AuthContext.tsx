@@ -238,34 +238,53 @@ const sendHeartbeat =
     handleSessionInvalid,
   ]);
 
+
+useEffect(() => {
+  if (!user || loading) {
+    return;
+  }
+
+  void sendHeartbeat();
+
+  const interval = window.setInterval(() => {
+    void sendHeartbeat();
+  }, HEARTBEAT_INTERVAL);
+
+  return () => {
+    window.clearInterval(interval);
+  };
+}, [
+  user,
+  loading,
+  sendHeartbeat,
+]);
+
 useEffect(() => {
   if (!user) {
     return;
   }
 
-  const interval =
-    window.setInterval(() => {
-      const now = Date.now();
+  const interval = window.setInterval(() => {
+    const now = Date.now();
 
-      if (
-        now - lastActivityAt.current >=
-        INACTIVITY_TIMEOUT
-      ) {
-        return;
-      }
+    if (
+      now - lastActivityAt.current >=
+      INACTIVITY_TIMEOUT
+    ) {
+      return;
+    }
 
-      void validateSession();
-    }, SESSION_VALIDATION_INTERVAL);
+    void validateSession();
+  }, SESSION_VALIDATION_INTERVAL);
 
   return () => {
-    window.clearInterval(
-      interval,
-    );
+    window.clearInterval(interval);
   };
 }, [
   user,
   validateSession,
 ]);
+
 
 useEffect(() => {
   if (!user) {

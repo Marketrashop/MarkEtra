@@ -151,6 +151,7 @@ export async function revokeCurrentSession() {
 
   if (token) {
     const tokenHash = hashToken(token);
+    const now = new Date();
 
     await prisma.session.updateMany({
       where: {
@@ -158,12 +159,15 @@ export async function revokeCurrentSession() {
         revokedAt: null,
       },
       data: {
-        revokedAt: new Date(),
+        lastActivityAt: now,
+        revokedAt: now,
       },
     });
   }
 
-  cookieStore.delete(AUTH_CONSTANTS.SESSION_COOKIE_NAME);
+  cookieStore.delete(
+    AUTH_CONSTANTS.SESSION_COOKIE_NAME,
+  );
 }
 
 export async function refreshSessionActivity(

@@ -7,7 +7,9 @@ const BRAND_NAME =
 
 const BRAND_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
-  "http://localhost:3000";
+  "https://marketra.shop/";
+
+const BRAND_LOGO_URL = `${BRAND_URL.replace(/\/+$/, "")}/assets/images/general/logo.png`;
 
 export function buildBaseEmail({
   subject,
@@ -218,130 +220,161 @@ export function buildBaseEmail({
       ${safePreheader}
     </div>
 
-    <table
-      role="presentation"
-      width="100%"
-      cellpadding="0"
-      cellspacing="0"
-      border="0"
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  style="
+    width:100%;
+    background:#f5f5f8;
+  "
+>
+  <tr>
+    <td
+      align="center"
       style="
-        width:100%;
-        background:#f5f5f8;
+        padding:28px 14px;
       "
     >
-      <tr>
-        <td
-          align="center"
-          style="
-            padding:28px 14px;
-          "
-        >
-          <table
-            role="presentation"
-            width="100%"
-            cellpadding="0"
-            cellspacing="0"
-            border="0"
+      <table
+        role="presentation"
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="
+          width:100%;
+          max-width:620px;
+          background:#ffffff;
+          border:1px solid #e7e7ed;
+          border-radius:12px;
+          overflow:hidden;
+        "
+      >
+        <!-- Centered logo header -->
+        <tr>
+          <td
+            align="center"
             style="
-              width:100%;
-              max-width:620px;
+              padding:22px 24px;
+              border-bottom:1px solid #ececf1;
               background:#ffffff;
-              border:1px solid #e7e7ed;
-              border-radius:12px;
-              overflow:hidden;
+              text-align:center;
             "
           >
-            <tr>
-              <td
-                style="
-                  padding:22px 24px;
-                  border-bottom:1px solid #ececf1;
-                  background:#ffffff;
-                "
-              >
-                <a
-                  href="${escapeAttribute(
-                    BRAND_URL,
-                  )}"
-                  style="
-                    font-family:Arial,Helvetica,sans-serif;
-                    font-size:17px;
-                    font-weight:700;
-                    line-height:22px;
-                    color:#18191f;
-                    text-decoration:none;
-                  "
-                >
-                  ${BRAND_NAME}
-                </a>
-              </td>
-            </tr>
+            <table
+              role="presentation"
+              align="center"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              style="
+                margin:0 auto;
+                border-collapse:collapse;
+              "
+            >
+              <tr>
+                <td align="center" style="text-align:center;">
+                  <a
+                    href="${escapeAttribute(BRAND_URL)}"
+                    style="
+                      display:inline-block;
+                      text-decoration:none;
+                    "
+                  >
+                    <img
+                      src="${escapeAttribute(BRAND_LOGO_URL)}"
+                      alt="${BRAND_NAME}"
+width="150"
+style="
+  display:block;
+  width:160px;
+  max-width:100%;
+  height:auto;
+  border:0;
+  outline:none;
+  text-decoration:none;
+"
+                    />
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
 
-            <tr>
-              <td
-                style="
-                  padding:30px 24px 32px;
-                "
-              >
-                <h1
-                  style="
-                    margin:0;
-                    font-family:Arial,Helvetica,sans-serif;
-                    font-size:22px;
-                    line-height:30px;
-                    font-weight:700;
-                    color:#18191f;
-                  "
-                >
-                  ${safeTitle}
-                </h1>
+        <!-- Email content -->
+        <tr>
+          <td
+            style="
+              padding:30px 24px 32px;
+            "
+          >
+            <h1
+              style="
+                margin:0;
+                font-family:Arial,Helvetica,sans-serif;
+                font-size:22px;
+                line-height:30px;
+                font-weight:700;
+                color:#18191f;
+              "
+            >
+              ${safeTitle}
+            </h1>
 
-                <div
-                  style="
-                    margin-top:14px;
-                    font-family:Arial,Helvetica,sans-serif;
-                    font-size:14px;
-                    line-height:23px;
-                    color:#555762;
-                  "
-                >
-                  ${safeMessage}
-                </div>
+            <div
+              style="
+                margin-top:14px;
+                font-family:Arial,Helvetica,sans-serif;
+                font-size:14px;
+                line-height:23px;
+                color:#555762;
+              "
+            >
+              ${safeMessage}
+            </div>
 
-                ${sectionHtml}
+            ${sectionHtml}
 
-                ${detailsHtml}
+            ${detailsHtml}
 
-                ${buttonHtml}
+            ${buttonHtml}
 
-                ${footerHtml}
-              </td>
-            </tr>
+            ${footerHtml}
+          </td>
+        </tr>
 
-            <tr>
-              <td
-                style="
-                  padding:18px 24px;
-                  border-top:1px solid #ececf1;
-                  background:#fafafd;
-                "
-              >
-                <p
-                  style="
-                    margin:0;
-                    font-family:Arial,Helvetica,sans-serif;
-                    font-size:11px;
-                    line-height:18px;
-                    color:#8a8b95;
-                  "
-                >
-                  This is an automated message from
-                  ${BRAND_NAME}. Please do not reply
-                  directly to this email.
-                </p>
-              </td>
-            </tr>
-          </table>
+        <!-- Email footer -->
+        <tr>
+          <td
+            style="
+              padding:18px 24px;
+              border-top:1px solid #ececf1;
+              background:#fafafd;
+            "
+          >
+            <p
+              style="
+                margin:0;
+                font-family:Arial,Helvetica,sans-serif;
+                font-size:11px;
+                line-height:18px;
+                color:#8a8b95;
+              "
+            >
+              This is an automated message from
+              ${BRAND_NAME}. Please do not reply
+              directly to this email.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
         </td>
       </tr>
     </table>
