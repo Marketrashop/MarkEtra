@@ -1549,6 +1549,42 @@ const messageInputRef =
     null,
   );
 
+
+const [visualViewportSize, setVisualViewportSize] = useState({
+  height: 0,
+  top: 0,
+});
+
+useEffect(() => {
+  if (!open) return;
+
+  const updateViewport = () => {
+    const viewport = window.visualViewport;
+
+    setVisualViewportSize({
+      height: viewport?.height ?? window.innerHeight,
+      top: viewport?.offsetTop ?? 0,
+    });
+  };
+
+  updateViewport();
+
+  const viewport = window.visualViewport;
+
+  viewport?.addEventListener("resize", updateViewport);
+  viewport?.addEventListener("scroll", updateViewport);
+  window.addEventListener("resize", updateViewport);
+  window.addEventListener("orientationchange", updateViewport);
+
+  return () => {
+    viewport?.removeEventListener("resize", updateViewport);
+    viewport?.removeEventListener("scroll", updateViewport);
+    window.removeEventListener("resize", updateViewport);
+    window.removeEventListener("orientationchange", updateViewport);
+  };
+}, [open]);
+
+
 const [
   liveLastActiveAt,
   setLiveLastActiveAt,
@@ -1730,11 +1766,6 @@ useEffect(() => {
 if (!open) {
   return null;
 }
-
-  if (!open) {
-    return null;
-  }
-
   const hasMessages =
     messages.length > 0;
 
@@ -1811,39 +1842,46 @@ if (succeeded) {
 
 className="
   fixed
-  inset-0
+  inset-x-0
   z-[150]
   flex
   items-center
   justify-center
+  overflow-hidden
   bg-black/45
   p-0
   backdrop-blur-sm
   sm:p-4
 "
-
+style={{
+  top: `${visualViewportSize.top}px`,
+  height: visualViewportSize.height
+    ? `${visualViewportSize.height}px`
+    : "100dvh",
+}}
 >
   <form
     role="dialog"
     aria-modal="true"
     aria-label="Negotiate buyer offer"
     onSubmit={handleSubmit}
-    className="
-      flex
-      h-[100dvh]
-      max-h-[100dvh]
-      w-full
-      max-w-sm
-      flex-col
-      overflow-hidden
-      rounded-lg
-      border
-      shadow-2xl
-      sm:h-[min(100vh,720px)]
-      sm:max-h-[100dvh]
-      sm:rounded-xl
-    "
-
+className="
+  flex
+  h-full
+  max-h-full
+  w-full
+  max-w-none
+  min-h-0
+  flex-col
+  overflow-hidden
+  rounded-none
+  border
+  shadow-2xl
+  sm:h-[min(100dvh,720px)]
+  sm:max-h-[100dvh]
+  sm:max-w-sm
+  sm:rounded-xl
+"
         style={{
           background:
             "var(--user-card-bg)",
@@ -1853,17 +1891,21 @@ className="
         }}
       >
         <div
-          className="
-            flex
-            items-center
-            justify-between
-            gap-3
-            border-b
-            px-3
-            py-2.5
-            sm:px-4
-            sm:py-3
-          "
+className="
+  sticky
+  top-0
+  z-20
+  flex
+  shrink-0
+  items-center
+  justify-between
+  gap-3
+  border-b
+  px-3
+  py-2.5
+  sm:px-4
+  sm:py-3
+"
           style={{
             borderColor:
               "var(--user-divider)",
