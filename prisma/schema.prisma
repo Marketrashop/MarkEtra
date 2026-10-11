@@ -469,6 +469,7 @@ model AffiliateInterest {
   @@index([createdAt])
 }
 
+
 model AffiliateNegotiationMessage {
   id           String            @id @default(cuid())
   interestId   String
@@ -476,12 +477,16 @@ model AffiliateNegotiationMessage {
   message      String
   offeredPrice Decimal?          @db.Decimal(18, 2)
   createdAt    DateTime          @default(now())
+  imageUrl     String?
+  imageKey     String?
+
   interest     AffiliateInterest @relation(fields: [interestId], references: [id], onDelete: Cascade)
   sender       User              @relation(fields: [senderUserId], references: [id], onDelete: Cascade)
 
   @@index([interestId, createdAt])
   @@index([senderUserId])
 }
+
 
 model AffiliateTransaction {
   id               String                     @id @default(cuid())

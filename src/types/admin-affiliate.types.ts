@@ -145,6 +145,9 @@ export type AdminAffiliateNegotiationMessage = {
 
   message: string;
 
+  imageUrl: string | null;
+  imageKey: string | null;
+
   offeredPrice: number | null;
 
   createdAt: string;

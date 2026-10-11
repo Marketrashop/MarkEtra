@@ -49,6 +49,16 @@ export async function POST(
         ? body.message.trim()
         : "";
 
+const imageUrl =
+  typeof body.imageUrl === "string"
+    ? body.imageUrl
+    : null;
+
+const imageKey =
+  typeof body.imageKey === "string"
+    ? body.imageKey
+    : null;
+
     const hasOfferedPrice =
       body.offeredPrice !==
         undefined &&
@@ -63,7 +73,7 @@ export async function POST(
           )
         : null;
 
-    if (!message) {
+    if (!message && !imageUrl && !imageKey) {
       return NextResponse.json(
         {
           success: false,
@@ -76,6 +86,59 @@ export async function POST(
         },
       );
     }
+
+
+if (Boolean(imageUrl) !== Boolean(imageKey)) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: "Both imageUrl and imageKey are required for an image attachment.",
+    },
+    { status: 400 },
+  );
+}
+
+if (imageUrl && imageKey) {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
+  let parsedImageUrl: URL;
+
+  try {
+    parsedImageUrl = new URL(imageUrl);
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Invalid image URL." },
+      { status: 400 },
+    );
+  }
+
+  const expectedFolder =
+    `marketra/affiliate-negotiations/${interestId}/`;
+
+  const isCloudinaryUrl =
+    parsedImageUrl.protocol === "https:" &&
+    parsedImageUrl.hostname === "res.cloudinary.com" &&
+    Boolean(cloudName) &&
+    parsedImageUrl.pathname.startsWith(
+      `/${cloudName}/image/upload/`,
+    );
+
+  const isExpectedImageKey =
+    imageKey.startsWith(expectedFolder) &&
+    !imageKey.includes("..") &&
+    !imageKey.includes("\\");
+
+  if (!isCloudinaryUrl || !isExpectedImageKey) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "The image attachment is invalid for this negotiation.",
+      },
+      { status: 400 },
+    );
+  }
+}
+
 
     if (
       offeredPrice !== null &&
@@ -269,10 +332,14 @@ export async function POST(
                   senderUserId:
                     session.user.id,
 
-                  message,
+message,
 
-                  offeredPrice:
-                    negotiationPrice,
+imageUrl,
+
+imageKey,
+
+offeredPrice:
+  negotiationPrice,
                 },
               },
             );
@@ -310,6 +377,12 @@ await realtime
         result
           .negotiationMessage
           .message,
+
+imageUrl:
+  result.negotiationMessage.imageUrl,
+
+imageKey:
+  result.negotiationMessage.imageKey,
 
       offeredPrice:
         result
@@ -469,6 +542,12 @@ await realtime
             result
               .negotiationMessage
               .message,
+
+imageUrl:
+  result.negotiationMessage.imageUrl,
+
+imageKey:
+  result.negotiationMessage.imageKey,
 
           offeredPrice:
             result

@@ -84,10 +84,28 @@ export default function AffiliateProductDetailsModal({
     setReplyPrice,
   ] = useState("");
 
-  const [
-    replyLoading,
-    setReplyLoading,
-  ] = useState(false);
+const [
+  replyLoading,
+  setReplyLoading,
+] = useState(false);
+
+
+const [replyImage, setReplyImage] =
+  useState<File | null>(null);
+
+const [replyImagePreviewUrl, setReplyImagePreviewUrl] =
+  useState<string | null>(null);
+
+const [isReplyImagePreviewOpen, setIsReplyImagePreviewOpen] =
+  useState(false);
+
+const [messageImagePreviewUrl, setMessageImagePreviewUrl] = useState<string | null>(null);
+
+const [isMessageImagePreviewOpen, setIsMessageImagePreviewOpen] = useState(false);
+
+const replyImageInputRef =
+  useRef<HTMLInputElement | null>(null);
+
 
 const [
   otherUserTyping,
@@ -348,10 +366,14 @@ onData({ event, data }) {
                         data.interestId,
                       senderUserId:
                         data.senderUserId,
-                      message:
-                        data.message,
-                      offeredPrice:
-                        data.offeredPrice,
+message:
+  data.message,
+imageUrl:
+  data.imageUrl ?? null,
+imageKey:
+  data.imageKey ?? null,
+offeredPrice:
+  data.offeredPrice,
                       createdAt:
                         data.createdAt,
                       sender: {
@@ -471,15 +493,23 @@ onData({ event, data }) {
     );
   }
 
+
   function openInterest(
     interest: AdminAffiliateInterest,
   ) {
+    if (replyImagePreviewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(replyImagePreviewUrl);
+    }
+
+    setReplyImagePreviewUrl(null);
+    setReplyImage(null);
+    setIsReplyImagePreviewOpen(false);
+    setReplyMessage("");
+    setReplyPrice("");
+
     setSelectedInterestId(
       interest.id,
     );
-
-    setReplyMessage("");
-    setReplyPrice("");
   }
 
   function closeInterest() {
@@ -487,13 +517,21 @@ onData({ event, data }) {
       return;
     }
 
-    setSelectedInterestId(
-      null,
-    );
+    if (replyImagePreviewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(replyImagePreviewUrl);
+    }
 
+    setReplyImagePreviewUrl(null);
+    setReplyImage(null);
+    setIsReplyImagePreviewOpen(false);
+    setMessageImagePreviewUrl(null);
+    setIsMessageImagePreviewOpen(false);
+
+    setSelectedInterestId(null);
     setReplyMessage("");
     setReplyPrice("");
   }
+
 
 async function updateTypingStatus(
   isTyping: boolean,
@@ -587,16 +625,15 @@ function stopTyping() {
       return;
     }
 
-    const message =
-      replyMessage.trim();
+const message =
+  replyMessage.trim();
 
-    if (!message) {
-      toast.error(
-        "Enter a reply message.",
-      );
 
-      return;
-    }
+if (!message && !replyImage) {
+  toast.error("Enter a reply message or attach an image.");
+  return;
+}
+
 
     const parsedPrice =
       replyPrice.trim()
@@ -625,6 +662,38 @@ function stopTyping() {
         true,
       );
 
+
+let imageUrl: string | null = null;
+let imageKey: string | null = null;
+
+if (replyImage && selectedInterest) {
+  const formData = new FormData();
+  formData.append("image", replyImage);
+
+  const uploadResponse = await fetch(
+    `/api/admin/affiliate/interests/${encodeURIComponent(
+      selectedInterest.id,
+    )}/upload-image`,
+    {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    },
+  );
+
+  const uploadData = await uploadResponse.json();
+
+  if (!uploadResponse.ok || !uploadData.success) {
+    throw new Error(
+      uploadData.error ?? "Unable to upload image.",
+    );
+  }
+
+  imageUrl = uploadData.data.imageUrl;
+  imageKey = uploadData.data.imageKey;
+}
+
+
 stopTyping();
 
       const response =
@@ -643,13 +712,14 @@ stopTyping();
                 "application/json",
             },
 
-            body: JSON.stringify({
-              message,
 
-              offeredPrice:
-                parsedPrice ??
-                undefined,
-            }),
+body: JSON.stringify({
+  message,
+  offeredPrice: parsedPrice ?? undefined,
+  imageUrl: imageUrl ?? undefined,
+  imageKey: imageKey ?? undefined,
+}),
+
           },
         );
 
@@ -705,8 +775,9 @@ messages: interest.messages.some(
           newMessage.interestId,
         senderUserId:
           newMessage.senderUserId,
-        message:
-          newMessage.message,
+        message: newMessage.message,
+         imageUrl: newMessage.imageUrl ?? null,
+         imageKey: newMessage.imageKey ?? null,
         offeredPrice:
           newMessage.offeredPrice,
         createdAt:
@@ -730,6 +801,16 @@ messages: interest.messages.some(
 
       setReplyMessage("");
       setReplyPrice("");
+
+
+if (replyImagePreviewUrl) {
+  URL.revokeObjectURL(replyImagePreviewUrl);
+}
+
+setReplyImagePreviewUrl(null);
+setReplyImage(null);
+setIsReplyImagePreviewOpen(false);
+
 
       toast.success(
         "Buyer reply sent.",
@@ -1773,6 +1854,28 @@ className="
     </p>
   </div>
 
+
+{message.imageUrl && (
+  <button
+    type="button"
+    onClick={() => {
+      setMessageImagePreviewUrl(message.imageUrl);
+      setIsMessageImagePreviewOpen(true);
+    }}
+    aria-label="View attached image"
+    className="mt-2 block max-w-full overflow-hidden rounded-lg border"
+    style={{ borderColor: "var(--border)" }}
+  >
+    <img
+      src={message.imageUrl}
+      alt="Negotiation image attachment"
+      loading="lazy"
+      className="h-auto max-h-[150px] max-w-[150px] object-contain"
+    />
+  </button>
+)}
+
+{message.message && (
   <p
     className="
       mt-0.5
@@ -1789,6 +1892,7 @@ className="
   >
     {message.message}
   </p>
+)}
 
   {message.offeredPrice !==
     null && (
@@ -1895,216 +1999,238 @@ className="
         "
       >
 
-                                  <div>
-                                    <label
-                                      className="
-                                        mb-0.5
-                                        block
-                                        text-[7px]
-                                        font-semibold
-                                        uppercase
-                                        tracking-[0.06em]
-                                        sm:mb-1
-                                        sm:text-[8px]
-                                      "
-                                      style={{
-                                        color:
-                                          "var(--foreground-muted)",
-                                      }}
-                                    >
-                                      Reply as{" "}
-                                      {
-                                        interest
-                                          .testBuyer
-                                          .name
-                                      }
-                                    </label>
 
-                                    <textarea
-                                      value={
-                                        isSelected
-                                          ? replyMessage
-                                          : ""
-                                      }
-onChange={(event) => {
-  setReplyMessage(
-    event.target.value,
-  );
+<input
+  ref={replyImageInputRef}
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+  className="hidden"
+  onChange={(event) => {
+    const file = event.target.files?.[0];
 
-  handleReplyTyping();
-}}
-                                      placeholder="Write the buyer's reply..."
-                                      rows={
-                                        2
-                                      }
-                                      disabled={
-                                        replyLoading
-                                      }
-                                      className="
-                                        min-h-[52px]
-                                        w-full
-                                        resize-none
-                                        rounded-md
-                                        border
-                                        bg-transparent
-                                        px-2
-                                        py-1.5
-                                        text-[9px]
-                                        leading-3.5
-                                        outline-none
-                                        focus:border-[var(--foreground-muted)]
-                                        sm:min-h-0
-                                        sm:px-2.5
-                                        sm:py-2
-                                        sm:text-[10px]
-                                        sm:leading-4
-                                      "
-                                      style={{
-                                        color:
-                                          "var(--foreground)",
+    if (!file) return;
 
-                                        borderColor:
-                                          "var(--border)",
-                                      }}
-                                    />
-                                  </div>
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(file.type)
+    ) {
+      toast.error("Only JPG, PNG and WebP images are supported.");
+      event.target.value = "";
+      return;
+    }
 
-                                  <div
-                                    className="
-                                      flex
-                                      items-center
-                                      gap-1.5
-                                      sm:gap-2
-                                    "
-                                  >
-                                    <div
-                                      className="
-                                        flex
-                                        h-7
-                                        min-w-0
-                                        flex-1
-                                        items-center
-                                        rounded-md
-                                        border
-                                        px-2
-                                        sm:h-8
-                                        sm:px-2.5
-                                      "
-                                      style={{
-                                        background:
-                                          "var(--surface)",
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must not exceed 5 MB.");
+      event.target.value = "";
+      return;
+    }
 
-                                        borderColor:
-                                          "var(--border)",
-                                      }}
-                                    >
-                                      <span
-                                        className="
-                                          mr-1
-                                          text-[9px]
-                                          font-semibold
-                                          sm:text-[10px]
-                                        "
-                                        style={{
-                                          color:
-                                            "var(--foreground-muted)",
-                                        }}
-                                      >
-                                        $
-                                      </span>
+    if (replyImagePreviewUrl) {
+      URL.revokeObjectURL(replyImagePreviewUrl);
+    }
 
-                                      <input
-                                        type="number"
-                                        min="0.01"
-                                        step="0.01"
-                                        value={
-                                          replyPrice
-                                        }
-                                        onChange={(
-                                          event,
-                                        ) =>
-                                          setReplyPrice(
-                                            event
-                                              .target
-                                              .value,
-                                          )
-                                        }
-                                        placeholder="Optional price"
-                                        disabled={
-                                          replyLoading
-                                        }
-                                        className="
-                                          h-full
-                                          min-w-0
-                                          flex-1
-                                          bg-transparent
-                                          text-[9px]
-                                          outline-none
-                                          sm:text-[10px]
-                                        "
-                                        style={{
-                                          color:
-                                            "var(--foreground)",
-                                        }}
-                                      />
-                                    </div>
+    setReplyImage(file);
+    setReplyImagePreviewUrl(URL.createObjectURL(file));
+    event.target.value = "";
+  }}
+/>
 
-                                    <button
-                                      type="submit"
-                                      disabled={
-                                        replyLoading ||
-                                        !replyMessage.trim()
-                                      }
-                                      className="
-                                        inline-flex
-                                        h-7
-                                        shrink-0
-                                        items-center
-                                        gap-1
-                                        rounded-md
-                                        border
-                                        px-2
-                                        text-[8px]
-                                        font-semibold
-                                        transition
-                                        hover:bg-[var(--surface)]
-                                        disabled:cursor-not-allowed
-                                        disabled:opacity-50
-                                        sm:h-8
-                                        sm:gap-1.5
-                                        sm:px-2.5
-                                        sm:text-[9px]
-                                      "
-                                      style={{
-                                        background:
-                                          "var(--surface-hover)",
 
-                                        color:
-                                          "var(--foreground-muted)",
+<div className="flex items-end gap-2 sm:gap-2.5">
+  {/* Attachment button */}
+  <button
+    type="button"
+    aria-label="Attach image"
+    disabled={replyLoading}
+    onClick={() => replyImageInputRef.current?.click()}
+    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xl transition hover:bg-[var(--surface-hover)] disabled:opacity-50 sm:h-10 sm:w-10"
+    style={{
+      color: "var(--foreground-muted)",
+      borderColor: "var(--border)",
+    }}
+  >
+    +
+  </button>
 
-                                        borderColor:
-                                          "var(--border)",
-                                      }}
-                                    >
-                                      {replyLoading ? (
-                                        <Loader2
-                                          size={
-                                            11
-                                          }
-                                          className="animate-spin"
-                                        />
-                                      ) : (
-                                        <Send
-                                          size={
-                                            11
-                                          }
-                                        />
-                                      )}
+  {/* Message composer */}
+  <div className="flex min-w-0 flex-1 items-end gap-2 rounded-xl border px-2 py-2 sm:px-2.5">
+    {replyImagePreviewUrl && (
+      <div className="relative mb-0.5 shrink-0">
+        <button
+          type="button"
+          onClick={() => setIsReplyImagePreviewOpen(true)}
+          aria-label="Preview attached image"
+          className="h-10 w-10 overflow-hidden rounded-md border sm:h-11 sm:w-11"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <img
+            src={replyImagePreviewUrl}
+            alt="Selected attachment"
+            className="h-full w-full object-cover"
+          />
+        </button>
 
-                                      Reply
-                                    </button>
-                                  </div>
+        <button
+          type="button"
+          aria-label="Remove attached image"
+          onClick={() => {
+            if (replyImagePreviewUrl.startsWith("blob:")) {
+              URL.revokeObjectURL(replyImagePreviewUrl);
+            }
+            setReplyImagePreviewUrl(null);
+            setReplyImage(null);
+            setIsReplyImagePreviewOpen(false);
+          }}
+          className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border"
+          style={{
+            background: "var(--surface)",
+            color: "var(--foreground)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <X size={10} />
+        </button>
+      </div>
+    )}
+
+    <textarea
+      value={isSelected ? replyMessage : ""}
+      onChange={(event) => {
+        setReplyMessage(event.target.value);
+        handleReplyTyping();
+      }}
+      placeholder="Write the buyer's reply..."
+      rows={2}
+      disabled={replyLoading}
+      className="min-h-[40px] min-w-0 flex-1 resize-none bg-transparent py-1 text-[10px] leading-4 outline-none placeholder:text-[var(--foreground-muted)] sm:min-h-[44px] sm:text-[11px]"
+      style={{ color: "var(--foreground)" }}
+    />
+  </div>
+
+  {/* Send button */}
+  <button
+    type="submit"
+    disabled={replyLoading || (!replyMessage.trim() && !replyImage)}
+    aria-label="Send reply"
+    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition hover:bg-[var(--surface-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 sm:w-10"
+    style={{
+      background: "var(--surface-hover)",
+      color: "var(--foreground-muted)",
+      borderColor: "var(--border)",
+    }}
+  >
+    {replyLoading ? (
+      <Loader2 size={15} className="animate-spin" />
+    ) : (
+      <Send size={15} />
+    )}
+  </button>
+</div>
+
+
+<div
+  className="flex items-center gap-2"
+>
+  <div
+    className="flex h-8 min-w-0 flex-1 items-center rounded-md border px-2 sm:px-2.5"
+    style={{
+      background: "var(--surface)",
+      borderColor: "var(--border)",
+    }}
+  >
+    <span
+      className="mr-1 text-[9px] font-semibold sm:text-[10px]"
+      style={{
+        color: "var(--foreground-muted)",
+      }}
+    >
+      $
+    </span>
+
+    <input
+      type="number"
+      min="0.01"
+      step="0.01"
+      value={replyPrice}
+      onChange={(event) =>
+        setReplyPrice(event.target.value)
+      }
+      placeholder="Optional price"
+      disabled={replyLoading}
+      className="h-full min-w-0 flex-1 bg-transparent text-[9px] outline-none sm:text-[10px]"
+      style={{
+        color: "var(--foreground)",
+      }}
+    />
+  </div>
+</div>
+
       </form>
+
+
+{isReplyImagePreviewOpen && replyImagePreviewUrl && (
+  <div
+    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image attachment preview"
+    onMouseDown={(event) => {
+      if (event.target === event.currentTarget) {
+        setIsReplyImagePreviewOpen(false);
+      }
+    }}
+  >
+    <button
+      type="button"
+      onClick={() => setIsReplyImagePreviewOpen(false)}
+      aria-label="Close image preview"
+      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white"
+    >
+      <X size={20} />
+    </button>
+
+    <img
+      src={replyImagePreviewUrl}
+      alt="Enlarged image attachment"
+      className="max-h-[85vh] max-w-full rounded-xl object-contain"
+    />
+  </div>
+)}
+
+
+{isMessageImagePreviewOpen && messageImagePreviewUrl && (
+  <div
+    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Conversation image preview"
+    onMouseDown={(event) => {
+      if (event.target === event.currentTarget) {
+        setIsMessageImagePreviewOpen(false);
+        setMessageImagePreviewUrl(null);
+      }
+    }}
+  >
+    <button
+      type="button"
+      onClick={() => {
+        setIsMessageImagePreviewOpen(false);
+        setMessageImagePreviewUrl(null);
+      }}
+      aria-label="Close conversation image preview"
+      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white"
+    >
+      <X size={20} />
+    </button>
+
+    <img
+      src={messageImagePreviewUrl}
+      alt="Enlarged conversation image"
+      className="max-h-[85vh] max-w-full rounded-xl object-contain"
+    />
+  </div>
+)}
+
+
     </>
   )}
 

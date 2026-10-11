@@ -180,11 +180,17 @@ export default function AffiliateInterestCard({
                 senderUserId:
                   data.senderUserId,
 
-                message:
-                  data.message,
+message:
+  data.message,
 
-                offeredPrice:
-                  data.offeredPrice,
+imageUrl:
+  data.imageUrl ?? null,
+
+imageKey:
+  data.imageKey ?? null,
+
+offeredPrice:
+  data.offeredPrice,
 
                 createdAt:
                   data.createdAt,
@@ -518,15 +524,46 @@ export default function AffiliateInterestCard({
 async function handleNegotiate(
   message: string,
   offeredPrice: number | null,
+  image?: File | null,
 ) {
   if (actionLoading) {
     return false;
   }
 
-    try {
-      setActionLoading(
-        "negotiate",
+
+try {
+  setActionLoading("negotiate");
+
+  let imageUrl: string | null = null;
+  let imageKey: string | null = null;
+
+  if (image) {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const uploadResponse = await fetch(
+      `/api/affiliate/interests/${encodeURIComponent(
+        currentInterest.id,
+      )}/upload-image`,
+      {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      },
+    );
+
+    const uploadData = await uploadResponse.json();
+
+    if (!uploadResponse.ok || !uploadData.success) {
+      throw new Error(
+        uploadData.error ?? "Unable to upload image.",
       );
+    }
+
+    imageUrl = uploadData.data.imageUrl;
+    imageKey = uploadData.data.imageKey;
+  }
+
 
       const response =
         await fetch(
@@ -544,13 +581,12 @@ async function handleNegotiate(
                 "application/json",
             },
 
-            body: JSON.stringify({
-              message,
-
-              offeredPrice:
-                offeredPrice ??
-                undefined,
-            }),
+body: JSON.stringify({
+  message,
+  offeredPrice: offeredPrice ?? undefined,
+  imageUrl: imageUrl ?? undefined,
+  imageKey: imageKey ?? undefined,
+}),
           },
         );
 
@@ -1441,6 +1477,7 @@ type NegotiationDialogProps = {
   onSubmit: (
   message: string,
   offeredPrice: number | null,
+  image?: File | null,
 ) => Promise<boolean>;
 };
 
@@ -1534,6 +1571,42 @@ const [
   message,
   setMessage,
 ] = useState("");
+
+const [selectedImage, setSelectedImage] =
+  useState<File | null>(null);
+
+const [imagePreviewUrl, setImagePreviewUrl] =
+  useState<string | null>(null);
+
+const [isImagePreviewOpen, setIsImagePreviewOpen] =
+  useState(false);
+
+const [viewingMessageImageUrl, setViewingMessageImageUrl] = useState<string | null>(null);
+const [isMessageImagePreviewOpen, setIsMessageImagePreviewOpen] = useState(false);
+
+
+
+useEffect(() => {
+  if (open) return;
+
+  setIsImagePreviewOpen(false);
+  setIsMessageImagePreviewOpen(false);
+  setViewingMessageImageUrl(null);
+
+  if (imagePreviewUrl) {
+    if (imagePreviewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    setImagePreviewUrl(null);
+    setSelectedImage(null);
+  }
+}, [open, imagePreviewUrl]);
+
+
+
+const imageInputRef =
+  useRef<HTMLInputElement | null>(null);
 
 const [
   proposedPrice,
@@ -1773,13 +1846,13 @@ async function handleSubmit(
     const trimmedMessage =
       message.trim();
 
-    if (!trimmedMessage) {
-      toast.error(
-        "Enter a negotiation message.",
-      );
+if (!trimmedMessage && !selectedImage) {
+  toast.error(
+    "Enter a message or attach an image.",
+  );
 
-      return;
-    }
+  return;
+}
 
     const parsedPrice =
       proposedPrice.trim()
@@ -1807,13 +1880,24 @@ const succeeded =
   await onSubmit(
     trimmedMessage,
     parsedPrice,
+    selectedImage,
   );
+
 
 if (succeeded) {
   setMessage("");
 
+  if (imagePreviewUrl) {
+    URL.revokeObjectURL(imagePreviewUrl);
+  }
+
+  setImagePreviewUrl(null);
+  setSelectedImage(null);
+  setIsImagePreviewOpen(false);
+
   const textarea =
     messageInputRef.current;
+
 
   if (textarea) {
     textarea.style.height = "";
@@ -2578,6 +2662,30 @@ return (
                             </p>
                           </div>
 
+
+
+{item.imageUrl && (
+  <button
+    type="button"
+onClick={() => {
+  setViewingMessageImageUrl(item.imageUrl!);
+  setIsMessageImagePreviewOpen(true);
+}}
+    aria-label="View attached image"
+    className="mt-2 block max-w-full overflow-hidden rounded-lg border"
+    style={{ borderColor: "var(--user-card-border)" }}
+  >
+    <img
+      src={item.imageUrl}
+      alt="Image attachment"
+      loading="lazy"
+      className="h-auto max-h-[120px] max-w-[120px] object-contain"
+    />
+  </button>
+)}
+
+
+                    {item.message && (
                           <p
                             className="
                               mt-0.5
@@ -2595,7 +2703,8 @@ return (
                             {
                               item.message
                             }
-                          </p>
+  </p>
+)}
 
                           {item.offeredPrice !==
                             null && (
@@ -2628,7 +2737,7 @@ return (
             )}
 
 {otherUserTyping && hasMessages && (
-  <div className="flex justify-end">
+  <div className="flex justify-start">
     <div
       className="
         flex
@@ -2642,18 +2751,12 @@ return (
         sm:py-2
       "
       style={{
-        background:
-          "rgba(59, 130, 246, 0.18)",
-        borderColor:
-          "rgba(59, 130, 246, 0.35)",
+        background: "rgba(34, 197, 94, 0.12)",
+        borderColor: "rgba(34, 197, 94, 0.3)",
       }}
     >
       <span
-        className="
-          inline-flex
-          items-center
-          gap-0.5
-        "
+        className="inline-flex items-center gap-0.5"
         aria-hidden="true"
       >
         <span
@@ -2662,7 +2765,7 @@ return (
             w-1
             animate-bounce
             rounded-full
-            bg-[var(--message-blue)]
+            bg-green-500
             [animation-delay:-0.3s]
           "
         />
@@ -2673,7 +2776,7 @@ return (
             w-1
             animate-bounce
             rounded-full
-            bg-[var(--message-blue)]
+            bg-green-500
             [animation-delay:-0.15s]
           "
         />
@@ -2684,7 +2787,7 @@ return (
             w-1
             animate-bounce
             rounded-full
-            bg-[var(--message-blue)]
+            bg-green-500
           "
         />
       </span>
@@ -2707,163 +2810,294 @@ return (
               }}
             >
 
-<div
-  className="
-    flex
-    min-h-8
-    items-center
-    gap-1
-    rounded-full
-    border
-    px-1
-    py-0.5
-    sm:min-h-9
-    sm:gap-1.5
-    sm:px-1.5
-    sm:py-0
-  "
-  style={{
-    background:
-      "var(--user-card-bg)",
 
-    borderColor:
-      "var(--user-card-border)",
-  }}
->
-<textarea
-  ref={
-    messageInputRef
-  }
-  id="affiliate-negotiation-message"
-  value={
-    message
-  }
-  onChange={(
-    event,
-  ) => {
-    const value =
-      event.target.value;
+<div className="flex items-center gap-1.5 sm:gap-2">
 
-    setMessage(
-      value,
-    );
 
-    onTyping();
+<input
+  ref={imageInputRef}
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+  className="hidden"
+  onChange={(event) => {
+    const file = event.target.files?.[0];
 
-    const textarea =
-      event.target;
+    if (!file) return;
 
-    textarea.style.height =
-      "0px";
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(
+        file.type,
+      )
+    ) {
+      toast.error("Only JPG, PNG and WebP images are supported.");
+      event.target.value = "";
+      return;
+    }
 
-    const maxHeight =
-      window.innerWidth >=
-      640
-        ? 84
-        : 60;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must not exceed 5 MB.");
+      event.target.value = "";
+      return;
+    }
 
-    const nextHeight =
-      Math.min(
-        textarea.scrollHeight,
-        maxHeight,
-      );
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
 
-    textarea.style.height =
-      `${nextHeight}px`;
-
-    textarea.style.overflowY =
-      textarea.scrollHeight >
-      maxHeight
-        ? "auto"
-        : "hidden";
-  }}
-  placeholder={
-    hasMessages
-      ? "Write a reply..."
-      : "Write a professional message..."
-  }
-  rows={1}
-  disabled={
-    loading
-  }
-className="
-  min-h-7
-  flex-1
-  resize-none
-  overflow-hidden
-  bg-transparent
-  px-2.5
-  py-1
-  text-[10px]
-  leading-5
-  outline-none
-  placeholder:text-[var(--user-text-muted)]
-  disabled:opacity-60
-  sm:min-h-9
-  sm:px-2.5
-  sm:py-1.5
-  sm:text-[11px]
-"
-  style={{
-    color:
-      "var(--user-title)",
+    setSelectedImage(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+    event.target.value = "";
   }}
 />
 
-                <button
-                  type="submit"
-                  disabled={
-                    loading ||
-                    !message.trim()
-                  }
-                  aria-label={
-                    loading
-                      ? "Sending reply"
-                      : hasMessages
-                        ? "Send reply"
-                        : "Send message"
-                  }
-className="
-  flex
-  h-8
-  w-8
-  shrink-0
-  items-center
-  justify-center
-  rounded-full
-  border
-  transition
-  hover:bg-[var(--user-surface-secondary)]
-  disabled:cursor-not-allowed
-  disabled:opacity-50
-  sm:h-9
-  sm:w-9
-"
-                  style={{
-                    background:
-                      "var(--user-surface-secondary)",
 
-                    color:
-                      "var(--user-text-muted)",
+  {/* Plus button outside the composer */}
+  <button
+    onClick={() => imageInputRef.current?.click()}
+    type="button"
+    aria-label="Add attachment"
+    className="
+      flex
+      h-10
+      w-10
+      shrink-0
+      items-center
+      justify-center
+      rounded-full
+      border
+      sm:h-11
+      sm:w-11
+    "
+    style={{
+      background: "var(--user-surface-secondary)",
+      color: "var(--user-text-muted)",
+      borderColor: "var(--user-card-border)",
+    }}
+  >
+    <span className="text-2xl leading-none">+</span>
+  </button>
 
-                    borderColor:
-                      "var(--user-card-border)",
-                  }}
-                >
-                  {loading ? (
-                    <Loader2
-                      size={12}
-                      className="animate-spin"
-                    />
-                  ) : (
-                    <Send
-                      size={12}
-                    />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
+  {/* Composer retains its existing appearance */}
+  <div
+    className="
+      flex
+      min-h-8
+      min-w-0
+      flex-1
+      items-center
+      gap-1
+      rounded-full
+      border
+      px-1
+      py-0.5
+      sm:min-h-9
+      sm:gap-1.5
+      sm:px-1.5
+      sm:py-0
+    "
+    style={{
+      background: "var(--user-card-bg)",
+      borderColor: "var(--user-card-border)",
+    }}
+  >
+
+
+{imagePreviewUrl && (
+  <div className="relative ml-1 shrink-0">
+    <button
+      type="button"
+      onClick={() => setIsImagePreviewOpen(true)}
+      aria-label="Preview attached image"
+      className="block h-10 w-10 overflow-hidden rounded-lg border sm:h-11 sm:w-11"
+      style={{ borderColor: "var(--user-card-border)" }}
+    >
+      <img
+        src={imagePreviewUrl}
+        alt="Selected image attachment"
+        className="h-full w-full object-cover"
+      />
+    </button>
+
+    <button
+      type="button"
+      onClick={() => {
+        if (imagePreviewUrl) {
+          URL.revokeObjectURL(imagePreviewUrl);
+        }
+
+        setImagePreviewUrl(null);
+        setSelectedImage(null);
+      }}
+      aria-label="Remove attached image"
+      className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border"
+      style={{
+        background: "var(--user-card-bg)",
+        color: "var(--user-title)",
+        borderColor: "var(--user-card-border)",
+      }}
+    >
+      <X size={10} />
+    </button>
+  </div>
+)}
+
+    <textarea
+      ref={messageInputRef}
+      id="affiliate-negotiation-message"
+      value={message}
+      onChange={(event) => {
+        const value = event.target.value;
+        setMessage(value);
+        onTyping();
+
+        const textarea = event.target;
+        textarea.style.height = "0px";
+
+        const maxHeight = window.innerWidth >= 640 ? 84 : 60;
+        const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+
+        textarea.style.height = `${nextHeight}px`;
+        textarea.style.overflowY =
+          textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+      }}
+      placeholder={
+        hasMessages
+          ? "Write a reply..."
+          : "Write a professional message..."
+      }
+      rows={1}
+      disabled={loading}
+      className="
+        min-h-7
+        min-w-0
+        flex-1
+        resize-none
+        overflow-hidden
+        bg-transparent
+        px-2.5
+        py-1
+        text-[10px]
+        leading-5
+        outline-none
+        placeholder:text-[var(--user-text-muted)]
+        disabled:opacity-60
+        sm:min-h-9
+        sm:px-2.5
+        sm:py-1.5
+        sm:text-[11px]
+      "
+      style={{ color: "var(--user-title)" }}
+    />
+  </div>
+
+  {/* Send button outside the composer */}
+  <button
+    type="submit"
+    disabled={loading || (!message.trim() && !selectedImage)}
+    aria-label={
+      loading
+        ? "Sending reply"
+        : hasMessages
+          ? "Send reply"
+          : "Send message"
+    }
+    className="
+      flex
+      h-10
+      w-10
+      shrink-0
+      items-center
+      justify-center
+      rounded-full
+      border
+      transition
+      hover:bg-[var(--user-surface-secondary)]
+      disabled:cursor-not-allowed
+      disabled:opacity-50
+      sm:h-11
+      sm:w-11
+    "
+    style={{
+      background: "var(--user-surface-secondary)",
+      color: "var(--user-text-muted)",
+      borderColor: "var(--user-card-border)",
+    }}
+  >
+    {loading ? (
+      <Loader2 size={12} className="animate-spin" />
+    ) : (
+      <Send size={16} />
+    )}
+  </button>
+</div>
+</div>
+</div>
+
+
+{isImagePreviewOpen && imagePreviewUrl && (
+  <div
+    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image attachment preview"
+    onMouseDown={(event) => {
+      if (event.target === event.currentTarget) {
+        setIsImagePreviewOpen(false);
+      }
+    }}
+  >
+    <button
+      type="button"
+      onClick={() => setIsImagePreviewOpen(false)}
+      aria-label="Close image preview"
+      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white"
+    >
+      <X size={20} />
+    </button>
+
+    <img
+      src={imagePreviewUrl}
+      alt="Enlarged image attachment"
+      className="max-h-[85vh] max-w-full rounded-xl object-contain"
+    />
+  </div>
+)}
+
+
+{isMessageImagePreviewOpen && viewingMessageImageUrl && (
+  <div
+    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Conversation image preview"
+    onMouseDown={(event) => {
+      if (event.target === event.currentTarget) {
+        setIsMessageImagePreviewOpen(false);
+        setViewingMessageImageUrl(null);
+      }
+    }}
+  >
+    <button
+      type="button"
+      onClick={() => {
+        setIsMessageImagePreviewOpen(false);
+        setViewingMessageImageUrl(null);
+      }}
+      aria-label="Close conversation image preview"
+      className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white"
+    >
+      <X size={20} />
+    </button>
+
+    <img
+      src={viewingMessageImageUrl}
+      alt="Enlarged conversation image"
+      className="max-h-[85vh] max-w-full rounded-xl object-contain"
+    />
+  </div>
+)}
+
+
 
           <div
             className="

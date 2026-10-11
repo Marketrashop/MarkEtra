@@ -405,8 +405,9 @@ categories:
                 senderUserId:
                   message.senderUserId,
 
-                message:
-                  message.message,
+                message: message.message,
+                imageUrl: message.imageUrl ?? null,
+                imageKey: message.imageKey ?? null,
 
                 offeredPrice:
                   message

@@ -78,15 +78,12 @@ export type AffiliateTestBuyer = {
 
 export type AffiliateNegotiationMessage = {
   id: string;
-
   interestId: string;
-
   senderUserId: string;
-
   message: string;
-
   offeredPrice: number | null;
-
+  imageUrl: string | null;
+  imageKey: string | null;
   createdAt: string;
 };
 

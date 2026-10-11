@@ -11,6 +11,8 @@ const schema = {
       interestId: z.string(),
       senderUserId: z.string(),
       message: z.string(),
+      imageUrl: z.string().nullable().optional(),
+      imageKey: z.string().nullable().optional(),
       offeredPrice: z.number().nullable(),
       createdAt: z.string(),
       senderType: z.enum([
