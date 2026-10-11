@@ -599,10 +599,6 @@ onNegotiate?.(
   updatedInterest,
 );
 
-toast.success(
-  "Negotiation message sent.",
-);
-
 return true;
     } catch (error) {
       toast.error(
@@ -2714,14 +2710,14 @@ return (
 <div
   className="
     flex
-    min-h-7
+    min-h-8
     items-center
     gap-1
     rounded-full
     border
     px-1
     py-0.5
-    sm:min-h-7
+    sm:min-h-9
     sm:gap-1.5
     sm:px-1.5
     sm:py-0
@@ -2790,24 +2786,24 @@ return (
   disabled={
     loading
   }
-  className="
-    min-h-6
-    flex-1
-    resize-none
-    overflow-hidden
-    bg-transparent
-    px-2
-    py-0.5
-    text-[9px]
-    leading-4
-    outline-none
-    placeholder:text-[var(--user-text-muted)]
-    disabled:opacity-60
-    sm:min-h-8
-    sm:px-2.5
-    sm:py-1.5
-    sm:text-[10px]
-  "
+className="
+  min-h-7
+  flex-1
+  resize-none
+  overflow-hidden
+  bg-transparent
+  px-2.5
+  py-1
+  text-[10px]
+  leading-5
+  outline-none
+  placeholder:text-[var(--user-text-muted)]
+  disabled:opacity-60
+  sm:min-h-9
+  sm:px-2.5
+  sm:py-1.5
+  sm:text-[11px]
+"
   style={{
     color:
       "var(--user-title)",
@@ -2827,22 +2823,22 @@ return (
                         ? "Send reply"
                         : "Send message"
                   }
-                  className="
-                    flex
-                    h-7
-                    w-7
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    transition
-                    hover:bg-[var(--user-surface-secondary)]
-                    disabled:cursor-not-allowed
-                    disabled:opacity-50
-                    sm:h-8
-                    sm:w-8
-                  "
+className="
+  flex
+  h-8
+  w-8
+  shrink-0
+  items-center
+  justify-center
+  rounded-full
+  border
+  transition
+  hover:bg-[var(--user-surface-secondary)]
+  disabled:cursor-not-allowed
+  disabled:opacity-50
+  sm:h-9
+  sm:w-9
+"
                   style={{
                     background:
                       "var(--user-surface-secondary)",
