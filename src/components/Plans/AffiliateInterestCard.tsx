@@ -11,9 +11,12 @@ import Image from "next/image";
 import {
   Check,
   Copy,
+  Download,
+  FileText,
   Loader2,
   MessageSquareText,
   Phone,
+  Printer,
   Send,
   X,
 } from "lucide-react";
@@ -1202,6 +1205,134 @@ function ReceiptPromptDialog({
   );
 }
 
+
+type ReceiptRender = {
+  blob: Blob;
+  dataUrl: string;
+  width: number;
+  height: number;
+};
+
+function isTouchDevice() {
+  if (typeof navigator === "undefined" || typeof window === "undefined") {
+    return false;
+  }
+
+  return (
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
+    window.matchMedia("(pointer: coarse)").matches ||
+    window.matchMedia("(max-width: 768px)").matches
+  );
+}
+
+function canShareFile(file: File) {
+  return (
+    typeof navigator !== "undefined" &&
+    typeof navigator.share === "function" &&
+    typeof navigator.canShare === "function" &&
+    navigator.canShare({ files: [file] })
+  );
+}
+
+function shareUnavailableReason() {
+  if (!window.isSecureContext) {
+    return "Sharing needs a secure HTTPS page. Open the https:// version of the site.";
+  }
+
+  return "This browser can't share files.";
+}
+
+function needsRenderWarmUp() {
+  const ua = navigator.userAgent;
+
+  const isIOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  const isSafari = /^((?!chrome|crios|android).)*safari/i.test(ua);
+
+  return isIOS || isSafari;
+}
+
+function dataUrlToBlob(dataUrl: string) {
+  const [header, body] = dataUrl.split(",");
+  const mime = header.match(/:(.*?);/)?.[1] ?? "image/png";
+  const binary = atob(body);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return new Blob([bytes], { type: mime });
+}
+
+function downloadBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
+async function waitForImages(node: HTMLElement) {
+  await Promise.all(
+    Array.from(node.querySelectorAll("img")).map((image) =>
+      image.complete
+        ? Promise.resolve()
+        : new Promise<void>((resolve) => {
+            image.onload = () => resolve();
+            image.onerror = () => resolve();
+          }),
+    ),
+  );
+}
+
+async function renderReceiptToPng(
+  node: HTMLElement | null,
+): Promise<ReceiptRender> {
+  if (!node) {
+    throw new Error("Receipt is not ready yet.");
+  }
+
+  const { toPng } = await import("html-to-image");
+
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
+  await waitForImages(node);
+
+  const options = {
+    cacheBust: true,
+    pixelRatio: 2,
+    backgroundColor: "#ffffff",
+    style: {
+      borderRadius: "0",
+      boxShadow: "none",
+    },
+  };
+
+  if (needsRenderWarmUp()) {
+    await toPng(node, options);
+  }
+
+  const dataUrl = await toPng(node, options);
+
+  return {
+    blob: dataUrlToBlob(dataUrl),
+    dataUrl,
+    width: node.offsetWidth,
+    height: node.offsetHeight,
+  };
+}
+
 function AffiliateReceiptDialog({
   interest,
   product,
@@ -1213,101 +1344,299 @@ function AffiliateReceiptDialog({
   audience: "AFFILIATE" | "BUYER";
   onClose: () => void;
 }) {
+  const receiptRef = useRef<HTMLElement | null>(null);
+  const renderRef = useRef<Promise<ReceiptRender> | null>(null);
+  const pdfRef = useRef<Promise<Blob> | null>(null);
+
+  const [busy, setBusy] = useState<"image" | "pdf" | null>(null);
+  const [status, setStatus] = useState<"preparing" | "ready" | "failed">("preparing");
+  const [imageViewerUrl, setImageViewerUrl] = useState<string | null>(null);
+
   const transaction = interest.transaction;
   const productImage = product.images.find((image) => image.isPrimary)?.imageUrl ?? product.images[0]?.imageUrl;
   const amount = transaction?.agreedPrice ?? interest.offeredPrice;
   const statusLabel = transaction ? formatTransactionStatus(transaction.status) : interest.status === "ACCEPTED" ? "Offer accepted · transaction details pending" : "Offer rejected";
   const receiptNumber = `${audience === "AFFILIATE" ? "AFF" : "BUY"}-${interest.id.slice(-8).toUpperCase()}`;
   const isAffiliateReceipt = audience === "AFFILIATE";
+  const preparing = status === "preparing";
+
+  // Renders the receipt once and caches it.
+  function ensureRender(): Promise<ReceiptRender> {
+    if (!renderRef.current) {
+      renderRef.current = renderReceiptToPng(receiptRef.current).catch(
+        (error) => {
+          renderRef.current = null;
+          throw error;
+        },
+      );
+    }
+
+    return renderRef.current;
+  }
+
+  // Builds the PDF once and caches it, so sharing is instant on tap.
+  function ensurePdf(): Promise<Blob> {
+    if (!pdfRef.current) {
+      pdfRef.current = ensureRender()
+        .then(async ({ dataUrl, width, height }) => {
+          const { jsPDF } = await import("jspdf");
+
+          // One page sized to the receipt, so nothing is ever cut off.
+          const pdf = new jsPDF({
+            orientation: width > height ? "landscape" : "portrait",
+            unit: "px",
+            format: [width, height],
+            hotfixes: ["px_scaling"],
+          });
+
+          pdf.addImage(dataUrl, "PNG", 0, 0, width, height);
+
+          return pdf.output("blob");
+        })
+        .catch((error) => {
+          pdfRef.current = null;
+          throw error;
+        });
+    }
+
+    return pdfRef.current;
+  }
+
+  // Prepare both files in the background. Share sheets on phones only open
+  // when called right after a tap, so the buttons stay disabled until ready.
+  useEffect(() => {
+    let cancelled = false;
+
+    const timer = window.setTimeout(() => {
+      ensureRender()
+        .then(() => ensurePdf())
+        .then(() => {
+          if (!cancelled) setStatus("ready");
+        })
+        .catch(() => {
+          if (!cancelled) setStatus("failed");
+        });
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+async function handleSaveImage() {
+  if (busy) return;
+
+  setBusy("image");
+
+  try {
+    const { blob, dataUrl } = await ensureRender();
+    const fileName = `receipt-${receiptNumber}.png`;
+    const file = new File([blob], fileName, { type: "image/png" });
+    const touch = isTouchDevice();
+
+    if (touch && canShareFile(file)) {
+      // Share sheet: iPhone shows "Save Image" (goes to Photos).
+      try {
+        await navigator.share({
+          files: [file],
+          title: `Receipt ${receiptNumber}`,
+        });
+
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        console.error("Image share failed:", error);
+        toast.error(
+          `Share failed (${error instanceof Error ? error.name : "unknown error"}).`,
+        );
+      }
+    } else if (touch) {
+      toast.info(shareUnavailableReason());
+    }
+
+    if (touch) {
+      // Press and hold the image to save it to the gallery.
+      setImageViewerUrl(dataUrl);
+      return;
+    }
+
+    downloadBlob(blob, fileName);
+    toast.success("Receipt image saved.");
+  } catch (error) {
+    console.error("Receipt image error:", error);
+    toast.error("Unable to create the receipt image. Please try again.");
+  } finally {
+    setBusy(null);
+  }
+}
+
+async function handleSharePdf() {
+  if (busy) return;
+
+  setBusy("pdf");
+
+  try {
+    const pdfBlob = await ensurePdf();
+    const fileName = `receipt-${receiptNumber}.pdf`;
+    const file = new File([pdfBlob], fileName, { type: "application/pdf" });
+    const touch = isTouchDevice();
+
+    if (touch && canShareFile(file)) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: `Receipt ${receiptNumber}`,
+        });
+
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        console.error("PDF share failed:", error);
+        toast.error(
+          `Share failed (${error instanceof Error ? error.name : "unknown error"}).`,
+        );
+      }
+    } else if (touch) {
+      toast.info(shareUnavailableReason());
+    }
+
+    downloadBlob(pdfBlob, fileName);
+    toast.success("Receipt PDF downloaded.");
+  } catch (error) {
+    console.error("Receipt PDF error:", error);
+    toast.error("Unable to create the receipt PDF. Please try again.");
+  } finally {
+    setBusy(null);
+  }
+}
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-slate-950/60 p-3 backdrop-blur-sm sm:p-6">
-      <style>{`@media print { body * { visibility: hidden !important; } .affiliate-receipt-print, .affiliate-receipt-print * { visibility: visible !important; } .affiliate-receipt-print { position: absolute !important; inset: 0 auto auto 0 !important; width: 100% !important; max-width: none !important; margin: 0 !important; border: 0 !important; box-shadow: none !important; } .affiliate-receipt-no-print { display: none !important; } @page { size: A4; margin: 14mm; } }`}</style>
-      <div className="w-full max-w-2xl">
-        <div className="affiliate-receipt-no-print mb-3 flex items-center justify-between gap-3 text-white">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/80">{isAffiliateReceipt ? "Affiliate receipt" : "Buyer receipt"}</p>
-            <p className="mt-0.5 text-sm text-white/80">Review, print, or save as PDF</p>
-          </div>
-          <button type="button" onClick={onClose} aria-label="Close receipt" className="rounded-full border border-white/25 p-2 text-white transition hover:bg-white/10"><X size={18} /></button>
-        </div>
+    <div className="affiliate-receipt-overlay fixed inset-0 z-[200] overflow-y-auto overscroll-contain bg-slate-950/60 backdrop-blur-sm">
+      <style>{`@media print { body * { visibility: hidden !important; } .affiliate-receipt-print, .affiliate-receipt-print * { visibility: visible !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .affiliate-receipt-print { position: absolute !important; inset: 0 auto auto 0 !important; width: 100% !important; max-width: none !important; margin: 0 !important; border: 0 !important; box-shadow: none !important; } .affiliate-receipt-no-print { display: none !important; } @page { size: A4; margin: 14mm; } }`}</style>
 
-        <article className="affiliate-receipt-print overflow-hidden rounded-2xl border border-blue-100 bg-white text-slate-900 shadow-2xl">
-          <header className="relative overflow-hidden px-5 py-6 text-white sm:px-8 sm:py-8" style={{ backgroundColor: "#06067e" }}>
-            <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full border-[28px] border-white/10" />
-            <div className="relative flex items-start justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">Affiliate marketplace</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Receipt</h2>
-                <p className="mt-1 text-xs text-white/80">{isAffiliateReceipt ? "Offer record and affiliate transaction summary" : "Buyer copy of the offer and transaction summary"}</p>
-              </div>
-              <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-right backdrop-blur-sm">
-                <p className="text-[9px] uppercase tracking-[0.14em] text-white/80">Receipt no.</p>
-                <p className="mt-1 text-xs font-bold">{receiptNumber}</p>
-              </div>
+      <div className="flex min-h-full justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-6">
+        <div className="my-auto w-full max-w-2xl">
+          <div className="affiliate-receipt-no-print mb-3 flex items-center justify-between gap-3 text-white">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/80">{isAffiliateReceipt ? "Affiliate receipt" : "Buyer receipt"}</p>
+              <p className="mt-0.5 text-sm text-white/80">Review, save as an image, or share as PDF</p>
             </div>
-          </header>
-
-          <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-8">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Buyer details</p>
-                <p className="mt-2 break-words text-sm font-semibold">{interest.testBuyer.name}</p>
-                <p className="mt-1 break-words text-xs text-slate-600">{interest.testBuyer.phone}</p>
-                {interest.testBuyer.email && <p className="mt-1 break-words text-xs text-slate-600">{interest.testBuyer.email}</p>}
-              </div>
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Receipt details</p>
-                <p className="mt-2 text-sm font-semibold">{formatDateTime(interest.updatedAt)}</p>
-                <p className="mt-1 break-words text-xs text-slate-600">Interest ID: {interest.id}</p>
-                <span className="mt-2 inline-flex rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-800">{statusLabel}</span>
-              </div>
-            </div>
-
-            <section>
-              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Item summary</p>
-              <div className="flex items-center gap-4 rounded-xl border border-slate-200 p-3 sm:p-4">
-                {productImage ? <img src={productImage} alt={product.name} className="h-20 w-20 shrink-0 rounded-lg border border-slate-100 bg-slate-50 object-contain p-1" /> : <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">ITEM</div>}
-                <div className="min-w-0 flex-1">
-                  <h3 className="break-words text-sm font-semibold sm:text-base">{product.name}</h3>
-                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{product.description}</p>
-                  <p className="mt-2 text-xs text-slate-500">Listed price: {formatReceiptMoney(product.price)}</p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-[9px] uppercase tracking-wide text-slate-500">{transaction ? "Agreed price" : interest.status === "ACCEPTED" ? "Offer price" : "Rejected offer"}</p>
-                  <p className="mt-1 text-sm font-bold text-slate-900">{formatReceiptMoney(amount)}</p>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-xl border border-blue-100 bg-blue-50/70 p-4 sm:p-5">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-800">Financial summary</p>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Offer / agreed amount</span><span className="font-semibold">{formatReceiptMoney(amount)}</span></div>
-                {isAffiliateReceipt && transaction && <>
-                  <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Commission rate</span><span className="font-semibold">{transaction.commissionRate.toFixed(2)}%</span></div>
-                  <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Commission amount</span><span className="font-semibold">{formatReceiptMoney(transaction.commissionAmount)}</span></div>
-                </>}
-                <div className="border-t border-blue-200 pt-3">
-                  <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-700">Transaction status</span><span className="text-right text-sm font-bold text-blue-800">{statusLabel}</span></div>
-                </div>
-              </div>
-            </section>
-
-            <footer className="border-t border-slate-200 pt-4 text-xs leading-5 text-slate-500">
-              <p>{isAffiliateReceipt ? "This document records the affiliate offer status and the transaction details available at the time it was generated." : "This buyer copy records the offer and transaction details available at the time it was generated."}</p>
-              <p className="mt-1 font-medium text-slate-600">Generated on {new Date().toLocaleString()}</p>
-              {!transaction && interest.status === "ACCEPTED" && <p className="mt-2 text-blue-800">A transaction record has not been returned yet. This receipt does not confirm payment.</p>}
-              {transaction && transaction.status !== "COMPLETED" && <p className="mt-2 text-blue-800">This transaction is not marked as completed. This receipt is not proof of completed payment.</p>}
-            </footer>
+            <button type="button" onClick={onClose} aria-label="Close receipt" className="rounded-full border border-white/25 p-2 text-white transition hover:bg-white/10"><X size={18} /></button>
           </div>
-        </article>
 
-        <div className="affiliate-receipt-no-print mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <button type="button" onClick={onClose} className="rounded-lg border border-white/25 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">Close</button>
-          <button type="button" onClick={() => window.print()} className="rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow transition hover:bg-blue-50">Print / Save as PDF</button>
+          <article ref={receiptRef} className="affiliate-receipt-print overflow-hidden rounded-2xl border border-blue-100 bg-white text-slate-900 shadow-2xl">
+            <header className="relative overflow-hidden px-5 py-6 text-white sm:px-8 sm:py-8" style={{ backgroundColor: "#06067e" }}>
+              <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full border-[28px] border-white/10" />
+              <div className="relative flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">Affiliate marketplace</p>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Receipt</h2>
+                  <p className="mt-1 text-xs text-white/80">{isAffiliateReceipt ? "Offer record and affiliate transaction summary" : "Buyer copy of the offer and transaction summary"}</p>
+                </div>
+                <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-right">
+                  <p className="text-[9px] uppercase tracking-[0.14em] text-white/80">Receipt no.</p>
+                  <p className="mt-1 text-xs font-bold">{receiptNumber}</p>
+                </div>
+              </div>
+            </header>
+
+            <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-8">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Buyer details</p>
+                  <p className="mt-2 break-words text-sm font-semibold">{interest.testBuyer.name}</p>
+                  <p className="mt-1 break-words text-xs text-slate-600">{interest.testBuyer.phone}</p>
+                  {interest.testBuyer.email && <p className="mt-1 break-words text-xs text-slate-600">{interest.testBuyer.email}</p>}
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Receipt details</p>
+                  <p className="mt-2 text-sm font-semibold">{formatDateTime(interest.updatedAt)}</p>
+                  <p className="mt-1 break-words text-xs text-slate-600">Interest ID: {interest.id}</p>
+                  <span className="mt-2 inline-flex rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-800">{statusLabel}</span>
+                </div>
+              </div>
+
+              <section>
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Item summary</p>
+                <div className="flex items-center gap-4 rounded-xl border border-slate-200 p-3 sm:p-4">
+                  {productImage ? <img src={productImage} alt={product.name} crossOrigin="anonymous" className="h-20 w-20 shrink-0 rounded-lg border border-slate-100 bg-slate-50 object-contain p-1" /> : <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">ITEM</div>}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="break-words text-sm font-semibold sm:text-base">{product.name}</h3>
+                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{product.description}</p>
+                    <p className="mt-2 text-xs text-slate-500">Listed price: {formatReceiptMoney(product.price)}</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-[9px] uppercase tracking-wide text-slate-500">{transaction ? "Agreed price" : interest.status === "ACCEPTED" ? "Offer price" : "Rejected offer"}</p>
+                    <p className="mt-1 text-sm font-bold text-slate-900">{formatReceiptMoney(amount)}</p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-blue-100 bg-blue-50/70 p-4 sm:p-5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-800">Financial summary</p>
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Offer / agreed amount</span><span className="font-semibold">{formatReceiptMoney(amount)}</span></div>
+                  {isAffiliateReceipt && transaction && <>
+                    <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Commission rate</span><span className="font-semibold">{transaction.commissionRate.toFixed(2)}%</span></div>
+                    <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Commission amount</span><span className="font-semibold">{formatReceiptMoney(transaction.commissionAmount)}</span></div>
+                  </>}
+                  <div className="border-t border-blue-200 pt-3">
+                    <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-700">Transaction status</span><span className="text-right text-sm font-bold text-blue-800">{statusLabel}</span></div>
+                  </div>
+                </div>
+              </section>
+
+              <footer className="border-t border-slate-200 pt-4 text-xs leading-5 text-slate-500">
+                <p>{isAffiliateReceipt ? "This document records the affiliate offer status and the transaction details available at the time it was generated." : "This buyer copy records the offer and transaction details available at the time it was generated."}</p>
+                <p className="mt-1 font-medium text-slate-600">Generated on {new Date().toLocaleString()}</p>
+                {!transaction && interest.status === "ACCEPTED" && <p className="mt-2 text-blue-800">A transaction record has not been returned yet. This receipt does not confirm payment.</p>}
+                {transaction && transaction.status !== "COMPLETED" && <p className="mt-2 text-blue-800">This transaction is not marked as completed. This receipt is not proof of completed payment.</p>}
+              </footer>
+            </div>
+          </article>
+
+          <div className="affiliate-receipt-no-print mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button type="button" onClick={onClose} className="rounded-lg border border-white/25 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">Close</button>
+
+            <button type="button" onClick={() => window.print()} className="hidden items-center justify-center gap-2 rounded-lg border border-white/25 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 sm:inline-flex">
+              <Printer size={16} />
+              Print
+            </button>
+
+            <button type="button" onClick={handleSharePdf} disabled={busy !== null || preparing} className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/25 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60">
+              {busy === "pdf" || preparing ? <Loader2 size={16} className="animate-spin" /> : <FileText size={16} />}
+              {preparing ? "Preparing..." : busy === "pdf" ? "Opening share..." : "Share PDF"}
+            </button>
+
+            <button type="button" onClick={handleSaveImage} disabled={busy !== null || preparing} className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60">
+              {busy === "image" || preparing ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+              {preparing ? "Preparing..." : busy === "image" ? "Opening..." : "Save as image"}
+            </button>
+          </div>
         </div>
       </div>
+
+      {imageViewerUrl && (
+        <div className="affiliate-receipt-no-print fixed inset-0 z-[210] flex flex-col bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="Receipt image">
+          <div className="mb-3 flex items-start justify-between gap-3 text-white">
+            <p className="text-sm leading-5 text-white/90">
+              Press and hold the image, then choose <span className="font-semibold">Save to Photos</span> (iPhone) or <span className="font-semibold">Download image</span> (Android).
+            </p>
+            <button type="button" onClick={() => setImageViewerUrl(null)} aria-label="Close image" className="shrink-0 rounded-full border border-white/25 p-2 text-white transition hover:bg-white/10"><X size={18} /></button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-auto">
+            <img src={imageViewerUrl} alt={`Receipt ${receiptNumber}`} className="mx-auto h-auto w-full max-w-2xl rounded-lg bg-white" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
