@@ -1189,11 +1189,11 @@ function ReceiptPromptDialog({
         <p className="mt-2 text-sm leading-6 text-slate-600">Choose the version you want to generate. Both can be printed or saved as a PDF.</p>
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <button type="button" onClick={() => onGenerate("AFFILIATE")} className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-left transition hover:border-blue-900 hover:bg-blue-100">
-            <span className="block text-sm font-semibold text-blue-950">Affiliate receipt</span>
+            <span className="block text-sm font-semibold text-blue-950">For Myself (Affiliate)</span>
             <span className="mt-1 block text-xs leading-5 text-slate-600">Includes commission and affiliate-facing transaction details.</span>
           </button>
           <button type="button" onClick={() => onGenerate("BUYER")} className="rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-blue-900 hover:bg-slate-50">
-            <span className="block text-sm font-semibold text-slate-900">Buyer receipt</span>
+            <span className="block text-sm font-semibold text-slate-900">For Buyer</span>
             <span className="mt-1 block text-xs leading-5 text-slate-600">A buyer-facing copy without affiliate commission details.</span>
           </button>
         </div>
