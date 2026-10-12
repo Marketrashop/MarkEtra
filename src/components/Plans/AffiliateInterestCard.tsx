@@ -3510,7 +3510,6 @@ style={{
   "
   style={{ color: "var(--affiliate-composer-icon)" }}
 />
-
   </div>
 
   {/* Send button outside the composer */}
