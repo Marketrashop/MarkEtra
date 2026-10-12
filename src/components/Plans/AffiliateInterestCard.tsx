@@ -3485,7 +3485,7 @@ style={{
   placeholder={
     hasMessages
       ? "Write a reply..."
-      : "Write a professional message..."
+      : "Write a message..."
   }
   rows={1}
   disabled={loading}
