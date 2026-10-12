@@ -987,86 +987,62 @@ return true;
             </div>
           )}
 
-          {isAccepted &&
-            currentInterest.transaction && (
-              <TransactionSummary
-                status={
-                  currentInterest
-                    .transaction
-                    .status
-                }
-                agreedPrice={
-                  currentInterest
-                    .transaction
-                    .agreedPrice
-                }
-                commissionRate={
-                  currentInterest
-                    .transaction
-                    .commissionRate
-                }
-                commissionAmount={
-                  currentInterest
-                    .transaction
-                    .commissionAmount
-                }
-              />
-            )}
+{isAccepted && currentInterest.transaction && (
+  <>
+    <TransactionSummary
+      status={currentInterest.transaction.status}
+      agreedPrice={currentInterest.transaction.agreedPrice}
+      commissionRate={currentInterest.transaction.commissionRate}
+      commissionAmount={currentInterest.transaction.commissionAmount}
+    />
 
-          {isRejected && (
-            <div
-              className="
-                mt-2
-                rounded-lg
-                border
-                px-2.5
-                py-2
-                sm:mt-3
-              "
-              style={{
-                background:
-                  "var(--user-surface-secondary)",
+    <InterestAction
+      label="View Conversation"
+      icon={<MessageSquareText size={12} />}
+      loading={false}
+      onClick={() => setNegotiateOpen(true)}
+    />
+  </>
+)}
 
-                borderColor:
-                  "var(--user-divider)",
-              }}
-            >
-              <p
-                className="
-                  text-[9px]
-                  font-semibold
-                  sm:text-[10px]
-                "
-                style={{
-                  color:
-                    "var(--user-title)",
-                }}
-              >
-                Offer rejected
-              </p>
+{isRejected && (
+  <>
+    <div
+      className="mt-2 rounded-lg border px-2.5 py-2 sm:mt-3"
+      style={{
+        background: "var(--user-surface-secondary)",
+        borderColor: "var(--user-divider)",
+      }}
+    >
+      <p
+        className="text-[9px] font-semibold sm:text-[10px]"
+        style={{ color: "var(--user-title)" }}
+      >
+        Offer rejected
+      </p>
 
-              <p
-                className="
-                  mt-0.5
-                  text-[9px]
-                  leading-4
-                  sm:text-[10px]
-                "
-                style={{
-                  color:
-                    "var(--user-text-muted)",
-                }}
-              >
-                This buyer offer is no longer
-                active.
-              </p>
-            </div>
-          )}
+      <p
+        className="mt-0.5 text-[9px] leading-4 sm:text-[10px]"
+        style={{ color: "var(--user-text-muted)" }}
+      >
+        This buyer offer is no longer active.
+      </p>
+    </div>
+
+    <InterestAction
+      label="View Conversation"
+      icon={<MessageSquareText size={12} />}
+      loading={false}
+      onClick={() => setNegotiateOpen(true)}
+    />
+  </>
+)}
         </div>
       </article>
 
 <NegotiationDialog
   open={negotiateOpen}
+  status={currentInterest.status}
   buyerName={buyer.name}
   buyerImageUrl={imageUrl}
   buyerPhone={buyer.phone}
@@ -1458,6 +1434,7 @@ function InterestStatusBadge({
 
 type NegotiationDialogProps = {
   open: boolean;
+  status: AffiliateInterest["status"];
   buyerName: string;
   buyerImageUrl: string | null;
   buyerPhone: string;
@@ -1584,6 +1561,8 @@ const [isImagePreviewOpen, setIsImagePreviewOpen] =
 const [viewingMessageImageUrl, setViewingMessageImageUrl] = useState<string | null>(null);
 const [isMessageImagePreviewOpen, setIsMessageImagePreviewOpen] = useState(false);
 
+const isConversationClosed =
+  status === "ACCEPTED" || status === "REJECTED";
 
 
 useEffect(() => {
@@ -2409,35 +2388,46 @@ className="
     sm:p-3
   "
 >
-<div
-  className="
-    flex
-    min-h-0
-    flex-1
-    flex-col
-    overflow-hidden
-    rounded-lg
-    border
-  "
-  style={{
-    background:
-      "var(--user-surface-secondary)",
+  <div
+    className="
+      relative
+      isolate
+      flex
+      min-h-0
+      flex-1
+      flex-col
+      overflow-hidden
+      rounded-lg
+      border
+    "
+    style={{
+      backgroundColor: "var(--user-surface-secondary)",
+      borderColor: "var(--user-divider)",
+    }}
+  >
+    <div
+      className="absolute inset-0 z-0 bg-center bg-repeat opacity-45"
+      style={{
+        backgroundImage: "var(--affiliate-chat-wallpaper)",
+        backgroundSize: "auto 100%",
+      }}
+    />
 
-    borderColor:
-      "var(--user-divider)",
-  }}
->
 <div
   className="
-    min-h-0
-    flex-1
-    space-y-1.5
+    absolute
+    inset-0
+    z-10
     overflow-y-auto
+    space-y-1.5
     p-2
+    pb-24
     sm:space-y-2
     sm:p-2.5
+    sm:pb-28
   "
 >
+
 {!hasMessages ? (
 <div
   className="
@@ -2798,17 +2788,16 @@ onClick={() => {
             <div ref={messagesEndRef} />
           </div>
 
-            <div
-              className="
-                border-t
-                p-1.5
-                sm:p-2
-              "
-              style={{
-                borderColor:
-                  "var(--user-divider)",
-              }}
-            >
+<div
+  className="
+    absolute
+    inset-x-0
+    bottom-0
+    z-20
+    p-1.5
+    sm:p-2
+  "
+>
 
 
 <div className="flex items-center gap-1.5 sm:gap-2">
@@ -2868,11 +2857,11 @@ onClick={() => {
       sm:h-11
       sm:w-11
     "
-    style={{
-      background: "var(--user-surface-secondary)",
-      color: "var(--user-text-muted)",
-      borderColor: "var(--user-card-border)",
-    }}
+style={{
+  background: "var(--affiliate-composer-bg)",
+  color: "var(--affiliate-composer-icon)",
+  borderColor: "var(--affiliate-composer-border)",
+}}
   >
     <span className="text-2xl leading-none">+</span>
   </button>
@@ -2895,10 +2884,11 @@ onClick={() => {
       sm:px-1.5
       sm:py-0
     "
-    style={{
-      background: "var(--user-card-bg)",
-      borderColor: "var(--user-card-border)",
-    }}
+style={{
+  background: "var(--affiliate-composer-bg)",
+  color: "var(--affiliate-composer-icon)",
+  borderColor: "var(--affiliate-composer-border)",
+}}
   >
 
 
@@ -2941,53 +2931,55 @@ onClick={() => {
   </div>
 )}
 
-    <textarea
-      ref={messageInputRef}
-      id="affiliate-negotiation-message"
-      value={message}
-      onChange={(event) => {
-        const value = event.target.value;
-        setMessage(value);
-        onTyping();
 
-        const textarea = event.target;
-        textarea.style.height = "0px";
+<textarea
+  ref={messageInputRef}
+  id="affiliate-negotiation-message"
+  value={message}
+  onChange={(event) => {
+    const value = event.target.value;
+    setMessage(value);
+    onTyping();
 
-        const maxHeight = window.innerWidth >= 640 ? 84 : 60;
-        const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+    const textarea = event.target;
+    textarea.style.height = "0px";
 
-        textarea.style.height = `${nextHeight}px`;
-        textarea.style.overflowY =
-          textarea.scrollHeight > maxHeight ? "auto" : "hidden";
-      }}
-      placeholder={
-        hasMessages
-          ? "Write a reply..."
-          : "Write a professional message..."
-      }
-      rows={1}
-      disabled={loading}
-      className="
-        min-h-7
-        min-w-0
-        flex-1
-        resize-none
-        overflow-hidden
-        bg-transparent
-        px-2.5
-        py-1
-        text-[10px]
-        leading-5
-        outline-none
-        placeholder:text-[var(--user-text-muted)]
-        disabled:opacity-60
-        sm:min-h-9
-        sm:px-2.5
-        sm:py-1.5
-        sm:text-[11px]
-      "
-      style={{ color: "var(--user-title)" }}
-    />
+    const maxHeight = window.innerWidth >= 640 ? 84 : 60;
+    const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+
+    textarea.style.height = `${nextHeight}px`;
+    textarea.style.overflowY =
+      textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+  }}
+  placeholder={
+    hasMessages
+      ? "Write a reply..."
+      : "Write a professional message..."
+  }
+  rows={1}
+  disabled={loading}
+  className="
+    min-h-7
+    min-w-0
+    flex-1
+    resize-none
+    overflow-hidden
+    bg-transparent
+    px-2.5
+    py-1
+    text-[10px]
+    leading-5
+    outline-none
+    placeholder:text-[var(--affiliate-composer-icon)]
+    disabled:opacity-60
+    sm:min-h-9
+    sm:px-2.5
+    sm:py-1.5
+    sm:text-[11px]
+  "
+  style={{ color: "var(--affiliate-composer-icon)" }}
+/>
+
   </div>
 
   {/* Send button outside the composer */}
@@ -3018,7 +3010,7 @@ onClick={() => {
       sm:w-11
     "
     style={{
-      background: "var(--user-surface-secondary)",
+      background: "rgba(6, 6, 126, 0.09)",
       color: "var(--user-text-muted)",
       borderColor: "var(--user-card-border)",
     }}

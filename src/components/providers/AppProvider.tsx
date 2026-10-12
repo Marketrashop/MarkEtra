@@ -42,6 +42,8 @@ import {
   RealtimeProvider,
 } from "@upstash/realtime/client";
 
+import ThemeColorSync from "./ThemeColorSync";
+
 type AppProviderProps = {
   children: ReactNode;
 };
@@ -50,8 +52,10 @@ export default function AppProvider({
   children,
 }: AppProviderProps) {
   return (
-    <ThemeProvider>
-      <ExperienceProvider>
+<ThemeProvider>
+  <ThemeColorSync />
+
+  <ExperienceProvider>
         <PremiumToastProvider>
           <AuthProvider>
 <RealtimeProvider

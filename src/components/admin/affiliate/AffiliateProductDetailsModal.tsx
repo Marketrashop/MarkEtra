@@ -1728,12 +1728,23 @@ className="
   </span>
 </div>
 
-    <div
-      className="
-        space-y-1.5
-        sm:space-y-2
-      "
-    >
+<div className="relative isolate overflow-hidden rounded-md">
+  <div
+    className="absolute inset-0 z-0 bg-center bg-repeat opacity-45"
+    style={{
+      backgroundImage: "var(--affiliate-chat-wallpaper)",
+      backgroundSize: "auto 100%",
+    }}
+  />
+
+  <div
+    className="
+      relative
+      z-10
+      space-y-1.5
+      sm:space-y-2
+    "
+  >
                               {interest.messages.length ===
                               0 ? (
                                 <p
@@ -1923,7 +1934,8 @@ className="
                                   ),
                                 )
                               )}
-                            </div>
+    </div>
+  </div>
 
 {interest.status !==
   "ACCEPTED" &&

@@ -1264,6 +1264,13 @@
   0 8px 24px rgba(0, 0, 0, 0.08);
 
 
+  --affiliate-chat-wallpaper: url("/assets/images/affiliate-chat/wallpaper-light.png");
+
+
+--affiliate-composer-bg: rgba(6, 6, 126, 0.284);
+--affiliate-composer-border: var(--user-card-border);
+--affiliate-composer-icon: #ffffff;
+
 
 
 --hero-features-background-image:
@@ -3599,6 +3606,13 @@
 
 --product-gallery-control-shadow:
   0 10px 28px rgba(0, 0, 0, 0.22);
+
+  --affiliate-chat-wallpaper: url("/assets/images/affiliate-chat/wallpaper-blue.png");
+
+
+--affiliate-composer-bg: rgba(6, 6, 126, 0.09);
+--affiliate-composer-border: var(--user-card-border);
+--affiliate-composer-icon: var(--user-text-muted);
 
 
 --hero-features-background-image:
