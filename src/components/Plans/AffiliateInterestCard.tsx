@@ -37,8 +37,28 @@ import {
   useRealtime,
 } from "@/lib/realtime/affiliate-negotiation-client";
 
+type AffiliateReceiptProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  compareAtPrice: number | null;
+  averageRating: number;
+  totalRatings: number;
+  images: {
+    id: string;
+    imageKey: string;
+    imageUrl: string;
+    altText: string | null;
+    isPrimary: boolean;
+    sortOrder: number;
+  }[];
+};
+
 type AffiliateInterestCardProps = {
   interest: AffiliateInterest;
+  product: AffiliateReceiptProduct;
 
   onAccept?: (
     interest: AffiliateInterest,
@@ -55,6 +75,7 @@ type AffiliateInterestCardProps = {
 
 export default function AffiliateInterestCard({
   interest,
+  product,
   onAccept,
   onReject,
   onNegotiate,
@@ -95,6 +116,10 @@ export default function AffiliateInterestCard({
     actionDialogOpen,
     setActionDialogOpen,
   ] = useState(false);
+
+  const [receiptPromptOpen, setReceiptPromptOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [receiptAudience, setReceiptAudience] = useState<"AFFILIATE" | "BUYER">("AFFILIATE");
 
 
   const typingTimeoutRef =
@@ -416,6 +441,7 @@ offeredPrice:
       toast.success(
         "Offer accepted.",
       );
+      setReceiptPromptOpen(true);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -484,6 +510,7 @@ offeredPrice:
       toast.success(
         "Offer rejected.",
       );
+      setReceiptPromptOpen(true);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -988,21 +1015,23 @@ return true;
           )}
 
 {isAccepted && currentInterest.transaction && (
-  <>
-    <TransactionSummary
-      status={currentInterest.transaction.status}
-      agreedPrice={currentInterest.transaction.agreedPrice}
-      commissionRate={currentInterest.transaction.commissionRate}
-      commissionAmount={currentInterest.transaction.commissionAmount}
-    />
+  <TransactionSummary
+    status={currentInterest.transaction.status}
+    agreedPrice={currentInterest.transaction.agreedPrice}
+    commissionRate={currentInterest.transaction.commissionRate}
+    commissionAmount={currentInterest.transaction.commissionAmount}
+  />
+)}
 
+{isAccepted && (
+  <div className="mt-2.5 flex flex-wrap gap-1.5 sm:mt-3">
     <InterestAction
       label="View Conversation"
       icon={<MessageSquareText size={12} />}
       loading={false}
       onClick={() => setNegotiateOpen(true)}
     />
-  </>
+  </div>
 )}
 
 {isRejected && (
@@ -1014,27 +1043,21 @@ return true;
         borderColor: "var(--user-divider)",
       }}
     >
-      <p
-        className="text-[9px] font-semibold sm:text-[10px]"
-        style={{ color: "var(--user-title)" }}
-      >
+      <p className="text-[9px] font-semibold sm:text-[10px]" style={{ color: "var(--user-title)" }}>
         Offer rejected
       </p>
-
-      <p
-        className="mt-0.5 text-[9px] leading-4 sm:text-[10px]"
-        style={{ color: "var(--user-text-muted)" }}
-      >
+      <p className="mt-0.5 text-[9px] leading-4 sm:text-[10px]" style={{ color: "var(--user-text-muted)" }}>
         This buyer offer is no longer active.
       </p>
     </div>
-
-    <InterestAction
-      label="View Conversation"
-      icon={<MessageSquareText size={12} />}
-      loading={false}
-      onClick={() => setNegotiateOpen(true)}
-    />
+    <div className="mt-2.5 flex flex-wrap gap-1.5 sm:mt-3">
+      <InterestAction
+        label="View Conversation"
+        icon={<MessageSquareText size={12} />}
+        loading={false}
+        onClick={() => setNegotiateOpen(true)}
+      />
+    </div>
   </>
 )}
         </div>
@@ -1078,6 +1101,7 @@ onAction={() =>
     true,
   )
 }
+onReceipt={() => setReceiptPromptOpen(true)}
 onTyping={
   handleMessageTyping
 }
@@ -1116,8 +1140,183 @@ onSubmit={
           }
         />
       )}
+
+      {receiptPromptOpen && (
+        <ReceiptPromptDialog
+          onGenerate={(audience) => {
+            setReceiptAudience(audience);
+            setReceiptPromptOpen(false);
+            setReceiptOpen(true);
+          }}
+          onSkip={() => setReceiptPromptOpen(false)}
+        />
+      )}
+
+      {receiptOpen && (
+        <AffiliateReceiptDialog
+          interest={currentInterest}
+          product={product}
+          audience={receiptAudience}
+          onClose={() => setReceiptOpen(false)}
+        />
+      )}
     </>
   );
+}
+
+function ReceiptIcon() {
+  return <span aria-hidden="true" className="text-[12px] leading-none">▤</span>;
+}
+
+function ReceiptPromptDialog({
+  onGenerate,
+  onSkip,
+}: {
+  onGenerate: (audience: "AFFILIATE" | "BUYER") => void;
+  onSkip: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[190] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+      <div role="dialog" aria-modal="true" aria-labelledby="receipt-prompt-title" className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 text-slate-900 shadow-2xl sm:p-6">
+        <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-900">
+          <ReceiptIcon />
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-900">Offer Receipt</p>
+        <h3 id="receipt-prompt-title" className="mt-1 text-lg font-semibold tracking-tight">Which receipt would you like?</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Choose the version you want to generate. Both can be printed or saved as a PDF.</p>
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <button type="button" onClick={() => onGenerate("AFFILIATE")} className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-left transition hover:border-blue-900 hover:bg-blue-100">
+            <span className="block text-sm font-semibold text-blue-950">Affiliate receipt</span>
+            <span className="mt-1 block text-xs leading-5 text-slate-600">Includes commission and affiliate-facing transaction details.</span>
+          </button>
+          <button type="button" onClick={() => onGenerate("BUYER")} className="rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-blue-900 hover:bg-slate-50">
+            <span className="block text-sm font-semibold text-slate-900">Buyer receipt</span>
+            <span className="mt-1 block text-xs leading-5 text-slate-600">A buyer-facing copy without affiliate commission details.</span>
+          </button>
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button type="button" onClick={onSkip} className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Not now</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AffiliateReceiptDialog({
+  interest,
+  product,
+  audience,
+  onClose,
+}: {
+  interest: AffiliateInterest;
+  product: AffiliateReceiptProduct;
+  audience: "AFFILIATE" | "BUYER";
+  onClose: () => void;
+}) {
+  const transaction = interest.transaction;
+  const productImage = product.images.find((image) => image.isPrimary)?.imageUrl ?? product.images[0]?.imageUrl;
+  const amount = transaction?.agreedPrice ?? interest.offeredPrice;
+  const statusLabel = transaction ? formatTransactionStatus(transaction.status) : interest.status === "ACCEPTED" ? "Offer accepted · transaction details pending" : "Offer rejected";
+  const receiptNumber = `${audience === "AFFILIATE" ? "AFF" : "BUY"}-${interest.id.slice(-8).toUpperCase()}`;
+  const isAffiliateReceipt = audience === "AFFILIATE";
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-slate-950/60 p-3 backdrop-blur-sm sm:p-6">
+      <style>{`@media print { body * { visibility: hidden !important; } .affiliate-receipt-print, .affiliate-receipt-print * { visibility: visible !important; } .affiliate-receipt-print { position: absolute !important; inset: 0 auto auto 0 !important; width: 100% !important; max-width: none !important; margin: 0 !important; border: 0 !important; box-shadow: none !important; } .affiliate-receipt-no-print { display: none !important; } @page { size: A4; margin: 14mm; } }`}</style>
+      <div className="w-full max-w-2xl">
+        <div className="affiliate-receipt-no-print mb-3 flex items-center justify-between gap-3 text-white">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/80">{isAffiliateReceipt ? "Affiliate receipt" : "Buyer receipt"}</p>
+            <p className="mt-0.5 text-sm text-white/80">Review, print, or save as PDF</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close receipt" className="rounded-full border border-white/25 p-2 text-white transition hover:bg-white/10"><X size={18} /></button>
+        </div>
+
+        <article className="affiliate-receipt-print overflow-hidden rounded-2xl border border-blue-100 bg-white text-slate-900 shadow-2xl">
+          <header className="relative overflow-hidden px-5 py-6 text-white sm:px-8 sm:py-8" style={{ backgroundColor: "#06067e" }}>
+            <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full border-[28px] border-white/10" />
+            <div className="relative flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">Affiliate marketplace</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Receipt</h2>
+                <p className="mt-1 text-xs text-white/80">{isAffiliateReceipt ? "Offer record and affiliate transaction summary" : "Buyer copy of the offer and transaction summary"}</p>
+              </div>
+              <div className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-right backdrop-blur-sm">
+                <p className="text-[9px] uppercase tracking-[0.14em] text-white/80">Receipt no.</p>
+                <p className="mt-1 text-xs font-bold">{receiptNumber}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-8">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Buyer details</p>
+                <p className="mt-2 break-words text-sm font-semibold">{interest.testBuyer.name}</p>
+                <p className="mt-1 break-words text-xs text-slate-600">{interest.testBuyer.phone}</p>
+                {interest.testBuyer.email && <p className="mt-1 break-words text-xs text-slate-600">{interest.testBuyer.email}</p>}
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Receipt details</p>
+                <p className="mt-2 text-sm font-semibold">{formatDateTime(interest.updatedAt)}</p>
+                <p className="mt-1 break-words text-xs text-slate-600">Interest ID: {interest.id}</p>
+                <span className="mt-2 inline-flex rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-800">{statusLabel}</span>
+              </div>
+            </div>
+
+            <section>
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">Item summary</p>
+              <div className="flex items-center gap-4 rounded-xl border border-slate-200 p-3 sm:p-4">
+                {productImage ? <img src={productImage} alt={product.name} className="h-20 w-20 shrink-0 rounded-lg border border-slate-100 bg-slate-50 object-contain p-1" /> : <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">ITEM</div>}
+                <div className="min-w-0 flex-1">
+                  <h3 className="break-words text-sm font-semibold sm:text-base">{product.name}</h3>
+                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{product.description}</p>
+                  <p className="mt-2 text-xs text-slate-500">Listed price: {formatReceiptMoney(product.price)}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-[9px] uppercase tracking-wide text-slate-500">{transaction ? "Agreed price" : interest.status === "ACCEPTED" ? "Offer price" : "Rejected offer"}</p>
+                  <p className="mt-1 text-sm font-bold text-slate-900">{formatReceiptMoney(amount)}</p>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-xl border border-blue-100 bg-blue-50/70 p-4 sm:p-5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-800">Financial summary</p>
+              <div className="mt-4 space-y-3">
+                <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Offer / agreed amount</span><span className="font-semibold">{formatReceiptMoney(amount)}</span></div>
+                {isAffiliateReceipt && transaction && <>
+                  <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Commission rate</span><span className="font-semibold">{transaction.commissionRate.toFixed(2)}%</span></div>
+                  <div className="flex items-center justify-between gap-3 text-sm"><span className="text-slate-600">Commission amount</span><span className="font-semibold">{formatReceiptMoney(transaction.commissionAmount)}</span></div>
+                </>}
+                <div className="border-t border-blue-200 pt-3">
+                  <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-700">Transaction status</span><span className="text-right text-sm font-bold text-blue-800">{statusLabel}</span></div>
+                </div>
+              </div>
+            </section>
+
+            <footer className="border-t border-slate-200 pt-4 text-xs leading-5 text-slate-500">
+              <p>{isAffiliateReceipt ? "This document records the affiliate offer status and the transaction details available at the time it was generated." : "This buyer copy records the offer and transaction details available at the time it was generated."}</p>
+              <p className="mt-1 font-medium text-slate-600">Generated on {new Date().toLocaleString()}</p>
+              {!transaction && interest.status === "ACCEPTED" && <p className="mt-2 text-blue-800">A transaction record has not been returned yet. This receipt does not confirm payment.</p>}
+              {transaction && transaction.status !== "COMPLETED" && <p className="mt-2 text-blue-800">This transaction is not marked as completed. This receipt is not proof of completed payment.</p>}
+            </footer>
+          </div>
+        </article>
+
+        <div className="affiliate-receipt-no-print mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button type="button" onClick={onClose} className="rounded-lg border border-white/25 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10">Close</button>
+          <button type="button" onClick={() => window.print()} className="rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-blue-800 shadow transition hover:bg-blue-50">Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function formatReceiptMoney(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(value);
 }
 
 function getTransactionStatusStyle(
@@ -1449,6 +1648,7 @@ type NegotiationDialogProps = {
   typingUserName: string;
   onClose: () => void;
   onAction: () => void;
+  onReceipt: () => void;
   onTyping: () => void;
   onStopTyping: () => void;
   onSubmit: (
@@ -1521,6 +1721,7 @@ function formatOfflineTime(
 
 function NegotiationDialog({
   open,
+  status,
   buyerName,
   buyerImageUrl,
   buyerPhone,
@@ -1535,6 +1736,7 @@ function NegotiationDialog({
   typingUserName,
   onClose,
   onAction,
+  onReceipt,
   onTyping,
   onStopTyping,
   onSubmit,
@@ -3128,7 +3330,9 @@ style={{
             <button
               type="button"
               onClick={() =>
-                onAction()
+                status === "ACCEPTED" || status === "REJECTED"
+                  ? onReceipt()
+                  : onAction()
               }
               disabled={
                 loading
@@ -3162,7 +3366,11 @@ style={{
                   "var(--user-card-border)",
               }}
             >
-              Take Action
+              {status === "ACCEPTED" || status === "REJECTED" ? (
+                <><ReceiptIcon /> Receipt</>
+              ) : (
+                "Take Action"
+              )}
             </button>
 
             <button
@@ -3406,14 +3614,9 @@ function FinalNegotiationActionDialog({
               sm:py-2.5
             "
             style={{
-              background:
-                "var(--user-card-bg)",
-
-              borderColor:
-                "var(--user-card-border)",
-
-              color:
-                "var(--user-title)",
+              background: "#ECFDF3",
+              borderColor: "#86EFAC",
+              color: "#166534",
             }}
           >
             <div>
@@ -3436,8 +3639,7 @@ function FinalNegotiationActionDialog({
                   leading-3.5
                 "
                 style={{
-                  color:
-                    "var(--user-text-muted)",
+                  color: "#166534",
                 }}
               >
                 Confirm that you have agreed
@@ -3485,14 +3687,9 @@ function FinalNegotiationActionDialog({
               sm:py-2.5
             "
             style={{
-              background:
-                "var(--user-card-bg)",
-
-              borderColor:
-                "var(--user-card-border)",
-
-              color:
-                "var(--user-title)",
+              background: "#FEF2F2",
+              borderColor: "#FCA5A5",
+              color: "#B91C1C",
             }}
           >
             <div>
@@ -3515,8 +3712,7 @@ function FinalNegotiationActionDialog({
                   leading-3.5
                 "
                 style={{
-                  color:
-                    "var(--user-text-muted)",
+                  color: "#991B1B",
                 }}
               >
                 End the negotiation without

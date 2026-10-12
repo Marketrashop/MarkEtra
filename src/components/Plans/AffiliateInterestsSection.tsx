@@ -14,23 +14,41 @@ import AffiliateInterestCard from "./AffiliateInterestCard";
 
 type AffiliateInterestsSectionProps = {
   listing: AffiliateListing | null;
-
   open: boolean;
-
   onClose: () => void;
-
-  onAccept?: (
-    interest: AffiliateInterest,
-  ) => void;
-
-  onReject?: (
-    interest: AffiliateInterest,
-  ) => void;
-
-  onNegotiate?: (
-    interest: AffiliateInterest,
-  ) => void;
+  onAccept?: (interest: AffiliateInterest) => void;
+  onReject?: (interest: AffiliateInterest) => void;
+  onNegotiate?: (interest: AffiliateInterest) => void;
 };
+
+function getLatestActivityTimestamp(interest: AffiliateInterest): number {
+  const latestMessageTimestamp = interest.messages.reduce((latest, message) => {
+    const timestamp = new Date(message.createdAt).getTime();
+    return Number.isFinite(timestamp) ? Math.max(latest, timestamp) : latest;
+  }, 0);
+
+  const updatedTimestamp = new Date(interest.updatedAt).getTime();
+  const createdTimestamp = new Date(interest.createdAt).getTime();
+
+  return Math.max(
+    latestMessageTimestamp,
+    Number.isFinite(updatedTimestamp) ? updatedTimestamp : 0,
+    Number.isFinite(createdTimestamp) ? createdTimestamp : 0,
+  );
+}
+
+function sortInterests(interests: AffiliateInterest[]): AffiliateInterest[] {
+  return [...interests].sort((a, b) => {
+    const aIsClosed = a.status === "ACCEPTED" || a.status === "REJECTED";
+    const bIsClosed = b.status === "ACCEPTED" || b.status === "REJECTED";
+
+    if (aIsClosed !== bIsClosed) {
+      return aIsClosed ? 1 : -1;
+    }
+
+    return getLatestActivityTimestamp(b) - getLatestActivityTimestamp(a);
+  });
+}
 
 export default function AffiliateInterestsSection({
   listing,
@@ -40,26 +58,17 @@ export default function AffiliateInterestsSection({
   onReject,
   onNegotiate,
 }: AffiliateInterestsSectionProps) {
-  if (
-    !open ||
-    !listing
-  ) {
+  if (!open || !listing) {
     return null;
   }
 
-  const interests =
-    listing.interests;
+  const interests = sortInterests(listing.interests);
 
   return (
     <div
       role="presentation"
-      onMouseDown={(
-        event,
-      ) => {
-        if (
-          event.target ===
-          event.currentTarget
-        ) {
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
           onClose();
         }
       }}
@@ -94,14 +103,9 @@ export default function AffiliateInterestsSection({
           sm:rounded-xl
         "
         style={{
-          background:
-            "var(--user-card-bg)",
-
-          borderColor:
-            "var(--user-card-border)",
-
-          boxShadow:
-            "var(--user-card-shadow)",
+          background: "var(--user-card-bg)",
+          borderColor: "var(--user-card-border)",
+          boxShadow: "var(--user-card-shadow)",
         }}
       >
         <div
@@ -116,20 +120,9 @@ export default function AffiliateInterestsSection({
             sm:px-4
             sm:py-3
           "
-          style={{
-            borderColor:
-              "var(--user-divider)",
-          }}
+          style={{ borderColor: "var(--user-divider)" }}
         >
-          <div
-            className="
-              flex
-              min-w-0
-              items-center
-              gap-1.5
-              sm:gap-2
-            "
-          >
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
             <div
               className="
                 flex
@@ -144,16 +137,11 @@ export default function AffiliateInterestsSection({
                 sm:rounded-lg
               "
               style={{
-                background:
-                  "var(--user-surface-secondary)",
-
-                color:
-                  "var(--user-text-muted)",
+                background: "var(--user-surface-secondary)",
+                color: "var(--user-text-muted)",
               }}
             >
-              <MessageCircle
-                size={13}
-              />
+              <MessageCircle size={13} />
             </div>
 
             <div className="min-w-0">
@@ -166,44 +154,21 @@ export default function AffiliateInterestsSection({
                   tracking-[0.08em]
                   sm:text-[8px]
                 "
-                style={{
-                  color:
-                    "var(--user-text-muted)",
-                }}
+                style={{ color: "var(--user-text-muted)" }}
               >
                 Interested Buyers
               </p>
 
               <h2
-                className="
-                  mt-0.5
-                  truncate
-                  text-[11px]
-                  font-bold
-                  sm:text-sm
-                "
-                style={{
-                  color:
-                    "var(--user-title)",
-                }}
+                className="mt-0.5 truncate text-[11px] font-bold sm:text-sm"
+                style={{ color: "var(--user-title)" }}
               >
-                {
-                  listing.product
-                    .name
-                }
+                {listing.product.name}
               </h2>
             </div>
           </div>
 
-          <div
-            className="
-              flex
-              shrink-0
-              items-center
-              gap-1.5
-              sm:gap-2
-            "
-          >
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <span
               className="
                 rounded-full
@@ -217,30 +182,18 @@ export default function AffiliateInterestsSection({
                 sm:text-[8px]
               "
               style={{
-                background:
-                  "var(--user-surface-secondary)",
-
-                color:
-                  "var(--user-text-muted)",
-
-                borderColor:
-                  "var(--user-card-border)",
+                background: "var(--user-surface-secondary)",
+                color: "var(--user-text-muted)",
+                borderColor: "var(--user-card-border)",
               }}
             >
-              {
-                interests.length
-              }{" "}
-              {interests.length ===
-              1
-                ? "Interest"
-                : "Interests"}
+              {interests.length}{" "}
+              {interests.length === 1 ? "Interest" : "Interests"}
             </span>
 
             <button
               type="button"
-              onClick={
-                onClose
-              }
+              onClick={onClose}
               aria-label="Close"
               className="
                 flex
@@ -257,67 +210,29 @@ export default function AffiliateInterestsSection({
                 sm:w-7
               "
               style={{
-                background:
-                  "var(--user-card-bg)",
-
-                color:
-                  "var(--user-text-muted)",
-
-                borderColor:
-                  "var(--user-card-border)",
+                background: "var(--user-card-bg)",
+                color: "var(--user-text-muted)",
+                borderColor: "var(--user-card-border)",
               }}
             >
-              <X
-                size={12}
-                className="sm:hidden"
-              />
-
-              <X
-                size={14}
-                className="hidden sm:block"
-              />
+              <X size={12} className="sm:hidden" />
+              <X size={14} className="hidden sm:block" />
             </button>
           </div>
         </div>
 
-        <div
-          className="
-            min-h-0
-            overflow-y-auto
-            p-2.5
-            sm:p-4
-          "
-        >
-          <div
-            className="
-              grid
-              grid-cols-1
-              gap-2
-              sm:gap-2.5
-              xl:grid-cols-2
-            "
-          >
-            {interests.map(
-              (interest) => (
-                <AffiliateInterestCard
-                  key={
-                    interest.id
-                  }
-                  interest={
-                    interest
-                  }
-                  onAccept={
-                    onAccept
-                  }
-                  onReject={
-                    onReject
-                  }
-                  onNegotiate={
-                    onNegotiate
-                  }
-                />
-              ),
-            )}
+        <div className="min-h-0 overflow-y-auto p-2.5 sm:p-4">
+          <div className="grid grid-cols-1 gap-2 sm:gap-2.5 xl:grid-cols-2">
+            {interests.map((interest) => (
+              <AffiliateInterestCard
+                key={interest.id}
+                interest={interest}
+                product={listing.product}
+                onAccept={onAccept}
+                onReject={onReject}
+                onNegotiate={onNegotiate}
+              />
+            ))}
           </div>
         </div>
       </div>
