@@ -689,11 +689,9 @@ try {
             },
 
 body: JSON.stringify({
-mode:
-  isDirectCheckout &&
-  !directItem.includeCart
-    ? "DIRECT"
-    : "CART",
+mode: isDirectCheckout
+  ? "DIRECT"
+  : "CART",
 
 ...(isDirectCheckout && {
   productId:
