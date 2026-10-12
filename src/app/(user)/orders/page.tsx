@@ -14,6 +14,7 @@ import {
   ChevronDown,
   Loader2,
   Package,
+  Receipt,
   Search,
   X,
   XCircle,
@@ -25,6 +26,7 @@ import {
 
 import DashboardPageLayout from "@/components/dashboard/DashboardPage";
 import { PageHeader } from "@/components/dashboard";
+import OrderReceiptDialog from "@/components/orders/OrderReceiptDialog";
 
 type OrderStatus =
   | "PENDING"
@@ -259,6 +261,11 @@ export default function OrdersPage() {
 const [
   selectedOrder,
   setSelectedOrder,
+] = useState<Order | null>(null);
+
+const [
+  receiptOrder,
+  setReceiptOrder,
 ] = useState<Order | null>(null);
 
 const [
@@ -821,6 +828,18 @@ async function confirmCancelOrder() {
     onCancel={() =>
       void cancelOrder(selectedOrder)
     }
+
+    onReceipt={(receiptTarget) => {
+      setSelectedOrder(null);
+      setReceiptOrder(receiptTarget);
+    }}
+  />
+)}
+
+{receiptOrder && (
+  <OrderReceiptDialog
+    order={receiptOrder}
+    onClose={() => setReceiptOrder(null)}
   />
 )}
 
@@ -1034,12 +1053,14 @@ function OrderDetailsModal({
   cancelling,
   onClose,
   onCancel,
+  onReceipt,
 }: {
   order: Order;
   currentTime: number;
   cancelling: boolean;
   onClose: () => void;
   onCancel: () => void;
+  onReceipt: (order: Order) => void;
 }) {
   useEffect(() => {
     const previousOverflow =
@@ -1302,6 +1323,30 @@ function OrderDetailsModal({
           value={formatCurrency(Number(order.total))}
           strong
         />
+      </div>
+    </div>
+
+    {/* Receipt */}
+    <div className="rounded-lg border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] px-3 py-2.5">
+      <div className="flex flex-col items-center gap-2.5 text-center">
+        <div className="min-w-0">
+          <p className="text-xs font-medium text-[var(--user-title)]">
+            Receipt
+          </p>
+
+          <p className="mt-0.5 text-[10px] leading-4 text-[var(--user-text-muted)]">
+            Save or share a copy of this order receipt.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => onReceipt(order)}
+          className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-3 text-[10px] font-semibold text-[var(--user-title)] transition hover:border-[var(--primary)]"
+        >
+          <Receipt size={13} strokeWidth={2} />
+          Get Receipt
+        </button>
       </div>
     </div>
 
