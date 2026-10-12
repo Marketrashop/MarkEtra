@@ -22,11 +22,10 @@ const include = {
     },
   },
 
-  variants: {
-    orderBy: {
-      createdAt:
-        "asc" as const,
-    },
+variants: {
+  orderBy: {
+    sortOrder: "asc" as const,
+  },
 
     include: {
       images: {
@@ -214,16 +213,17 @@ categories: {
               ),
           },
 
-          variants: {
-            create:
-              data.variants.map(
-                (variant) => ({
-                  type:
-                    variant.type,
+variants: {
+  create:
+    data.variants.map(
+      (variant, index) => ({
+        type: variant.type,
 
-                  label:
-                    variant.label ||
-                    null,
+        label:
+          variant.label ||
+          null,
+
+        sortOrder: index,
 
                   images: {
                     create:

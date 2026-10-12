@@ -474,16 +474,11 @@ className="
           mt-3
         "
       >
-        <RatingStars
-          rating={
-            rating
-          }
-          totalRatings={
-            reviewCount
-          }
-          showValue
-          showCount
-        />
+<RatingStars
+  rating={rating}
+  totalRatings={reviewCount}
+  showValue
+/>
       </div>
 
 <p

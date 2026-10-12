@@ -22,10 +22,10 @@ const productDetailsInclude = {
     },
   },
 
-  variants: {
-    orderBy: {
-      createdAt: "asc",
-    },
+variants: {
+  orderBy: {
+    sortOrder: "asc",
+  },
 
     include: {
       images: {

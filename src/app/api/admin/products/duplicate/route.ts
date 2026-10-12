@@ -29,10 +29,10 @@ const include = {
     },
   },
 
-  variants: {
-    orderBy: {
-      createdAt: "asc" as const,
-    },
+variants: {
+  orderBy: {
+    sortOrder: "asc" as const,
+  },
 
     include: {
       sizes: {
@@ -104,11 +104,14 @@ include: {
 
   images: true,
 
-  variants: {
-            include: {
-              sizes: true,
-            },
-          },
+variants: {
+  orderBy: {
+    sortOrder: "asc",
+  },
+  include: {
+    sizes: true,
+  },
+},
 
           specifications: true,
 
@@ -195,18 +198,19 @@ categories: {
               ),
           },
 
-          variants: {
-            create:
-              product.variants.map(
-                (variant) => ({
-                  type:
-                    variant.type,
+variants: {
+  create:
+    product.variants.map(
+      (variant, index) => ({
+        type: variant.type,
 
-                  label:
-                    variant.label,
+        label:
+          variant.label,
 
-                  imageKey:
-                    variant.imageKey,
+        imageKey:
+          variant.imageKey,
+
+        sortOrder: index,
 
                   sizes: {
                     create:

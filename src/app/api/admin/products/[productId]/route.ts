@@ -39,11 +39,10 @@ const include = {
     },
   },
 
-  variants: {
-    orderBy: {
-      createdAt:
-        "asc" as const,
-    },
+variants: {
+  orderBy: {
+    sortOrder: "asc" as const,
+  },
 
     include: {
       images: {
@@ -529,10 +528,7 @@ if (
             },
           );
 
-          for (
-            const variant of
-            data.variants
-          ) {
+for (const [index, variant] of data.variants.entries()) {
             let variantId =
               variant.id;
 
@@ -561,30 +557,23 @@ if (
                       variantId,
                   },
 
-                  data: {
-                    type:
-                      variant.type,
-
-                    label:
-                      variant.label ||
-                      null,
-                  },
+data: {
+  type: variant.type,
+  label: variant.label || null,
+  sortOrder: index,
+},
                 },
               );
             } else {
               const createdVariant =
                 await tx.productVariant.create(
                   {
-                    data: {
-                      productId,
-
-                      type:
-                        variant.type,
-
-                      label:
-                        variant.label ||
-                        null,
-                    },
+data: {
+  productId,
+  type: variant.type,
+  label: variant.label || null,
+  sortOrder: index,
+},
                   },
                 );
 

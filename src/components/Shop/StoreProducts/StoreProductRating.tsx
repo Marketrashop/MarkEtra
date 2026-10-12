@@ -72,17 +72,6 @@ export default function StoreProductRating({
         })}
       </div>
 
-      <span
-        className={`
-          ${styles.review}
-
-          font-medium
-
-          text-[var(--foreground-muted)]
-        `}
-      >
-        ({product.totalRatings})
-      </span>
     </div>
   );
 }

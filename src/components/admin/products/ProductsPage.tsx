@@ -159,13 +159,19 @@ export default function ProductsPage({
     );
   }
 
-  async function handleCreate(
-    values: CreateProductInput,
-  ) {
+async function handleCreate(
+  values: CreateProductInput,
+) {
+  try {
     await onCreate(values);
-
     setCreateOpen(false);
+  } catch (error) {
+    console.error(
+      "Failed to create product:",
+      error,
+    );
   }
+}
 
   async function handleUpdate(
     values: CreateProductInput,
