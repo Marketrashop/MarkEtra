@@ -15,6 +15,8 @@ import AppToaster from "@/components/ui/AppToaster";
 import { SITE } from "@/constants/site";
 import { cn } from "@/lib/utils";
 import NavigationLoaderProvider from "@/components/ui/Preloader/NavigationLoaderProvider";
+import MetaPixel from "@/components/MetaPixel";
+
 
 const geist = Geist({
   subsets: ["latin"],
@@ -95,21 +97,25 @@ export default function RootLayout({
         geist.variable,
       )}
     >
+
       <body
         className={`${poppins.variable} antialiased`}
       >
-<AppProvider>
-  <NavigationLoaderProvider>
-    <AppSearch />
+        <MetaPixel />
 
-    <AppPreloader>
-      {children}
-    </AppPreloader>
+        <AppProvider>
+          <NavigationLoaderProvider>
+            <AppSearch />
 
-    <AppToaster />
-  </NavigationLoaderProvider>
-</AppProvider>
+            <AppPreloader>
+              {children}
+            </AppPreloader>
+
+            <AppToaster />
+          </NavigationLoaderProvider>
+        </AppProvider>
       </body>
+
     </html>
   );
 }
