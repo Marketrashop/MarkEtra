@@ -148,7 +148,7 @@ const isCheckoutPage =
         `
           fixed
           inset-x-0
-          bottom-[max(0.5rem,env(safe-area-inset-bottom))]
+          bottom-[max(0.2rem,env(safe-area-inset-bottom))]
           z-30
           flex
           justify-center
