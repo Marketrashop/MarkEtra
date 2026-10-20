@@ -40,7 +40,7 @@ export default function DashboardShoppingOverview({
       icon: Banknote,
       value: pendingPayments,
       label: "Pending Payment",
-      description: "Action required",
+      description: "Awaiting Confirmation",
       tone: "#f59e0b",
     },
     {

@@ -2,10 +2,8 @@ import { prisma } from "@/lib/prisma";
 
 import type {
   Order,
-  OrderItem,
   OrderPaymentStatus,
   OrderStatus,
-  PaymentMethod,
   Prisma,
 } from "../../generated/prisma/client";
 

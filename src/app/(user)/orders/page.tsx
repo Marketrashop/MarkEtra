@@ -27,11 +27,13 @@ import {
 import DashboardPageLayout from "@/components/dashboard/DashboardPage";
 import { PageHeader } from "@/components/dashboard";
 import OrderReceiptDialog from "@/components/orders/OrderReceiptDialog";
+import NavigationLink from "@/components/ui/Preloader/NavigationLink";
 
 type OrderStatus =
   | "PENDING"
   | "PROCESSING"
   | "SHIPPED"
+  | "NEAR_DESTINATION"
   | "DELIVERED"
   | "CANCELLED";
 
@@ -220,6 +222,10 @@ const STATUS_OPTIONS: {
     value: "SHIPPED",
     label: "Shipped",
   },
+{
+  value: "NEAR_DESTINATION",
+  label: "Near destination",
+},
   {
     value: "DELIVERED",
     label: "Delivered",
@@ -1043,6 +1049,18 @@ function OrderCard({
           </span>
         </div>
       </button>
+
+
+<div className="flex items-center justify-end border-t border-[var(--user-card-border)] px-3 py-2">
+  <NavigationLink
+    href={`/order-tracking/${encodeURIComponent(order.orderNumber)}`}
+    className="inline-flex h-8 items-center gap-2 rounded-lg border border-[#5b5ef7]/25 bg-[#5b5ef7]/[0.07] px-3 text-[10px] font-semibold text-[#5b5ef7] transition hover:bg-[#5b5ef7]/[0.14]"
+  >
+    <Package size={13} />
+    Track Order
+  </NavigationLink>
+</div>
+
     </article>
   );
 }
@@ -1330,23 +1348,31 @@ function OrderDetailsModal({
     <div className="rounded-lg border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] px-3 py-2.5">
       <div className="flex flex-col items-center gap-2.5 text-center">
         <div className="min-w-0">
-          <p className="text-xs font-medium text-[var(--user-title)]">
-            Receipt
-          </p>
+<p className="text-xs font-medium text-[var(--user-title)]">
+  Order Tracking & Receipt
+</p>
 
-          <p className="mt-0.5 text-[10px] leading-4 text-[var(--user-text-muted)]">
-            Save or share a copy of this order receipt.
-          </p>
+<p className="mt-0.5 text-[10px] leading-4 text-[var(--user-text-muted)]">
+  Track your order status and view, save, or share your receipt.
+</p>
         </div>
+<NavigationLink
+  href={`/order-tracking/${encodeURIComponent(order.orderNumber)}`}
+  className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-3 text-[10px] font-semibold text-[var(--user-title)] transition hover:border-[var(--primary)]"
+>
+  <Package size={13} strokeWidth={2} />
+  Track Order
+</NavigationLink>
 
-        <button
-          type="button"
-          onClick={() => onReceipt(order)}
-          className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-3 text-[10px] font-semibold text-[var(--user-title)] transition hover:border-[var(--primary)]"
-        >
-          <Receipt size={13} strokeWidth={2} />
-          Get Receipt
-        </button>
+
+<button
+  type="button"
+  onClick={() => onReceipt(order)}
+  className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-3 text-[10px] font-semibold text-[var(--user-title)] transition hover:border-[var(--primary)]"
+>
+  <Receipt size={13} strokeWidth={2} />
+  Get Receipt
+</button>
       </div>
     </div>
 
@@ -1361,7 +1387,7 @@ function OrderDetailsModal({
       </div>
     )}
 
-    {order.status !== "CANCELLED" && (
+    {order.status !== "CANCELLED" && order.status !== "DELIVERED" && (
       <OrderCancellationAction
         order={order}
         currentTime={currentTime}
@@ -1961,16 +1987,14 @@ function getPaymentTone(
 function getOrderTone(
   value: OrderStatus,
 ): StatusTone {
-  if (
-    value ===
-      "PROCESSING" ||
-    value ===
-      "SHIPPED" ||
-    value ===
-      "DELIVERED"
-  ) {
-    return "success";
-  }
+if (
+  value === "PROCESSING" ||
+  value === "SHIPPED" ||
+  value === "NEAR_DESTINATION" ||
+  value === "DELIVERED"
+) {
+  return "success";
+}
 
   if (
     value ===
