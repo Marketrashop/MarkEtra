@@ -11,8 +11,6 @@ import {
 } from "lucide-react";
 
 import Logo from "@/components/layout/Header/Logo";
-import PublicTopBar from "@/components/layout/Header/TopBar";
-
 import BottomDock from "./BottomDock";
 import MoreMenu from "./MoreMenu";
 import TopBar from "./TopBar";
@@ -107,9 +105,6 @@ export default function DashboardLayout({
         duration-300
       "
     >
-      <PublicTopBar
-        environment={environment}
-      />
 
       <TopBar
         left={

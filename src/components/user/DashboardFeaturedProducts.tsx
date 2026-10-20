@@ -3,15 +3,8 @@
 import Image from "next/image";
 import NavigationLink from "@/components/ui/Preloader/NavigationLink";
 
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
-import {
-  ArrowRight,
-} from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowRight, RefreshCw } from "lucide-react";
 
 export type DashboardFeaturedProduct = {
   id: string;
@@ -26,540 +19,363 @@ type DashboardFeaturedProductsProps = {
   products: DashboardFeaturedProduct[];
 };
 
-const DISPLAY_LIMIT = 10;
-const ROTATION_INTERVAL =
-  5 * 60 * 1000;
+/* One spotlight product + a grid of supporting products. */
+const DISPLAY_LIMIT = 7;
+const ROTATION_INTERVAL = 5 * 60 * 1000;
+const SWAP_FADE_MS = 250;
 
-function shuffleProducts(
-  products: DashboardFeaturedProduct[],
-) {
-  const result = [
-    ...products,
-  ];
+const currency = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
 
-  for (
-    let index =
-      result.length - 1;
-    index > 0;
-    index--
-  ) {
-    const randomIndex =
-      Math.floor(
-        Math.random() *
-          (index + 1),
-      );
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
 
-    [
-      result[index],
-      result[randomIndex],
-    ] = [
-      result[randomIndex],
-      result[index],
-    ];
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
   }
 
   return result;
 }
 
-function buildDisplaySet(
+/**
+ * Picks the next set to show. Products from the current set are avoided
+ * whenever the pool is big enough, so every rotation feels fresh.
+ */
+function pickNextSet(
   pool: DashboardFeaturedProduct[],
-  usedIds: Set<string>,
+  current: DashboardFeaturedProduct[],
 ) {
-  if (
-    pool.length <=
-    DISPLAY_LIMIT
-  ) {
-    return pool;
-  }
+  if (pool.length <= DISPLAY_LIMIT) return pool;
 
-  const unused =
-    pool.filter(
-      (product) =>
-        !usedIds.has(
-          product.id,
-        ),
-    );
+  const currentIds = new Set(current.map((product) => product.id));
+  const fresh = shuffle(pool.filter((product) => !currentIds.has(product.id)));
 
-  const shuffledUnused =
-    shuffleProducts(
-      unused,
-    );
+  if (fresh.length >= DISPLAY_LIMIT) return fresh.slice(0, DISPLAY_LIMIT);
 
-  const nextSet =
-    shuffledUnused.slice(
-      0,
-      DISPLAY_LIMIT,
-    );
+  const fillers = shuffle(pool.filter((product) => currentIds.has(product.id)));
 
-  if (
-    nextSet.length ===
-    DISPLAY_LIMIT
-  ) {
-    return nextSet;
-  }
-
-  const remaining =
-    pool.filter(
-      (product) =>
-        !nextSet.some(
-          (item) =>
-            item.id ===
-            product.id,
-        ),
-    );
-
-  const shuffledRemaining =
-    shuffleProducts(
-      remaining,
-    );
-
-  return [
-    ...nextSet,
-    ...shuffledRemaining.slice(
-      0,
-      DISPLAY_LIMIT -
-        nextSet.length,
-    ),
-  ];
+  return [...fresh, ...fillers].slice(0, DISPLAY_LIMIT);
 }
+
+function getDiscountPercent(price: number, compareAtPrice: number | null) {
+  if (compareAtPrice === null || compareAtPrice <= price) return null;
+
+  return Math.round((1 - price / compareAtPrice) * 100);
+}
+
+/* ------------------------------------------------------------------ */
+/* Small building blocks                                               */
+/* ------------------------------------------------------------------ */
+
+function DiscountBadge({ percent }: { percent: number }) {
+  return (
+    <span className="inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm sm:text-xs">
+      -{percent}%
+    </span>
+  );
+}
+
+function Price({
+  price,
+  compareAtPrice,
+  large = false,
+  onImage = false,
+}: {
+  price: number;
+  compareAtPrice: number | null;
+  large?: boolean;
+  onImage?: boolean;
+}) {
+  const hasDiscount = compareAtPrice !== null && compareAtPrice > price;
+
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+      <span
+        className={`font-semibold tabular-nums ${
+          large ? "text-xl sm:text-2xl" : "text-sm sm:text-[15px]"
+        } ${onImage ? "text-white" : "text-[var(--user-title)]"}`}
+      >
+        {currency.format(price)}
+      </span>
+
+      {hasDiscount && (
+        <span
+          className={`tabular-nums line-through ${
+            large ? "text-sm" : "text-[11px] sm:text-xs"
+          } ${onImage ? "text-white/60" : "text-[var(--user-text-muted)]"}`}
+        >
+          {currency.format(compareAtPrice)}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function ImageFallback() {
+  return (
+    <div className="flex h-full w-full items-center justify-center text-xs text-[var(--user-text-muted)]">
+      No image
+    </div>
+  );
+}
+
+const cardFocus =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--user-card-bg)]";
+
+/* ------------------------------------------------------------------ */
+/* Spotlight (hero) card                                               */
+/* ------------------------------------------------------------------ */
+
+function SpotlightCard({ product }: { product: DashboardFeaturedProduct }) {
+  const discount = getDiscountPercent(product.price, product.compareAtPrice);
+
+  return (
+    <NavigationLink
+      href={`/Market-Place/${encodeURIComponent(product.slug)}`}
+      className={`group relative block aspect-[4/3] overflow-hidden rounded-xl border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[360px] ${cardFocus}`}
+    >
+      {product.imageUrl ? (
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 40vw"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        />
+      ) : (
+        <ImageFallback />
+      )}
+
+      {/* Legibility scrim */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent"
+      />
+
+      {discount !== null && (
+        <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
+          <DiscountBadge percent={discount} />
+        </div>
+      )}
+
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-3.5 sm:p-5">
+        <div className="min-w-0">
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-white sm:text-lg">
+            {product.name}
+          </h3>
+
+          <div className="mt-1.5">
+            <Price
+              price={product.price}
+              compareAtPrice={product.compareAtPrice}
+              large
+              onImage
+            />
+          </div>
+        </div>
+
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-neutral-900 transition group-hover:bg-[var(--primary)] group-hover:text-white sm:text-sm">
+          Shop now
+          <ArrowRight size={14} />
+        </span>
+      </div>
+    </NavigationLink>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Standard product tile                                               */
+/* ------------------------------------------------------------------ */
+
+function ProductTile({ product }: { product: DashboardFeaturedProduct }) {
+  const discount = getDiscountPercent(product.price, product.compareAtPrice);
+
+  return (
+    <NavigationLink
+      href={`/Market-Place/${encodeURIComponent(product.slug)}`}
+      className={`group flex min-w-0 flex-col overflow-hidden rounded-xl border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] transition duration-200 hover:border-[var(--primary)] ${cardFocus}`}
+    >
+      <div className="relative aspect-square overflow-hidden bg-[var(--user-card-bg)]">
+        {product.imageUrl ? (
+          <Image
+            src={product.imageUrl}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 14vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          />
+        ) : (
+          <ImageFallback />
+        )}
+
+        {discount !== null && (
+          <div className="absolute left-2 top-2">
+            <DiscountBadge percent={discount} />
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col gap-1 p-2.5 sm:p-3">
+        <p className="line-clamp-2 min-h-[2.5em] text-xs font-medium leading-snug text-[var(--user-title)] sm:text-[13px]">
+          {product.name}
+        </p>
+
+        <Price price={product.price} compareAtPrice={product.compareAtPrice} />
+      </div>
+    </NavigationLink>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Section                                                             */
+/* ------------------------------------------------------------------ */
 
 export default function DashboardFeaturedProducts({
   products,
 }: DashboardFeaturedProductsProps) {
-  const [
-    displayedProducts,
-    setDisplayedProducts,
-  ] = useState<
-    DashboardFeaturedProduct[]
-  >(() =>
-    products.slice(
-      0,
-      DISPLAY_LIMIT,
-    ),
+  const [displayed, setDisplayed] = useState<DashboardFeaturedProduct[]>(() =>
+    products.slice(0, DISPLAY_LIMIT),
   );
+  const [isSwapping, setIsSwapping] = useState(false);
 
-  const [
-    usedIds,
-    setUsedIds,
-  ] = useState<Set<string>>(
-    () =>
-      new Set(
-        products
-          .slice(
-            0,
-            DISPLAY_LIMIT,
-          )
-          .map(
-            (product) =>
-              product.id,
-          ),
-      ),
-  );
+  const isPausedRef = useRef(false);
+  const swapTimeoutRef = useRef<number | null>(null);
 
-  const hasEnoughProducts =
-    products.length >=
-    DISPLAY_LIMIT;
+  const canRotate = products.length > DISPLAY_LIMIT;
 
+  // Keep in sync if the server sends a new list.
   useEffect(() => {
-    if (
-      products.length === 0 ||
-      !hasEnoughProducts
-    ) {
-      return;
+    setDisplayed(products.slice(0, DISPLAY_LIMIT));
+  }, [products]);
+
+  const rotate = useCallback(() => {
+    if (swapTimeoutRef.current !== null) {
+      window.clearTimeout(swapTimeoutRef.current);
     }
 
-    const interval =
-      window.setInterval(() => {
-        setUsedIds(
-          (currentUsedIds) => {
-            let nextUsedIds =
-              currentUsedIds;
+    setIsSwapping(true);
 
-            const unusedCount =
-              products.filter(
-                (product) =>
-                  !currentUsedIds.has(
-                    product.id,
-                  ),
-              ).length;
+    swapTimeoutRef.current = window.setTimeout(() => {
+      setDisplayed((current) => pickNextSet(products, current));
+      setIsSwapping(false);
+      swapTimeoutRef.current = null;
+    }, SWAP_FADE_MS);
+  }, [products]);
 
-            if (
-              unusedCount <
-              DISPLAY_LIMIT
-            ) {
-              nextUsedIds =
-                new Set();
-            }
+  // Auto-rotate, but never while the user is looking at / interacting
+  // with the grid, or while the tab is hidden.
+  useEffect(() => {
+    if (!canRotate) return;
 
-            return nextUsedIds;
-          },
-        );
+    const interval = window.setInterval(() => {
+      if (isPausedRef.current || document.visibilityState === "hidden") return;
+      rotate();
+    }, ROTATION_INTERVAL);
 
-        setDisplayedProducts(
-          (currentDisplayed) => {
-            const currentUsedIds =
-              new Set(
-                currentDisplayed.map(
-                  (product) =>
-                    product.id,
-                ),
-              );
+    return () => window.clearInterval(interval);
+  }, [canRotate, rotate]);
 
-            const availableForNextSet =
-              products.filter(
-                (product) =>
-                  !currentUsedIds.has(
-                    product.id,
-                  ),
-              );
+  useEffect(
+    () => () => {
+      if (swapTimeoutRef.current !== null) {
+        window.clearTimeout(swapTimeoutRef.current);
+      }
+    },
+    [],
+  );
 
-            let nextSet =
-              availableForNextSet.length >=
-              DISPLAY_LIMIT
-                ? shuffleProducts(
-                    availableForNextSet,
-                  ).slice(
-                    0,
-                    DISPLAY_LIMIT,
-                  )
-                : [];
-
-            if (
-              nextSet.length <
-              DISPLAY_LIMIT
-            ) {
-              const usedInCurrentRotation =
-                new Set(
-                  nextSet.map(
-                    (product) =>
-                      product.id,
-                  ),
-                );
-
-              const refillPool =
-                shuffleProducts(
-                  products.filter(
-                    (product) =>
-                      !usedInCurrentRotation.has(
-                        product.id,
-                      ),
-                  ),
-                );
-
-              nextSet = [
-                ...nextSet,
-                ...refillPool.slice(
-                  0,
-                  DISPLAY_LIMIT -
-                    nextSet.length,
-                ),
-              ];
-            }
-
-            return nextSet;
-          },
-        );
-      }, ROTATION_INTERVAL);
-
-    return () =>
-      window.clearInterval(
-        interval,
-      );
-  }, [
-    products,
-    hasEnoughProducts,
-  ]);
-
-  const visibleProducts =
-    useMemo(
-      () =>
-        displayedProducts.slice(
-          0,
-          DISPLAY_LIMIT,
-        ),
-      [displayedProducts],
-    );
+  const [spotlight, ...rest] = displayed;
 
   return (
     <section
-      className="
-        mb-8
-        overflow-hidden
-        rounded-lg
-        border
-        border-[var(--user-card-border)]
-        bg-[var(--user-card-bg)]
-        shadow-[var(--user-card-shadow)]
-        sm:mb-12
-        sm:rounded-xl
-      "
+      aria-labelledby="featured-products-heading"
+      className="mb-8 overflow-hidden rounded-xl border border-[var(--user-card-border)] bg-[var(--user-card-bg)] shadow-[var(--user-card-shadow)] sm:mb-12 sm:rounded-2xl"
     >
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-          gap-2.5
-          px-3
-          py-2.5
-          sm:gap-4
-          sm:px-5
-          sm:py-4
-        "
-      >
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-5">
         <div className="min-w-0">
           <h2
-            className="
-              text-[12px]
-              font-semibold
-              tracking-tight
-              text-[var(--user-title)]
-              sm:text-base
-            "
+            id="featured-products-heading"
+            className="text-base font-semibold tracking-tight text-[var(--user-title)] sm:text-lg"
           >
-            Featured Products
+            Top Products For You
           </h2>
 
-          <p
-            className="
-              mt-0.5
-              truncate
-              text-[9px]
-              leading-4
-              text-[var(--user-text-muted)]
-              sm:text-[11px]
-              sm:leading-5
-            "
-          >
-            A selection of products worth
-            exploring.
+          <p className="mt-0.5 truncate text-xs text-[var(--user-text-muted)] sm:text-[13px]">
+            Hand-picked items from the marketplace
           </p>
         </div>
 
-        <NavigationLink
-          href="/Market-Place"
-          className="
-            inline-flex
-            shrink-0
-            items-center
-            gap-1
-            rounded-lg
-            px-2
-            py-1.5
-            text-[9px]
-            font-medium
-            text-[var(--primary)]
-            transition
-            hover:opacity-80
-            sm:gap-1.5
-            sm:px-2.5
-            sm:text-[11px]
-          "
-        >
-          Explore Store
+        <div className="flex shrink-0 items-center gap-2">
+          {canRotate && (
+            <button
+              type="button"
+              onClick={rotate}
+              aria-label="Show different products"
+              title="Show different products"
+              className={`inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--user-card-border)] text-[var(--user-text-muted)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] ${cardFocus}`}
+            >
+              <RefreshCw
+                size={15}
+                className={isSwapping ? "animate-spin" : ""}
+              />
+            </button>
+          )}
 
-          <ArrowRight
-            size={11}
-            className="sm:h-[13px] sm:w-[13px]"
-          />
-        </NavigationLink>
+          <NavigationLink
+            href="/Market-Place"
+            className={`inline-flex h-9 items-center gap-1.5 rounded-full border border-[var(--user-card-border)] px-3.5 text-xs font-medium text-[var(--user-title)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] sm:text-[13px] ${cardFocus}`}
+          >
+            Explore store
+            <ArrowRight size={14} />
+          </NavigationLink>
+        </div>
       </div>
 
-      <div
-        className="
-          border-t
-          border-[var(--user-card-border)]
-          px-2.5
-          py-2.5
-          sm:px-4
-          sm:py-4
-        "
-      >
-        {products.length ===
-        0 ? (
-          <div
-            className="
-              rounded-lg
-              border
-              border-[var(--user-card-border)]
-              bg-[var(--user-stat-bg)]
-              px-3
-              py-6
-              text-center
-              text-[10px]
-              text-[var(--user-text-muted)]
-              sm:px-4
-              sm:py-8
-              sm:text-[11px]
-            "
-          >
-            No featured products are
-            available right now.
+      {/* Body */}
+      <div className="border-t border-[var(--user-card-border)] p-3 sm:p-5">
+        {products.length === 0 || !spotlight ? (
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-[var(--user-card-border)] bg-[var(--user-stat-bg)] px-4 py-10 text-center">
+            <p className="text-sm text-[var(--user-text-muted)]">
+              No featured products yet. Check the store for new arrivals.
+            </p>
+
+            <NavigationLink
+              href="/Market-Place"
+              className={`inline-flex items-center gap-1.5 rounded-full bg-[var(--primary)] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 sm:text-sm ${cardFocus}`}
+            >
+              Browse the store
+              <ArrowRight size={14} />
+            </NavigationLink>
           </div>
         ) : (
           <div
-            className="
-              grid
-              grid-cols-2
-              gap-2
-              sm:grid-cols-3
-              sm:gap-2.5
-              lg:grid-cols-4
-              xl:grid-cols-5
-            "
+            onMouseEnter={() => (isPausedRef.current = true)}
+            onMouseLeave={() => (isPausedRef.current = false)}
+            onFocusCapture={() => (isPausedRef.current = true)}
+            onBlurCapture={() => (isPausedRef.current = false)}
+            className={`grid gap-3 transition-opacity duration-200 motion-reduce:transition-none sm:gap-4 lg:grid-cols-12 ${
+              isSwapping ? "opacity-0" : "opacity-100"
+            }`}
           >
-            {visibleProducts.map(
-              (product) => (
-                <NavigationLink
-                  key={product.id}
-                  href={`/Market-Place/${encodeURIComponent(
-                    product.slug,
-                  )}`}
-                  className="
-                    group
-                    min-w-0
-                    overflow-hidden
-                    rounded-lg
-                    border
-                    border-[var(--user-card-border)]
-                    bg-[var(--user-stat-bg)]
-                    transition
-                    duration-200
-                    hover:border-[var(--primary)]
-                  "
-                >
-                  <div
-                    className="
-                      relative
-                      aspect-[4/4.5]
-                      overflow-hidden
-                      bg-[var(--user-card-bg)]
-                    "
-                  >
-                    {product.imageUrl ? (
-                      <Image
-                        src={
-                          product.imageUrl
-                        }
-                        alt={
-                          product.name
-                        }
-                        fill
-                        sizes="
-                          (max-width: 640px) 45vw,
-                          (max-width: 1024px) 30vw,
-                          (max-width: 1280px) 23vw,
-                          18vw
-                        "
-                        className="
-                          object-cover
-                          transition-transform
-                          duration-300
-                          group-hover:scale-[1.03]
-                        "
-                      />
-                    ) : (
-                      <div
-                        className="
-                          flex
-                          h-full
-                          w-full
-                          items-center
-                          justify-center
-                          px-2
-                          text-center
-                          text-[8px]
-                          text-[var(--user-text-muted)]
-                          sm:px-3
-                          sm:text-[9px]
-                        "
-                      >
-                        No image
-                      </div>
-                    )}
-                  </div>
+            <div className="lg:col-span-5">
+              <SpotlightCard product={spotlight} />
+            </div>
 
-                  <div
-                    className="
-                      px-2
-                      py-2
-                      sm:px-2.5
-                      sm:py-2.5
-                    "
-                  >
-                    <p
-                      className="
-                        truncate
-                        text-[9px]
-                        font-medium
-                        text-[var(--user-title)]
-                        sm:text-[11px]
-                      "
-                    >
-                      {product.name}
-                    </p>
-
-                    <div
-                      className="
-                        mt-0.5
-                        flex
-                        items-center
-                        gap-1
-                        sm:mt-1
-                        sm:gap-1.5
-                      "
-                    >
-                      <span
-                        className="
-                          text-[9px]
-                          font-semibold
-                          text-[var(--user-title)]
-                          sm:text-[11px]
-                        "
-                      >
-                        $
-                        {product.price.toLocaleString(
-                          undefined,
-                          {
-                            minimumFractionDigits:
-                              2,
-
-                            maximumFractionDigits:
-                              2,
-                          },
-                        )}
-                      </span>
-
-                      {product.compareAtPrice !==
-                        null &&
-                        product.compareAtPrice >
-                          product.price && (
-                          <span
-                            className="
-                              truncate
-                              text-[8px]
-                              line-through
-                              text-[var(--user-text-muted)]
-                              sm:text-[9px]
-                            "
-                          >
-                            $
-                            {product.compareAtPrice.toLocaleString(
-                              undefined,
-                              {
-                                minimumFractionDigits:
-                                  2,
-
-                                maximumFractionDigits:
-                                  2,
-                              },
-                            )}
-                          </span>
-                        )}
-                    </div>
-                  </div>
-                </NavigationLink>
-              ),
+            {rest.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:col-span-7">
+                {rest.map((product) => (
+                  <ProductTile key={product.id} product={product} />
+                ))}
+              </div>
             )}
           </div>
         )}

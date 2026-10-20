@@ -120,6 +120,11 @@ const financeItems = {
       icon: ArrowUpRight,
     },
     {
+      href: "/wallet",
+      label: "Wallet",
+      icon: Wallet,
+    },
+    {
       href: "/orders",
       label: "Orders",
       icon: Package,
