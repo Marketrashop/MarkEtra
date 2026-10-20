@@ -111,7 +111,7 @@ export default function DashboardHero({
           className="dashboard-hero__button"
         >
           <Wallet size={18} strokeWidth={2} aria-hidden="true" />
-          <span>My Shopping Wallet</span>
+          <span>Shopping Wallet</span>
         </NavigationLink>
       </div>
 
