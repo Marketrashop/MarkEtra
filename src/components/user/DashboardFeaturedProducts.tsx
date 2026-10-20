@@ -82,6 +82,7 @@ function DiscountBadge({ percent }: { percent: number }) {
   );
 }
 
+
 function Price({
   price,
   compareAtPrice,
@@ -93,18 +94,13 @@ function Price({
   large?: boolean;
   onImage?: boolean;
 }) {
-  const hasDiscount = compareAtPrice !== null && compareAtPrice > price;
+  // Follow ProductPrice.tsx: price is the current selling price and
+  // compareAtPrice is the original price shown when it is provided.
+  const hasDiscount = compareAtPrice !== null;
+  const savings = hasDiscount ? compareAtPrice - price : null;
 
   return (
-    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-      <span
-        className={`font-semibold tabular-nums ${
-          large ? "text-xl sm:text-2xl" : "text-sm sm:text-[15px]"
-        } ${onImage ? "text-white" : "text-[var(--user-title)]"}`}
-      >
-        {currency.format(price)}
-      </span>
-
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
       {hasDiscount && (
         <span
           className={`tabular-nums line-through ${
@@ -114,6 +110,16 @@ function Price({
           {currency.format(compareAtPrice)}
         </span>
       )}
+
+      <span
+        className={`font-semibold tabular-nums ${
+          large ? "text-xl sm:text-2xl" : "text-sm sm:text-[15px]"
+        } ${onImage ? "text-white" : "text-[var(--user-title)]"}`}
+      >
+        {currency.format(price)}
+      </span>
+
+
     </div>
   );
 }
@@ -182,10 +188,10 @@ function SpotlightCard({ product }: { product: DashboardFeaturedProduct }) {
           </div>
         </div>
 
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-neutral-900 transition group-hover:bg-[var(--primary)] group-hover:text-white sm:text-sm">
-          Shop now
-          <ArrowRight size={14} />
-        </span>
+<span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-neutral-900 transition sm:text-sm">
+  Shop now
+  <ArrowRight size={14} />
+</span>
       </div>
     </NavigationLink>
   );
@@ -251,9 +257,10 @@ export default function DashboardFeaturedProducts({
 
   const canRotate = products.length > DISPLAY_LIMIT;
 
-  // Keep in sync if the server sends a new list.
+  // Randomize the displayed products on mount/page refresh and whenever
+  // the server supplies a different product pool.
   useEffect(() => {
-    setDisplayed(products.slice(0, DISPLAY_LIMIT));
+    setDisplayed(pickNextSet(products, []));
   }, [products]);
 
   const rotate = useCallback(() => {
