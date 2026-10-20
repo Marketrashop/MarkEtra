@@ -313,11 +313,11 @@ export default function DashboardFeaturedProducts({
             id="featured-products-heading"
             className="text-base font-semibold tracking-tight text-[var(--user-title)] sm:text-lg"
           >
-            Top Products For You
+            Exceptional Picks for You
           </h2>
 
           <p className="mt-0.5 truncate text-xs text-[var(--user-text-muted)] sm:text-[13px]">
-            Hand-picked items from the marketplace
+            Quality finds across multiple categories
           </p>
         </div>
 
