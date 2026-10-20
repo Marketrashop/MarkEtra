@@ -4928,11 +4928,11 @@ main {
     letter-spacing: 0.13em;
   }
 
-  .dashboard-hero__title {
-    max-width: 17rem;
-    font-size: clamp(1.2rem, 5.5vw, 1.55rem);
-    line-height: 1.15;
-  }
+.dashboard-hero__title {
+  max-width: 17rem;
+  font-size: clamp(0.84rem, 3.85vw, 1.085rem);
+  line-height: 1.15;
+}
 
   .dashboard-hero__description {
     max-width: 15rem;
