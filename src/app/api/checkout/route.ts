@@ -524,6 +524,72 @@ export async function POST(
             },
           );
 
+
+        case "PROMO_CODE_INVALID":
+          return NextResponse.json(
+            {
+              success: false,
+              error: "This promo code does not exist.",
+            },
+            { status: 400 },
+          );
+
+        case "PROMO_CODE_INACTIVE":
+          return NextResponse.json(
+            {
+              success: false,
+              error: "This promo code is currently inactive.",
+            },
+            { status: 400 },
+          );
+
+        case "PROMO_CODE_NOT_STARTED":
+          return NextResponse.json(
+            {
+              success: false,
+              error: "This promo code is not yet valid.",
+            },
+            { status: 400 },
+          );
+
+        case "PROMO_CODE_EXPIRED":
+          return NextResponse.json(
+            {
+              success: false,
+              error: "This promo code has expired.",
+            },
+            { status: 400 },
+          );
+
+        case "PROMO_CODE_MINIMUM_NOT_MET":
+          return NextResponse.json(
+            {
+              success: false,
+              error:
+                "The order does not meet the minimum subtotal required for this promo code.",
+            },
+            { status: 400 },
+          );
+
+        case "PROMO_CODE_USAGE_LIMIT_REACHED":
+          return NextResponse.json(
+            {
+              success: false,
+              error: "This promo code has reached its usage limit.",
+            },
+            { status: 400 },
+          );
+
+        case "PROMO_CODE_USER_LIMIT_REACHED":
+          return NextResponse.json(
+            {
+              success: false,
+              error:
+                "This promo code has already been used the maximum number of times allowed per user.",
+            },
+            { status: 400 },
+          );
+
         case "INVENTORY_NOT_FOUND":
           return NextResponse.json(
             {

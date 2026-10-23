@@ -201,9 +201,17 @@ async function resolveDeliveryAddress(
 async function getCheckoutItems(
   tx: Prisma.TransactionClient,
   userId: string,
-  input: CheckoutSubmitInput,
+  input: CheckoutSubmitInput | PromoPreviewInput,
 ) {
 if (input.mode === "DIRECT") {
+
+if (!input.variantSizeId) {
+  throw new Error("INVENTORY_NOT_FOUND");
+}
+
+if (!input.quantity || input.quantity < 1) {
+  throw new Error("INVALID_QUANTITY");
+}
   const inventory =
     await tx.productVariantSize.findUnique({
       where: {
@@ -483,6 +491,215 @@ if (input.mode === "DIRECT") {
   };
 }
 
+type PromoPreviewInput = {
+  mode: "CART" | "DIRECT";
+  variantSizeId?: string;
+  quantity?: number;
+  includeCart?: boolean;
+};
+
+type PromoCalculation = {
+  promoCode: {
+    id: string;
+    code: string;
+  } | null;
+  discount: Prisma.Decimal;
+};
+
+async function calculatePromoDiscount(
+  tx: Prisma.TransactionClient,
+  userId: string,
+  code: string | undefined,
+  subtotal: Prisma.Decimal,
+): Promise<PromoCalculation> {
+  const normalizedCode = code?.trim().toUpperCase();
+
+  if (!normalizedCode) {
+    return {
+      promoCode: null,
+      discount: new Prisma.Decimal(0),
+    };
+  }
+
+  await tx.$queryRaw`
+    SELECT "id"
+    FROM "PromoCode"
+    WHERE "code" = ${normalizedCode}
+    FOR UPDATE
+  `;
+
+  const promo = await tx.promoCode.findUnique({
+    where: {
+      code: normalizedCode,
+    },
+  });
+
+  if (!promo) {
+    throw new Error("PROMO_CODE_INVALID");
+  }
+
+  const now = new Date();
+
+  if (!promo.isActive) {
+    throw new Error("PROMO_CODE_INACTIVE");
+  }
+
+  if (promo.startsAt && promo.startsAt > now) {
+    throw new Error("PROMO_CODE_NOT_STARTED");
+  }
+
+  if (promo.expiresAt && promo.expiresAt < now) {
+    throw new Error("PROMO_CODE_EXPIRED");
+  }
+
+  if (
+    promo.minimumSubtotal &&
+    subtotal.lessThan(promo.minimumSubtotal)
+  ) {
+    throw new Error("PROMO_CODE_MINIMUM_NOT_MET");
+  }
+
+  const activeStatuses = [
+    "RESERVED",
+    "REDEEMED",
+  ] as const;
+
+  const totalRedemptions =
+    await tx.promoCodeRedemption.count({
+      where: {
+        promoCodeId: promo.id,
+        status: {
+          in: [...activeStatuses],
+        },
+      },
+    });
+
+  if (
+    promo.usageLimit !== null &&
+    totalRedemptions >= promo.usageLimit
+  ) {
+    throw new Error("PROMO_CODE_USAGE_LIMIT_REACHED");
+  }
+
+  if (promo.perUserLimit !== null) {
+    const userRedemptions =
+      await tx.promoCodeRedemption.count({
+        where: {
+          promoCodeId: promo.id,
+          userId,
+          status: {
+            in: [...activeStatuses],
+          },
+        },
+      });
+
+    if (userRedemptions >= promo.perUserLimit) {
+      throw new Error("PROMO_CODE_USER_LIMIT_REACHED");
+    }
+  }
+
+  let discount: Prisma.Decimal;
+
+  if (promo.discountType === "PERCENTAGE") {
+    discount = subtotal
+      .mul(promo.discountValue)
+      .div(100)
+      .toDecimalPlaces(
+        2,
+        Prisma.Decimal.ROUND_HALF_UP,
+      );
+
+    if (
+      promo.maximumDiscount !== null &&
+      discount.greaterThan(promo.maximumDiscount)
+    ) {
+      discount = promo.maximumDiscount;
+    }
+  } else {
+    discount = promo.discountValue;
+  }
+
+  if (discount.greaterThan(subtotal)) {
+    discount = subtotal;
+  }
+
+  return {
+    promoCode: {
+      id: promo.id,
+      code: promo.code,
+    },
+    discount,
+  };
+}
+
+
+export async function previewCheckoutPromoService(
+  userId: string,
+  code: string,
+  input: PromoPreviewInput,
+) {
+  return prisma.$transaction(async (tx) => {
+    const checkout = await getCheckoutItems(
+      tx,
+      userId,
+      input,
+    );
+
+    let subtotal = new Prisma.Decimal(0);
+
+    for (const item of checkout.items) {
+      if (item.product.status !== "ACTIVE") {
+        throw new Error(
+          `PRODUCT_UNAVAILABLE:${item.product.name}`,
+        );
+      }
+
+      if (!item.variantSize) {
+        throw new Error("INVENTORY_NOT_FOUND");
+      }
+
+      const inventory = await tx.productVariantSize.findUnique({
+        where: {
+          id: item.variantSize.id,
+          variant: {
+            productId: item.productId,
+          },
+        },
+        select: {
+          id: true,
+          price: true,
+        },
+      });
+
+      if (!inventory) {
+        throw new Error("INVENTORY_NOT_FOUND");
+      }
+
+      const unitPrice =
+        inventory.price ?? item.product.price;
+
+      subtotal = subtotal.plus(
+        unitPrice.mul(item.quantity),
+      );
+    }
+
+    const calculation = await calculatePromoDiscount(
+      tx,
+      userId,
+      code,
+      subtotal,
+    );
+
+    return {
+      code: calculation.promoCode?.code ?? null,
+      subtotal: subtotal.toString(),
+      discount: calculation.discount.toString(),
+      total: subtotal.minus(calculation.discount).toString(),
+    };
+  });
+}
+
+
 export async function createCheckoutOrderService(
   userId: string,
   input: CheckoutSubmitInput,
@@ -650,8 +867,17 @@ orderItems.push({
 });
           }
 
-          const total =
-            subtotal;
+const promoCalculation =
+  await calculatePromoDiscount(
+    tx,
+    userId,
+    input.discountCode,
+    subtotal,
+  );
+
+const discount = promoCalculation.discount;
+
+const total = subtotal.minus(discount);
 
           if (
             input.paymentMethod ===
@@ -754,14 +980,17 @@ orderItems.push({
 
                   orderNumber,
 
-                  subtotal,
+subtotal,
 
-                  discount:
-                    new Prisma.Decimal(
-                      0,
-                    ),
+discount,
 
-                  total,
+total,
+
+promoCodeId:
+  promoCalculation.promoCode?.id ?? null,
+
+promoCodeLabel:
+  promoCalculation.promoCode?.code ?? null,
 
                   paymentMethod:
                     "CRYPTO",
@@ -857,6 +1086,18 @@ items: {
                   items: true,
                 },
               });
+
+if (promoCalculation.promoCode) {
+  await tx.promoCodeRedemption.create({
+    data: {
+      promoCodeId: promoCalculation.promoCode.id,
+      orderId: order.id,
+      userId,
+      discountAmount: discount,
+      status: "RESERVED",
+    },
+  });
+}              
 
 if (checkout.cartId) {
   await tx.cartItem.deleteMany({
@@ -1071,14 +1312,17 @@ for (
 
                 orderNumber,
 
-                subtotal,
+subtotal,
 
-                discount:
-                  new Prisma.Decimal(
-                    0,
-                  ),
+discount,
 
-                total,
+total,
+
+promoCodeId:
+  promoCalculation.promoCode?.id ?? null,
+
+promoCodeLabel:
+  promoCalculation.promoCode?.code ?? null,
 
                 paymentMethod:
                   "WALLET",
@@ -1177,6 +1421,19 @@ items: {
                 items: true,
               },
             });
+
+if (promoCalculation.promoCode) {
+  await tx.promoCodeRedemption.create({
+    data: {
+      promoCodeId: promoCalculation.promoCode.id,
+      orderId: order.id,
+      userId,
+      discountAmount: discount,
+      status: "REDEEMED",
+      redeemedAt: new Date(),
+    },
+  });
+}            
 
 if (checkout.cartId) {
   await tx.cartItem.deleteMany({
@@ -1313,9 +1570,6 @@ export async function cancelOrderService(
           );
         }
 
-        /*
-         * Ownership is always checked server-side.
-         */
         if (
           actor.type === "USER" &&
           order.userId !== actor.userId
@@ -1325,12 +1579,6 @@ export async function cancelOrderService(
           );
         }
 
-        /*
-         * Already cancelled orders are idempotent.
-         *
-         * This prevents a repeated request from creating
-         * another wallet credit or reversing inventory twice.
-         */
         if (
           order.status ===
           OrderStatus.CANCELLED
@@ -1344,10 +1592,6 @@ export async function cancelOrderService(
           };
         }
 
-        /*
-         * Delivered orders can never be cancelled.
-         * Refund will be handled separately later.
-         */
         if (
           order.status ===
           OrderStatus.DELIVERED
@@ -1357,15 +1601,6 @@ export async function cancelOrderService(
           );
         }
 
-        /*
-         * User cancellation rules:
-         *
-         * - Only PENDING or PROCESSING
-         * - Must be within 2 hours
-         *
-         * Admin cancellation has no time restriction
-         * and can proceed from any non-delivered status.
-         */
         if (actor.type === "USER") {
           if (
             order.status !==
@@ -1392,15 +1627,6 @@ export async function cancelOrderService(
           }
         }
 
-        /*
-         * Reverse inventory using the exact allocation
-         * recorded on each OrderItem.
-         *
-         * Legacy orders created before this allocation
-         * tracking was introduced have 0/0 and therefore
-         * cannot safely have their historical allocation
-         * reconstructed.
-         */
         for (const item of order.items) {
           if (
             item.stockQuantity === 0 &&

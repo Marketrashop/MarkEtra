@@ -131,9 +131,16 @@ const commonCheckoutSchema =
         .max(1000)
         .optional()
         .nullable()
-        .or(
-          z.literal(""),
-        ),
+        .or(z.literal("")),
+
+    discountCode:
+      z
+        .string()
+        .trim()
+        .max(50)
+        .transform((value) => value.toUpperCase())
+        .optional()
+        .or(z.literal("")),
   });
 
 const walletCheckoutSchema =

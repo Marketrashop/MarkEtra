@@ -33,6 +33,7 @@ product: {
   unitPrice: number;
 };
 
+
 type CheckoutOrderSummaryProps = {
   items: CheckoutSummaryItem[];
 
@@ -40,15 +41,21 @@ type CheckoutOrderSummaryProps = {
 
   savings: number;
 
+  promoDiscount?: number;
+
   total: number;
 };
+
+
 
 export default function CheckoutOrderSummary({
   items,
   subtotal,
   savings,
+  promoDiscount = 0,
   total,
 }: CheckoutOrderSummaryProps) {
+
   return (
     <aside
       className="
@@ -286,15 +293,17 @@ const image =
           )}
         />
 
-        {savings > 0 && (
-          <SummaryRow
-            label="Savings"
-            value={`-${formatCurrency(
-              savings,
-            )}`}
-            positive
-          />
-        )}
+
+{promoDiscount > 0 && (
+  <SummaryRow
+    label="Promo discount"
+    value={`-${formatCurrency(
+      promoDiscount,
+    )}`}
+    positive
+  />
+)}
+
 
         <div
           className="

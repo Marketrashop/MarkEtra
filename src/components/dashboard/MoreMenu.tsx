@@ -39,6 +39,7 @@ import {
   Wallet,
   Package2,
   FolderTree,
+  Tag,
 } from "lucide-react";
 
 import { useNavigationLoader } from "@/components/ui/Preloader";
@@ -187,6 +188,11 @@ const marketplaceItems = {
       label: "Categories",
       icon: FolderTree,
     },
+{
+  href: "/admin/promo-codes",
+  label: "Promo Codes",
+  icon: Tag,
+},
   ],
 };
 

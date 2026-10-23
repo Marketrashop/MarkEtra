@@ -156,6 +156,17 @@ const {
     setNotes,
   ] = useState("");
 
+
+const [promoCode, setPromoCode] = useState("");
+
+const [appliedPromoCode, setAppliedPromoCode] =
+  useState<string | null>(null);
+
+const [promoDiscount, setPromoDiscount] = useState(0);
+
+const [applyingPromo, setApplyingPromo] = useState(false);
+
+
   const loadCheckout =
     useCallback(async () => {
       try {
@@ -424,8 +435,12 @@ const checkoutSavings =
       ? cart?.summary.savings ?? 0
       : 0;
 
-const checkoutTotal =
-  checkoutSubtotal;
+
+const checkoutTotal = Math.max(
+  0,
+  checkoutSubtotal - promoDiscount,
+);
+
 
 const walletCanPay =
   walletBalance >=
@@ -453,6 +468,90 @@ const hasDeliveryDetails =
           selectedDepositMethod &&
             receiptUrl,
         ));
+
+
+async function handleApplyPromo() {
+  const code = promoCode.trim().toUpperCase();
+
+  if (!code) {
+    toast.error("Enter a promo code first.");
+    return;
+  }
+
+  if (applyingPromo) {
+    return;
+  }
+
+  try {
+    setApplyingPromo(true);
+
+
+const response = await fetch("/api/checkout/promo", {
+  method: "POST",
+  credentials: "include",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    code,
+    mode: isDirectCheckout ? "DIRECT" : "CART",
+    ...(isDirectCheckout && directItem
+      ? {
+          productId: directItem.productId,
+          variantSizeId: directItem.variantSizeId,
+          quantity: directItem.quantity,
+          includeCart: directItem.includeCart,
+        }
+      : {}),
+  }),
+});
+
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(
+        result.error ?? "Unable to apply this promo code.",
+      );
+    }
+
+    const discount = Number(result.data.discount);
+    const validatedCode = String(result.data.code);
+
+    if (
+      !Number.isFinite(discount) ||
+      discount <= 0 ||
+      discount > checkoutSubtotal
+    ) {
+      throw new Error("The promo discount returned is invalid.");
+    }
+
+    setAppliedPromoCode(validatedCode);
+    setPromoCode(validatedCode);
+    setPromoDiscount(discount);
+
+    toast.success("Promo code applied successfully.");
+  } catch (error) {
+    console.error("Promo validation error:", error);
+
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : "Unable to apply this promo code.",
+    );
+  } finally {
+    setApplyingPromo(false);
+  }
+}
+
+function handleRemovePromo() {
+  setAppliedPromoCode(null);
+  setPromoDiscount(0);
+  setPromoCode("");
+
+  toast.success("Promo code removed.");
+}
+
 
   async function handleReceiptUpload(
     file: File,
@@ -692,6 +791,8 @@ body: JSON.stringify({
 mode: isDirectCheckout
   ? "DIRECT"
   : "CART",
+
+discountCode: appliedPromoCode ?? "",
 
 ...(isDirectCheckout && {
   productId:
@@ -1094,20 +1195,15 @@ if (
               min-w-0
             "
           >
+
 <CheckoutOrderSummary
-  items={
-    checkoutItems
-  }
-  subtotal={
-    checkoutSubtotal
-  }
-  savings={
-    checkoutSavings
-  }
-  total={
-    checkoutTotal
-  }
+  items={checkoutItems}
+  subtotal={checkoutSubtotal}
+  savings={checkoutSavings}
+  promoDiscount={promoDiscount}
+  total={checkoutTotal}
 />
+
 
             <div
               className="
@@ -1122,6 +1218,72 @@ if (
                 lg:top-[calc(1rem+210px)]
               "
             >
+
+<div className="mb-3 border-b border-[var(--user-card-border)] pb-3">
+  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--user-text-muted)]">
+    Promo code
+  </p>
+
+  {appliedPromoCode ? (
+    <div className="flex items-center justify-between gap-2">
+      <div className="min-w-0">
+        <p className="truncate text-xs font-semibold text-[var(--user-title)]">
+          ✓ {appliedPromoCode}
+        </p>
+        <p className="text-[10px] text-[var(--user-text-muted)]">
+          You saved {formatCheckoutCurrency(promoDiscount)}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleRemovePromo}
+        disabled={applyingPromo || submitting}
+        className="shrink-0 text-xs font-medium text-[var(--user-text-muted)] hover:text-[var(--user-title)] disabled:opacity-50"
+      >
+        Remove
+      </button>
+    </div>
+  ) : (
+    <form
+      className="flex items-center gap-2"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void handleApplyPromo();
+      }}
+    >
+      <input
+        type="text"
+        value={promoCode}
+        onChange={(event) =>
+          setPromoCode(event.target.value.toUpperCase())
+        }
+        placeholder="Enter promo code"
+        maxLength={50}
+        autoComplete="off"
+        aria-label="Promo code"
+        disabled={applyingPromo || submitting}
+        className="h-9 min-w-0 flex-1 rounded-md border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] px-2.5 text-xs font-medium uppercase text-[var(--user-title)] outline-none placeholder:normal-case placeholder:text-[var(--user-text-muted)] focus:border-[var(--primary)] disabled:opacity-50"
+      />
+
+      <button
+        type="submit"
+        disabled={!promoCode.trim() || applyingPromo || submitting}
+        className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-md border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] px-3 text-xs font-semibold text-[var(--user-title)] hover:border-[var(--primary)] disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {applyingPromo ? (
+          <>
+            <Loader2 size={13} className="animate-spin" />
+            Applying
+          </>
+        ) : (
+          "Apply"
+        )}
+      </button>
+    </form>
+  )}
+</div>
+
               <CheckoutSubmitButton
                 paymentMethod={
                   paymentMethod
@@ -1180,4 +1342,12 @@ function mapAddressToDelivery(
     postalCode:
       address.postalCode,
   };
+}
+
+
+function formatCheckoutCurrency(value: number) {
+  return `$${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
