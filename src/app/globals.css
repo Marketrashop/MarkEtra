@@ -4690,7 +4690,7 @@ main {
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 180px;
+  min-height: 188px;
   margin-bottom: 1rem;
   overflow: hidden;
   border: 1px solid var(--border);

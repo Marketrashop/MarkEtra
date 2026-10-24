@@ -1,5 +1,5 @@
 import NavigationLink from "@/components/ui/Preloader/NavigationLink";
-
+import DashboardTrackOrder from "@/components/user/Dashboardtrackorder";
 import {
   Banknote,
   Bookmark,
@@ -173,117 +173,104 @@ export default function DashboardShoppingOverview({
             sm:gap-0
           "
         >
-          {metrics.map(
-            (
-              metric,
-              index,
-            ) => {
-              const Icon =
-                metric.icon;
+          {metrics.map((metric, index) => {
+            const Icon = metric.icon;
 
-              return (
-                <div
-                  key={
-                    metric.label
+            return (
+              <div
+                key={metric.label}
+                className={`
+                  flex
+                  min-w-0
+                  items-center
+                  gap-2
+                  ${
+                    index % 2 === 1
+                      ? "border-l border-[var(--user-card-border)] pl-2.5 sm:border-l-0 sm:pl-0"
+                      : ""
                   }
-                  className={`
+                  ${
+                    index >= 2
+                      ? "border-t border-[var(--user-card-border)] pt-3 sm:border-t-0 sm:pt-0"
+                      : ""
+                  }
+                  ${
+                    index > 0
+                      ? "sm:border-l sm:border-[var(--user-card-border)] sm:pl-4 lg:pl-5"
+                      : ""
+                  }
+                  sm:gap-3
+                `}
+              >
+                <div
+                  className="
                     flex
-                    min-w-0
+                    h-8
+                    w-8
+                    shrink-0
                     items-center
-                    gap-2
-                    ${
-                      index % 2 === 1
-                        ? "border-l border-[var(--user-card-border)] pl-2.5 sm:border-l-0 sm:pl-0"
-                        : ""
-                    }
-                    ${
-                      index >= 2
-                        ? "border-t border-[var(--user-card-border)] pt-3 sm:border-t-0 sm:pt-0"
-                        : ""
-                    }
-                    ${
-                      index > 0
-                        ? "sm:border-l sm:border-[var(--user-card-border)] sm:pl-4 lg:pl-5"
-                        : ""
-                    }
-                    sm:gap-3
-                  `}
+                    justify-center
+                    rounded-lg
+                    sm:h-9
+                    sm:w-9
+                    sm:rounded-xl
+                  "
+                  style={{
+                    background: `color-mix(in srgb, ${metric.tone} 15%, transparent)`,
+                    color: metric.tone,
+                  }}
                 >
-                  <div
-                    className="
-                      flex
-                      h-8
-                      w-8
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-lg
-                      sm:h-9
-                      sm:w-9
-                      sm:rounded-xl
-                    "
-                    style={{
-                      background:
-                        `color-mix(in srgb, ${metric.tone} 15%, transparent)`,
-
-                      color:
-                        metric.tone,
-                    }}
-                  >
-                    <Icon
-                      size={14}
-                      strokeWidth={2}
-                      className="sm:h-4 sm:w-4"
-                    />
-                  </div>
-
-                  <div className="min-w-0">
-                    <p
-                      className="
-                        text-lg
-                        font-semibold
-                        leading-none
-                        tracking-tight
-                        text-[var(--user-title)]
-                        sm:text-2xl
-                      "
-                    >
-                      {metric.value}
-                    </p>
-
-                    <p
-                      className="
-                        mt-0.5
-                        truncate
-                        text-[9px]
-                        font-medium
-                        text-[var(--user-title)]
-                        sm:mt-1
-                        sm:text-xs
-                      "
-                    >
-                      {metric.label}
-                    </p>
-
-                    <p
-                      className="
-                        mt-0.5
-                        truncate
-                        text-[8px]
-                        text-[var(--user-text-muted)]
-                        sm:text-[10px]
-                      "
-                    >
-                      {
-                        metric.description
-                      }
-                    </p>
-                  </div>
+                  <Icon size={14} strokeWidth={2} className="sm:h-4 sm:w-4" />
                 </div>
-              );
-            },
-          )}
+
+                <div className="min-w-0">
+                  <p
+                    className="
+                      text-lg
+                      font-semibold
+                      leading-none
+                      tracking-tight
+                      text-[var(--user-title)]
+                      sm:text-2xl
+                    "
+                  >
+                    {metric.value}
+                  </p>
+
+                  <p
+                    className="
+                      mt-0.5
+                      truncate
+                      text-[9px]
+                      font-medium
+                      text-[var(--user-title)]
+                      sm:mt-1
+                      sm:text-xs
+                    "
+                  >
+                    {metric.label}
+                  </p>
+
+                  <p
+                    className="
+                      mt-0.5
+                      truncate
+                      text-[8px]
+                      text-[var(--user-text-muted)]
+                      sm:text-[10px]
+                    "
+                  >
+                    {metric.description}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
+
+        <div className="my-4 border-t border-[var(--user-card-border)] sm:my-5" />
+
+        <DashboardTrackOrder />
       </div>
 
       <div
@@ -300,61 +287,10 @@ export default function DashboardShoppingOverview({
           lg:block
         "
       >
-        <div
-          className="
-            absolute
-            bottom-0
-            right-5
-            h-28
-            w-24
-            rounded-b-[24px]
-            rounded-t-lg
-            border
-            border-[var(--primary)]
-          "
-        />
-
-        <div
-          className="
-            absolute
-            bottom-20
-            right-8
-            h-9
-            w-16
-            rounded-t-full
-            border
-            border-b-0
-            border-[var(--primary)]
-          "
-        />
-
-        <div
-          className="
-            absolute
-            bottom-[-2px]
-            right-[-2px]
-            h-24
-            w-20
-            rounded-b-[20px]
-            rounded-t-lg
-            border
-            border-[var(--primary)]
-          "
-        />
-
-        <div
-          className="
-            absolute
-            bottom-16
-            right-4
-            h-8
-            w-14
-            rounded-t-full
-            border
-            border-b-0
-            border-[var(--primary)]
-          "
-        />
+        <div className="absolute bottom-0 right-5 h-28 w-24 rounded-b-[24px] rounded-t-lg border border-[var(--primary)]" />
+        <div className="absolute bottom-20 right-8 h-9 w-16 rounded-t-full border border-b-0 border-[var(--primary)]" />
+        <div className="absolute bottom-[-2px] right-[-2px] h-24 w-20 rounded-b-[20px] rounded-t-lg border border-[var(--primary)]" />
+        <div className="absolute bottom-16 right-4 h-8 w-14 rounded-t-full border border-b-0 border-[var(--primary)]" />
       </div>
     </section>
   );
