@@ -375,9 +375,7 @@ setLoadingText(
 keepLoadingRef.current =
   true;
 
-toast.success(
-  "Signed in successfully",
-);
+
 
 router.push(destination);
 
