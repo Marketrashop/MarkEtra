@@ -273,20 +273,21 @@ export default function DashboardShoppingOverview({
         <DashboardTrackOrder />
       </div>
 
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          bottom-[-28px]
-          right-[-10px]
-          hidden
-          h-40
-          w-40
-          opacity-[0.08]
-          lg:block
-        "
-      >
+<div
+  aria-hidden="true"
+  className="
+    pointer-events-none
+    absolute
+    top-[30%]
+    right-[-4px]
+    -translate-y-1/2
+    hidden
+    h-32
+    w-32
+    opacity-[0.08]
+    lg:block
+  "
+>
         <div className="absolute bottom-0 right-5 h-28 w-24 rounded-b-[24px] rounded-t-lg border border-[var(--primary)]" />
         <div className="absolute bottom-20 right-8 h-9 w-16 rounded-t-full border border-b-0 border-[var(--primary)]" />
         <div className="absolute bottom-[-2px] right-[-2px] h-24 w-20 rounded-b-[20px] rounded-t-lg border border-[var(--primary)]" />

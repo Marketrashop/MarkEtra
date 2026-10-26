@@ -240,8 +240,8 @@ export default function DashboardTrackOrder({
 }: {
   onTrack?: TrackOrderHandler;
 }) {
-  const [sheetOpen, setSheetOpen] = useState(false);
   const router = useRouter();
+  const [isMobileTracking, setIsMobileTracking] = useState(false);
 
   const handleTrackOrder: TrackOrderHandler = async (orderNumber) => {
     // Preserve any existing custom handler supplied by the parent.
@@ -310,34 +310,86 @@ export default function DashboardTrackOrder({
         <TrackOrderForm variant="glass" onTrack={handleTrackOrder} />
       </section>
 
-      <button
-        type="button"
-        onClick={() => setSheetOpen(true)}
-        aria-haspopup="dialog"
-        className="group relative flex h-11 w-full items-center justify-between overflow-hidden rounded-full border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-3.5 text-left shadow-[0_4px_18px_rgba(0,0,0,0.08)] transition duration-200 hover:border-[var(--user-card-border)] hover:bg-[var(--user-card-bg)] active:scale-[0.99] sm:hidden"
+      <form
+onSubmit={async (event) => {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const input = form.elements.namedItem(
+    "mobileOrderReference",
+  ) as HTMLInputElement | null;
+
+  const reference = input?.value.trim().replace(/^#/, "") ?? "";
+
+  if (!reference) {
+    input?.setCustomValidity("Enter your order reference.");
+    input?.reportValidity();
+    input?.focus();
+    return;
+  }
+
+  input?.setCustomValidity("");
+  setIsMobileTracking(true);
+
+  try {
+    const message = await handleTrackOrder(reference);
+
+    if (typeof message === "string" && message) {
+      input?.setCustomValidity(message);
+      input?.reportValidity();
+      input?.focus();
+    }
+  } catch {
+    input?.setCustomValidity(
+      "Unable to connect right now. Please try again.",
+    );
+    input?.reportValidity();
+    input?.focus();
+  } finally {
+    setIsMobileTracking(false);
+  }
+}}
+        className="group relative flex h-10 w-full items-center overflow-hidden rounded-full border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-2.5 text-left shadow-[0_4px_18px_rgba(0,0,0,0.08)] transition duration-200 sm:hidden"
+        aria-label="Track an order"
       >
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[var(--user-title)]/[0.035] via-transparent to-transparent"
         />
-        <span className="relative flex min-w-0 items-center gap-2.5">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--user-card-border)] bg-transparent text-[var(--user-title)]">
-            <PackageSearch size={15} strokeWidth={1.8} />
-          </span>
-          <span className="truncate text-xs font-medium tracking-wide text-[var(--user-title)]">
-            Track an order
-          </span>
+        <span className="relative mr-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--user-card-border)] bg-transparent text-[var(--user-title)]">
+          <PackageSearch size={14} strokeWidth={1.8} aria-hidden="true" />
         </span>
-        <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--user-card-border)] bg-transparent text-[var(--user-title)] transition group-hover:bg-[var(--user-stat-bg)]">
-          <ArrowRight size={14} strokeWidth={1.8} />
-        </span>
-      </button>
+        <input
+          type="text"
+          name="mobileOrderReference"
+          placeholder="Enter order reference"
+          aria-label="Enter order reference"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          enterKeyHint="search"
+          className="relative min-w-0 flex-1 bg-transparent text-[11px] text-[var(--user-title)] outline-none placeholder:text-[var(--user-text-muted)]"
+        />
+        <button
+          type="submit"
+          aria-label="Track order"
+          disabled={isMobileTracking}
+          className="relative ml-1.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--user-card-border)] bg-transparent text-[var(--user-title)] transition hover:bg-[var(--user-stat-bg)] active:scale-95 disabled:cursor-wait disabled:opacity-70"
+        >
+          {isMobileTracking ? (
+            <Loader2 size={12} strokeWidth={1.8} className="animate-spin" aria-hidden="true" />
+          ) : (
+            <ArrowRight size={12} strokeWidth={1.8} aria-hidden="true" />
+          )}
+        </button>
+      </form>
 
-      <TrackOrderSheet
+      {/* Mobile tracking now uses the inline input; the centered dialog is intentionally disabled. */}
+      {/* <TrackOrderSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         onTrack={handleTrackOrder}
-      />
+      /> */}
     </>
   );
 }
