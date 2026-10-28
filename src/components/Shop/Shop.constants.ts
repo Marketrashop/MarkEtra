@@ -1,6 +1,6 @@
 import type {
   ShopBrand,
-} from "./shop.types";
+} from "./Shop.types";
 
 export const SHOP_HERO = {
   title: "Shop/Sell Products",
