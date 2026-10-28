@@ -475,6 +475,7 @@ async function handleAffiliate() {
           mt-2
           flex
           items-center
+          justify-between
           gap-2
           lg:mt-3
         "
@@ -487,12 +488,19 @@ async function handleAffiliate() {
           />
         </div>
 
-        <div className="lg:hidden [zoom:0.8]">
-          <ProductPrice
-            price={activePrice}
-            oldPrice={oldPrice ?? undefined}
-          />
-        </div>
+        <span
+          className={`
+            shrink-0
+            text-right
+            text-[12px]
+            font-semibold
+            leading-none
+            lg:hidden
+            ${stockClass}
+          `}
+        >
+          {stockLabel}
+        </span>
       </div>
 
       <p
@@ -527,14 +535,28 @@ async function handleAffiliate() {
       <div
         className="
           mt-2
-          text-sm
-          font-semibold
           lg:mt-4
         "
       >
-        <span className={stockClass}>
-          {stockLabel}
-        </span>
+        <div className="lg:hidden [zoom:0.76]">
+          <ProductPrice
+            price={activePrice}
+            oldPrice={oldPrice ?? undefined}
+          />
+        </div>
+
+        <div
+          className="
+            hidden
+            text-sm
+            font-semibold
+            lg:block
+          "
+        >
+          <span className={stockClass}>
+            {stockLabel}
+          </span>
+        </div>
       </div>
 
       {variants.length > 0 && (
