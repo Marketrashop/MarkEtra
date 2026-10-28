@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Container } from "@/components/layout";
@@ -26,9 +27,7 @@ export default function PricingPlans() {
 
   return (
     <section
-      className={
-        PRICING_SECTION_Y_PADDING
-      }
+      className={PRICING_SECTION_Y_PADDING}
       style={{
         background:
           "var(--pricing-bg)",
@@ -39,17 +38,20 @@ export default function PricingPlans() {
         <div
           className="
             mx-auto
-            mb-12
+            mb-7
             max-w-[820px]
             text-center
+
+            sm:mb-12
           "
         >
           <span
             className="
               inline-block
-              text-[18px]
+              text-[15px]
               font-extrabold
               text-[#5658EC]
+
               sm:text-[20px]
             "
           >
@@ -58,12 +60,15 @@ export default function PricingPlans() {
 
           <h2
             className="
-              mt-4
-              text-[30px]
+              mt-2.5
+              text-[25px]
               font-extrabold
               leading-[1.1]
               text-[var(--foreground)]
+
+              sm:mt-4
               sm:text-[36px]
+
               lg:text-[40px]
             "
           >
@@ -73,12 +78,15 @@ export default function PricingPlans() {
           <p
             className="
               mx-auto
-              mt-5
+              mt-3
               max-w-[720px]
-              text-[15px]
-              leading-7
+              text-[13px]
+              leading-[1.6]
               text-[var(--foreground-muted)]
+
+              sm:mt-5
               sm:text-[16px]
+              sm:leading-7
             "
           >
             Boost Your Earnings, Amplify Your
@@ -89,9 +97,7 @@ export default function PricingPlans() {
         </div>
 
         {/* Pricing Cards */}
-        <div
-          className={PRICING_GRID}
-        >
+        <div className={PRICING_GRID}>
           {pricingPlans.map(
             (plan) => (
               <PricingPlanCard
@@ -99,8 +105,7 @@ export default function PricingPlans() {
                 plan={plan}
                 current={
                   !loading &&
-                  currentPlanId ===
-                    plan.id
+                  currentPlanId === plan.id
                 }
               />
             ),

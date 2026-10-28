@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -21,6 +22,10 @@ export default function HeroVideoButton() {
       rel="noopener noreferrer"
       aria-label={heroData.videoButton.ariaLabel}
       className="relative inline-flex items-center justify-center"
+      style={{
+        "--hero-video-button-size": `${HERO_VIDEO_BUTTON_SIZE}px`,
+        "--hero-video-icon-size": `${HERO_VIDEO_ICON_SIZE}px`,
+      } as React.CSSProperties}
     >
       {/* Animated Waves */}
       {waves.map((delay) => (
@@ -28,13 +33,13 @@ export default function HeroVideoButton() {
           key={delay}
           className="
             absolute
+            h-[calc(var(--hero-video-button-size)+18px)]
+            w-[calc(var(--hero-video-button-size)+18px)]
             rounded-full
             bg-[var(--primary)]
+            sm:h-[calc(var(--hero-video-button-size)+18px)]
+            sm:w-[calc(var(--hero-video-button-size)+18px)]
           "
-          style={{
-            width: HERO_VIDEO_BUTTON_SIZE + 18,
-            height: HERO_VIDEO_BUTTON_SIZE + 18,
-          }}
           initial={{
             scale: 0.75,
             opacity: 0,
@@ -67,26 +72,29 @@ export default function HeroVideoButton() {
           relative
           z-10
           flex
+          h-[52px]
+          w-[52px]
           items-center
           justify-center
           rounded-full
           bg-white
+
+          sm:h-[var(--hero-video-button-size)]
+          sm:w-[var(--hero-video-button-size)]
         "
         style={{
-          width: HERO_VIDEO_BUTTON_SIZE,
-          height: HERO_VIDEO_BUTTON_SIZE,
           boxShadow: HERO_VIDEO_SHADOW,
         }}
       >
-<Play
-  fill="currentColor"
-  strokeWidth={2}
-  className="ml-[2px] text-[var(--hero-badge-bg)]"
-  style={{
-    width: HERO_VIDEO_ICON_SIZE,
-    height: HERO_VIDEO_ICON_SIZE,
-  }}
-/>
+        <Play
+          fill="currentColor"
+          strokeWidth={2}
+          className="ml-[2px] text-[var(--hero-badge-bg)]"
+          style={{
+            width: "var(--hero-video-icon-size)",
+            height: "var(--hero-video-icon-size)",
+          }}
+        />
       </motion.div>
     </Link>
   );

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -24,7 +25,6 @@ import { PricingPlan } from "./pricingPlans.types";
 
 type PricingPlanCardProps = {
   plan: PricingPlan;
-
   current?: boolean;
 };
 
@@ -32,8 +32,7 @@ export default function PricingPlanCard({
   plan,
   current = false,
 }: PricingPlanCardProps) {
-  const router =
-    useRouter();
+  const router = useRouter();
 
   function handlePlanClick() {
     if (current) {
@@ -72,9 +71,13 @@ export default function PricingPlanCard({
         overflow-hidden
         border
         bg-[var(--surface-card)]
-        px-7
-        pt-8
-        pb-9
+        px-4
+        pt-5
+        pb-6
+
+        sm:px-7
+        sm:pt-8
+        sm:pb-9
       "
       style={{
         borderRadius:
@@ -119,15 +122,18 @@ export default function PricingPlanCard({
             flex
             items-center
             justify-center
-            gap-2
+            gap-1.5
+            sm:gap-2
           "
         >
           <h3
             className="
               text-center
-              text-[40px]
+              text-[28px]
               font-extrabold
               text-[var(--foreground)]
+
+              sm:text-[40px]
             "
           >
             {plan.name}
@@ -137,11 +143,14 @@ export default function PricingPlanCard({
             <span
               className="
                 rounded-full
-                px-2.5
+                px-2
                 py-1
-                text-[10px]
+                text-[9px]
                 font-bold
                 uppercase
+
+                sm:px-2.5
+                sm:text-[10px]
               "
               style={{
                 background:
@@ -159,12 +168,15 @@ export default function PricingPlanCard({
         {/* Divider */}
         <div
           className="
-            mt-5
-            mb-5
+            mt-3
+            mb-3
             h-px
             w-full
             bg-[#282E7E]
             opacity-50
+
+            sm:mt-5
+            sm:mb-5
           "
         />
 
@@ -172,10 +184,13 @@ export default function PricingPlanCard({
         <div className="text-center">
           <span
             className="
-              mr-1.5
-              text-[28px]
+              mr-1
+              text-[22px]
               font-semibold
               text-[var(--foreground)]
+
+              sm:mr-1.5
+              sm:text-[28px]
             "
           >
             $
@@ -183,19 +198,19 @@ export default function PricingPlanCard({
 
           <span
             className="
-              text-[35px]
+              text-[29px]
               font-semibold
               tracking-[-0.02em]
               text-[var(--foreground)]
+
+              sm:text-[35px]
             "
           >
             {plan.price.toLocaleString(
               undefined,
               {
-                minimumFractionDigits:
-                  2,
-                maximumFractionDigits:
-                  2,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
               },
             )}
           </span>
@@ -203,9 +218,11 @@ export default function PricingPlanCard({
           <span
             className="
               ml-1
-              text-[18px]
+              text-[14px]
               font-semibold
               text-[var(--foreground-muted)]
+
+              sm:text-[18px]
             "
           >
             /m
@@ -215,8 +232,11 @@ export default function PricingPlanCard({
         {/* Features */}
         <ul
           className="
-            mt-8
-            space-y-4
+            mt-5
+            space-y-3
+
+            sm:mt-8
+            sm:space-y-4
           "
         >
           {plan.features.map(
@@ -233,24 +253,28 @@ export default function PricingPlanCard({
         <button
           type="button"
           disabled={current}
-          onClick={
-            handlePlanClick
-          }
+          onClick={handlePlanClick}
           className="
-            mt-10
+            mt-6
             flex
             w-full
             items-center
             justify-center
             gap-2
             rounded-lg
-            px-9
-            py-4
+            px-4
+            py-3
+            text-sm
             font-bold
             transition-all
             duration-300
             disabled:cursor-not-allowed
             disabled:opacity-70
+
+            sm:mt-10
+            sm:px-9
+            sm:py-4
+            sm:text-base
           "
           style={{
             background:
@@ -272,9 +296,7 @@ export default function PricingPlanCard({
           {buttonLabel}
 
           {!current && (
-            <ArrowRight
-              size={20}
-            />
+            <ArrowRight size={20} />
           )}
         </button>
       </div>

@@ -1,3 +1,4 @@
+
 export const HERO_ANIMATION = {
   subtitleDelay: 0.3,
   titleDelay: 0.4,
@@ -14,7 +15,7 @@ export const HERO_GLOW_BLUR = 70;
 
 /* CTA */
 
-export const HERO_CTA_HEIGHT = 50;
+export const HERO_CTA_HEIGHT = 46;
 
 export const HERO_CTA_RADIUS = 10;
 

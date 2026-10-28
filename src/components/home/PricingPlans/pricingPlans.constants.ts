@@ -1,12 +1,13 @@
+
 /* ==========================================
    Section
 ========================================== */
 
 export const PRICING_SECTION_Y_PADDING =
-  "py-12 lg:py-20";
+  "py-8 sm:py-12 lg:py-20";
 
 export const PRICING_GRID =
-  "grid gap-7 md:grid-cols-2 xl:grid-cols-3 items-start";
+  "grid gap-4 sm:gap-7 md:grid-cols-2 xl:grid-cols-3 items-start";
 
 /* ==========================================
    Card

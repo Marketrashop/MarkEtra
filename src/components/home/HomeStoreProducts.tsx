@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -287,82 +288,85 @@ export default function HomeStoreProducts({
   }
 
   return (
-<section
-  className="
-    relative
-    overflow-hidden
-    py-16
-    md:py-20
-    lg:py-24
-  "
-  style={{
-    background:
-      "var(--store-products-bg)",
-  }}
->
-{/* Featured products background artwork */}
-<div
-  className="
-    pointer-events-none
-    absolute
-    inset-0
-    z-0
-    bg-no-repeat
-    bg-[length:auto_100%]
-    bg-center
-    sm:bg-cover
-  "
-  style={{
-    backgroundImage:
-      "var(--store-products-bg-image)",
-  }}
-/>
+    <section
+      className="
+        relative
+        overflow-hidden
+        py-8
+        sm:py-16
+        md:py-20
+        lg:py-24
+      "
+      style={{
+        background:
+          "var(--store-products-bg)",
+      }}
+    >
+      {/* Featured products background artwork */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          z-0
+          bg-no-repeat
+          bg-[length:auto_100%]
+          bg-center
+          sm:bg-cover
+        "
+        style={{
+          backgroundImage:
+            "var(--store-products-bg-image)",
+        }}
+      />
 
-  {/* Readability overlay */}
-  <div
-    className="
-      pointer-events-none
-      absolute
-      inset-0
-      z-[1]
-    "
-    style={{
-      background:
-        "color-mix(in srgb, var(--store-products-bg) var(--store-products-image-overlay), transparent)",
-    }}
-  />
+      {/* Readability overlay */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          z-[1]
+        "
+        style={{
+          background:
+            "color-mix(in srgb, var(--store-products-bg) var(--store-products-image-overlay), transparent)",
+        }}
+      />
 
-  {/* Bottom transition */}
-  <div
-    className="
-      pointer-events-none
-      absolute
-      inset-x-0
-      bottom-0
-      z-[2]
-      h-24
-      sm:h-28
-      md:h-32
-    "
-    style={{
-      background:
-        "linear-gradient(to bottom, transparent 0%, var(--store-products-bg) 100%)",
-    }}
-  />
+      {/* Bottom transition */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-x-0
+          bottom-0
+          z-[2]
+          h-24
+          sm:h-28
+          md:h-32
+        "
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent 0%, var(--store-products-bg) 100%)",
+        }}
+      />
 
-  <Container
-    className="
-      relative
-      z-[3]
-    "
-  >
+      <Container
+        className="
+          relative
+          z-[3]
+        "
+      >
+        {/* Section heading */}
         <div
           className="
             mx-auto
-            mb-12
+            mb-7
             max-w-[700px]
             px-4
             text-center
+            sm:mb-12
             md:mb-14
           "
         >
@@ -381,11 +385,12 @@ export default function HomeStoreProducts({
 
           <h2
             className="
-              mt-3
-              text-[30px]
+              mt-2
+              text-[26px]
               font-extrabold
               leading-[1.1]
               text-[var(--foreground)]
+              sm:mt-3
               sm:text-[36px]
               md:text-[44px]
               lg:text-[40px]
@@ -397,12 +402,14 @@ export default function HomeStoreProducts({
           <p
             className="
               mx-auto
-              mt-5
+              mt-3
               max-w-[640px]
-              text-[15px]
-              leading-7
+              text-[14px]
+              leading-[1.6]
               text-[var(--foreground-muted)]
+              sm:mt-5
               sm:text-[16px]
+              sm:leading-7
               md:text-[17px]
               lg:text-[18px]
             "
@@ -414,13 +421,15 @@ export default function HomeStoreProducts({
           </p>
         </div>
 
+        {/* Product grid */}
         <div
           className="
             grid
             content-start
-            gap-6
+            gap-4
             grid-cols-1
             sm:grid-cols-2
+            sm:gap-6
             lg:grid-cols-4
           "
         >

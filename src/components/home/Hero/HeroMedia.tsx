@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 
 import { heroData } from "./hero.data";
@@ -16,9 +17,8 @@ export default function HeroMedia() {
       <div
         className="
           relative
+          mt-3
           w-full
-
-          mt-6
           sm:mt-8
           lg:mt-0
         "
@@ -26,56 +26,61 @@ export default function HeroMedia() {
           maxWidth: `${HERO_IMAGE_MAX_WIDTH}px`,
         }}
       >
-{/* Main Glow */}
-<div
-  className="
-    absolute
-    bottom-6
-    left-1/2
-    -translate-x-1/2
-    h-20
-    w-[60%]
-    rounded-full
-    blur-3xl
-    -z-10
-  "
-  style={{
-    background: "rgba(92, 102, 255, 1)",
-  }}
-/>
+        {/* Main Glow */}
+        <div
+          className="
+            absolute
+            bottom-6
+            left-1/2
+            h-20
+            w-[60%]
+            -translate-x-1/2
+            rounded-full
+            blur-3xl
+            -z-10
+          "
+          style={{
+            background: "rgba(92, 102, 255, 1)",
+          }}
+        />
 
-{/* Neon Ring */}
-<div
-  className="
-    absolute
-    bottom-0
-    left-1/2
-    -translate-x-1/2
-    w-[100%]
-    h-10
-    rounded-full
-    border
-    border-[#6f6cff]
-    opacity-90
-    blur-[1px]
-    -z-20
-  "
-/>
+        {/* Neon Ring */}
+        <div
+          className="
+            absolute
+            bottom-0
+            left-1/2
+            h-10
+            w-full
+            -translate-x-1/2
+            rounded-full
+            border
+            border-[#6f6cff]
+            opacity-90
+            blur-[1px]
+            -z-20
+          "
+        />
 
-<Image
-  src={heroData.image.src}
-  alt={heroData.image.alt}
-  width={510}
-  height={580}
-  priority
-  fetchPriority="high"
-  loading="eager"
-  className="
-    relative
-    z-20
-    drop-shadow-[0_35px_45px_rgba(0,0,0,.35)]
-  "
-/>
+        <Image
+          src={heroData.image.src}
+          alt={heroData.image.alt}
+          width={510}
+          height={580}
+          priority
+          fetchPriority="high"
+          loading="eager"
+          className="
+            relative
+            z-20
+            h-auto
+            w-[88%]
+            mx-auto
+            drop-shadow-[0_35px_45px_rgba(0,0,0,.35)]
+
+            sm:w-full
+          "
+        />
       </div>
     </div>
   );

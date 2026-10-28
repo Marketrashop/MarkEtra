@@ -1,3 +1,4 @@
+
 import {
   Globe2,
   Headphones,
@@ -22,7 +23,7 @@ export default function Hero() {
         relative
         overflow-hidden
 
-        pt-[48px]
+        pt-[28px]
         pb-0
 
         md:pt-[60px]
@@ -35,8 +36,7 @@ export default function Hero() {
         xl:pb-0
       "
       style={{
-        backgroundColor:
-          "var(--surface-hero)",
+        backgroundColor: "var(--surface-hero)",
       }}
     >
       {/* Hero Background Image */}
@@ -83,8 +83,7 @@ export default function Hero() {
           blur-[30px]
         "
         style={{
-          background:
-            "var(--hero-glow)",
+          background: "var(--hero-glow)",
         }}
       />
 
@@ -106,11 +105,12 @@ export default function Hero() {
         className="
           relative
           isolate
-          mt-10
+          mt-6
           overflow-hidden
-          pt-6
-          pb-3
+          pt-4
+          pb-2
 
+          md:mt-10
           md:pb-4
 
           lg:mt-16
@@ -169,12 +169,7 @@ export default function Hero() {
 
         {/* Features Content */}
         <Container className="relative z-10">
-          <div
-            className="
-              grid
-              grid-cols-4
-            "
-          >
+          <div className="grid grid-cols-4">
             {[
               {
                 icon: Truck,
@@ -197,11 +192,7 @@ export default function Hero() {
                 subtitle: "Marketplace",
               },
             ].map(
-              ({
-                icon: Icon,
-                title,
-                subtitle,
-              }, index) => (
+              ({ icon: Icon, title, subtitle }, index) => (
                 <div
                   key={title}
                   className={`
@@ -223,8 +214,8 @@ export default function Hero() {
                 >
                   <Icon
                     className="
-                      h-5
-                      w-5
+                      h-4
+                      w-4
                       text-[color:var(--hero-badge-bg)]
 
                       md:h-6
@@ -237,13 +228,14 @@ export default function Hero() {
 
                   <p
                     className="
-                      mt-2
-                      text-[11px]
+                      mt-1.5
+                      text-[10px]
                       font-semibold
                       leading-tight
                       tracking-tight
                       text-[var(--foreground)]
 
+                      md:mt-2
                       md:text-xs
 
                       lg:mt-3
@@ -256,7 +248,7 @@ export default function Hero() {
                   <p
                     className="
                       mt-0.5
-                      text-[9px]
+                      text-[8px]
                       leading-tight
                       text-[var(--foreground-muted)]
 
@@ -275,27 +267,27 @@ export default function Hero() {
         </Container>
       </div>
 
-{/* Soft Bottom Blend */}
-<div
-  className="
-    pointer-events-none
-    absolute
-    inset-x-0
-    bottom-0
-    z-[2]
-    h-10
+      {/* Soft Bottom Blend */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-x-0
+          bottom-0
+          z-[2]
+          h-8
 
-    sm:h-12
+          sm:h-12
 
-    md:h-14
+          md:h-14
 
-    lg:h-16
-  "
-  style={{
-    background:
-      "linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--home-category-bg) 35%, transparent) 55%, var(--home-category-bg) 100%)",
-  }}
-/>
+          lg:h-16
+        "
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--home-category-bg) 35%, transparent) 55%, var(--home-category-bg) 100%)",
+        }}
+      />
 
       <HeroDecoration />
     </section>

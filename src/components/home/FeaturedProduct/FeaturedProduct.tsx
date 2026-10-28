@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -151,8 +152,11 @@ export default function FeaturedProduct({
         relative
         overflow-hidden
 
-        pt-[60px]
-        pb-[60px]
+        pt-8
+        pb-8
+
+        sm:pt-[60px]
+        sm:pb-[60px]
 
         md:pt-[80px]
         md:pb-[70px]
@@ -205,10 +209,10 @@ export default function FeaturedProduct({
                       PRODUCT_TRANSITION
                     }
                     className="
+                      pointer-events-none
                       absolute
                       inset-0
                       z-20
-                      pointer-events-none
                     "
                   >
                     <FeaturedProductImage
@@ -224,8 +228,11 @@ export default function FeaturedProduct({
           <Col
             lg={6}
             className="
-              mb-12
               order-1
+              mb-6
+
+              sm:mb-12
+
               lg:order-2
               lg:mb-0
               lg:pl-1

@@ -1,3 +1,4 @@
+
 export default function FeaturedProductBackground() {
   return (
     <div
@@ -7,7 +8,7 @@ export default function FeaturedProductBackground() {
         left-0
         z-0
 
-        top-[720px]
+        top-[420px]
         bottom-0
 
         w-[102%]
