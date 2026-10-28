@@ -132,7 +132,7 @@ export default function NotFoundHero() {
           </NavigationLink>
 
           <NavigationLink
-            href="/shop"
+            href="/Shop"
             className="
               inline-flex
               h-10

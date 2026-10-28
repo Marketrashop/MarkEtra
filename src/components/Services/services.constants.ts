@@ -10,7 +10,7 @@ export const SERVICES: Service[] = [
     description:
       "Premium ebooks, templates, guides, and downloadable resources designed to help entrepreneurs move faster and make better business decisions.",
 
-    href: "/shop",
+    href: "/Shop",
   },
 
   {

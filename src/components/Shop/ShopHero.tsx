@@ -1,8 +1,9 @@
+
 "use client";
 
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 
-import { SHOP_HERO } from "./shop.constants";
+import { SHOP_HERO } from "./Shop.constants";
 
 type ShopHeroProps = {
   environment?: "public" | "user";
@@ -16,12 +17,12 @@ export default function ShopHero({
       className="
         bg-[var(--services-hero-bg)]
 
-        py-8
+        py-5
 
         transition-colors
         duration-300
 
-        md:py-10
+        md:py-7
       "
     >
       <div
@@ -66,11 +67,11 @@ export default function ShopHero({
 
         <h1
           className="
-            mt-3
+            mt-2
 
             text-center
 
-            text-[26px]
+            text-[18px]
 
             font-extrabold
 
@@ -81,9 +82,9 @@ export default function ShopHero({
             transition-colors
             duration-300
 
-            md:text-[36px]
+            md:text-[25px]
 
-            lg:text-[40px]
+            lg:text-[28px]
           "
         >
           {SHOP_HERO.title}
@@ -93,22 +94,22 @@ export default function ShopHero({
           className="
             mx-auto
 
-            mt-3
+            mt-2
 
             max-w-2xl
 
-            text-[14px]
+            text-[12px]
 
-            leading-6
+            leading-5
 
             text-[var(--services-hero-text)]
 
             transition-colors
             duration-300
 
-            lg:text-[15px]
+            lg:text-[13px]
 
-            lg:leading-7
+            lg:leading-6
           "
         >
           {SHOP_HERO.description}

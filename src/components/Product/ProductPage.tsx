@@ -1,3 +1,4 @@
+
 import PageBreadcrumb from "@/components/common/PageBreadcrumb";
 
 import {
@@ -34,12 +35,12 @@ export default async function ProductPage({
   product,
   environment = "public",
 }: ProductPageProps) {
-const relatedProducts =
-  await getRelatedProducts(
-    product.id,
-    product.categories[0]?.category.id ??
-      null,
-  );
+  const relatedProducts =
+    await getRelatedProducts(
+      product.id,
+      product.categories[0]?.category.id ??
+        null,
+    );
 
   return (
     <main
@@ -54,44 +55,42 @@ const relatedProducts =
           duration-300
         "
       >
-        {environment ===
-        "public" ? (
+        {environment === "public" ? (
           <div
             className="
               mx-auto
               max-w-7xl
               px-5
-              py-10
+              py-5
               lg:px-8
-              md:py-12
+              md:py-7
             "
           >
             <PageBreadcrumb
               items={[
                 {
                   label: "Shop",
-                  href: "/shop",
+                  href: "/Shop",
                 },
                 {
-                  label:
-                    product.name,
+                  label: product.name,
                 },
               ]}
             />
 
-<h1
-  className="
-    mt-4
-    text-center
-    text-[22px]
-    font-extrabold
-    leading-tight
-    text-[var(--services-hero-title)]
-    sm:text-[26px]
-    md:text-[40px]
-    lg:text-[44px]
-  "
->
+            <h1
+              className="
+                mt-2
+                text-center
+                text-[15px]
+                font-extrabold
+                leading-tight
+                text-[var(--services-hero-title)]
+                sm:text-[18px]
+                md:text-[28px]
+                lg:text-[31px]
+              "
+            >
               {product.name}
             </h1>
           </div>
@@ -104,8 +103,7 @@ const relatedProducts =
                 href: "/Market-Place",
               },
               {
-                label:
-                  product.name,
+                label: product.name,
               },
             ]}
           />
@@ -114,8 +112,7 @@ const relatedProducts =
 
       <section
         className={
-          environment ===
-          "public"
+          environment === "public"
             ? `
                 bg-[var(--background)]
                 py-10
@@ -134,9 +131,9 @@ const relatedProducts =
               `
         }
       >
-<ProductPurchaseSection
-  product={product}
-/>
+        <ProductPurchaseSection
+          product={product}
+        />
 
         <div
           className="
@@ -161,9 +158,7 @@ const relatedProducts =
 
       <StoreProducts
         products={relatedProducts}
-        environment={
-          environment
-        }
+        environment={environment}
         variant="compact"
         eyebrow="Related Products"
         title="You May Also Like"

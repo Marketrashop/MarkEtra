@@ -103,7 +103,7 @@ export default function CTA() {
           "
         >
           <Link
-            href="/shop"
+            href="/Shop"
             style={{
               backgroundColor:
                 "var(--services-cta-primary-bg)",

@@ -42,37 +42,31 @@ export default function ShopPage({
         />
       )}
 
-      <section
-        className={
-          environment === "public"
-            ? `
-                bg-[var(--background)]
-
-                py-16
-
-                transition-colors
-                duration-300
-
-                sm:py-20
-
-                lg:py-24
-              `
-            : `
-                bg-[var(--background)]
-
-                pt-8
-
-                pb-16
-
-                transition-colors
-                duration-300
-
-                sm:pb-20
-
-                lg:pb-24
-              `
-        }
-      >
+<section
+  className={
+    environment === "public"
+      ? `
+          bg-[var(--background)]
+          pt-6
+          pb-8
+          transition-colors
+          duration-300
+          sm:pt-8
+          sm:pb-10
+          lg:pt-10
+          lg:pb-12
+        `
+      : `
+          bg-[var(--background)]
+          pt-8
+          pb-16
+          transition-colors
+          duration-300
+          sm:pb-20
+          lg:pb-24
+        `
+  }
+>
         <div
           className="
             mx-auto
