@@ -457,114 +457,117 @@ async function handleAffiliate() {
       "
     >
       <h1
-className="
-  text-[21px]
-  font-bold
-  leading-[1.25]
-  tracking-[-0.02em]
-  text-[var(--foreground)]
-  lg:text-[30px]
-"
+        className="
+          text-[17px]
+          font-bold
+          leading-[1.2]
+          tracking-[-0.02em]
+          text-[var(--foreground)]
+          lg:text-[30px]
+          lg:leading-[1.25]
+        "
       >
         {name}
       </h1>
 
       <div
         className="
-          mt-3
+          mt-2
+          flex
+          items-center
+          gap-2
+          lg:mt-3
         "
       >
-<RatingStars
-  rating={rating}
-  totalRatings={reviewCount}
-  showValue
-/>
+        <div className="[zoom:0.9] lg:[zoom:1]">
+          <RatingStars
+            rating={rating}
+            totalRatings={reviewCount}
+            showValue
+          />
+        </div>
+
+        <div className="lg:hidden [zoom:0.8]">
+          <ProductPrice
+            price={activePrice}
+            oldPrice={oldPrice ?? undefined}
+          />
+        </div>
       </div>
 
-<p
-  className="
-    mt-4
-    hidden
-    max-w-[560px]
-text-[12px]
-leading-5
-lg:text-[14px]
-lg:leading-7
-    text-[var(--foreground-muted)]
-    lg:block
-  "
->
-  {description}
-</p>
+      <p
+        className="
+          mt-4
+          hidden
+          max-w-[560px]
+          text-[12px]
+          leading-5
+          text-[var(--foreground-muted)]
+          lg:block
+          lg:text-[14px]
+          lg:leading-7
+        "
+      >
+        {description}
+      </p>
 
       <div
         className="
-          mt-5
+          hidden
+          lg:mt-5
+          lg:block
         "
       >
         <ProductPrice
-          price={
-            activePrice
-          }
-          oldPrice={
-            oldPrice ??
-            undefined
-          }
+          price={activePrice}
+          oldPrice={oldPrice ?? undefined}
         />
       </div>
 
       <div
         className="
-          mt-4
+          mt-2
           text-sm
           font-semibold
+          lg:mt-4
         "
       >
-        <span
-          className={
-            stockClass
-          }
-        >
+        <span className={stockClass}>
           {stockLabel}
         </span>
       </div>
 
-      {variants.length >
-        0 && (
+      {variants.length > 0 && (
         <div
           className="
-            mt-6
+            mt-4
+            lg:mt-6
           "
         >
           <ProductVariantPicker
-            variants={
-              variants
-            }
-            onVariantChange={
-              handleVariantChange
-            }
+            variants={variants}
+            onVariantChange={handleVariantChange}
           />
         </div>
       )}
 
-<p
-  className="
-    mt-6
-    max-w-[560px]
-text-[12px]
-leading-5
-lg:text-[14px]
-lg:leading-7
-    text-[var(--foreground-muted)]
-    lg:hidden
-  "
->
-  {description}
-</p>
+      <p
+        className="
+          mt-3
+          max-w-[560px]
+          text-[12px]
+          leading-5
+          text-[var(--foreground-muted)]
+          lg:hidden
+        "
+      >
+        {description}
+      </p>
 
       <div
         className="
-          mt-5
+          mt-4
+          lg:mt-5
         "
       >
         <ProductQuantity
@@ -601,7 +604,8 @@ lg:leading-7
 
       <div
         className="
-          mt-5
+          mt-4
+          lg:mt-5
         "
       >
         <ProductActions
@@ -641,7 +645,8 @@ lg:leading-7
 
       <div
         className="
-          mt-6
+          mt-4
+          lg:mt-6
         "
       >
         <ProductShipping
@@ -659,7 +664,8 @@ lg:leading-7
 
       <div
         className="
-          mt-6
+          mt-4
+          lg:mt-6
         "
       >
         <ProductShare
