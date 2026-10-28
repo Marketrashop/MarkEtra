@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 
 import type {
@@ -38,7 +37,9 @@ export default function FeaturedProductImage({
         z-20
 
         w-full
-        max-w-[280px]
+
+        max-w-[430px]
+
         mx-auto
 
         sm:max-w-[470px]
