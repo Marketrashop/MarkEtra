@@ -1,11 +1,20 @@
+
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 
 import type {
   ProductCard,
 } from "@/lib/products/product.types";
 
+import { useNavigationLoader } from "@/components/ui/Preloader";
+
 import {
   FEATURED_IMAGE_RADIUS,
+  FEATURED_BUTTON_RADIUS,
 } from "./featuredProduct.constants";
 
 type FeaturedProductImageProps = {
@@ -15,6 +24,10 @@ type FeaturedProductImageProps = {
 export default function FeaturedProductImage({
   product,
 }: FeaturedProductImageProps) {
+  const router = useRouter();
+
+  const { startNavigation } = useNavigationLoader();
+
   const primaryImage =
     product.images.find(
       (image) =>
@@ -29,6 +42,8 @@ export default function FeaturedProductImage({
   if (!primaryImage?.imageUrl) {
     return null;
   }
+
+  const href = `/Product/${product.slug}`;
 
   return (
     <div
@@ -72,10 +87,69 @@ export default function FeaturedProductImage({
           w-full
         "
         style={{
-          borderRadius:
-            FEATURED_IMAGE_RADIUS,
+          borderRadius: FEATURED_IMAGE_RADIUS,
         }}
       />
+
+      {/* Mobile-only Buy Now overlay */}
+      <Link
+        href={href}
+        aria-label={`Buy ${product.name}`}
+        onClick={(event) => {
+          event.preventDefault();
+
+          startNavigation();
+
+          router.push(href);
+        }}
+className="
+  absolute
+  bottom-2.5
+  right-2.5
+  z-30
+
+  inline-flex
+  h-[30px]
+  items-center
+  justify-center
+  gap-1
+
+  rounded-md
+  px-2.5
+
+  text-[10px]
+  font-semibold
+  leading-none
+  text-white
+
+  shadow-[0_2px_8px_rgba(86,88,236,0.22)]
+
+  transition-all
+  duration-200
+
+  hover:bg-[#6B6DFF]
+  hover:shadow-[0_4px_12px_rgba(86,88,236,0.3)]
+
+  active:scale-[0.98]
+
+  focus:outline-none
+  focus-visible:ring-2
+  focus-visible:ring-white/80
+
+  lg:hidden
+"
+style={{
+  background: "var(--featured-accent)",
+  borderRadius: "7px",
+}}
+      >
+        Buy Now
+
+<ArrowRight
+  size={12}
+  strokeWidth={2}
+/>
+      </Link>
     </div>
   );
 }

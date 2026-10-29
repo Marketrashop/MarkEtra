@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -16,6 +17,12 @@ import {
   motion,
 } from "framer-motion";
 
+import {
+  ArrowRight,
+  ChevronRight,
+  Star,
+} from "lucide-react";
+
 import type {
   ProductCard,
 } from "@/lib/products/product.types";
@@ -29,9 +36,13 @@ function getPrimaryImage(
 ) {
   return (
     product.images.find(
-      (image) => image.isPrimary,
+      (image) =>
+        image.isPrimary &&
+        image.imageUrl,
     ) ??
-    product.images[0]
+    product.images.find(
+      (image) => image.imageUrl,
+    )
   );
 }
 
@@ -44,12 +55,16 @@ function formatPrice(
 export default function HomeProductGalleryCard({
   product,
 }: HomeProductGalleryCardProps) {
-  const router =
-    useRouter();
+  const router = useRouter();
 
   const [
     loading,
     setLoading,
+  ] = useState(false);
+
+  const [
+    isHovered,
+    setIsHovered,
   ] = useState(false);
 
   const primaryImage =
@@ -62,10 +77,23 @@ export default function HomeProductGalleryCard({
   const productHref =
     `/Product/${product.slug}`;
 
+  const hasDiscount =
+    product.compareAtPrice !== null &&
+    product.compareAtPrice >
+      product.price;
+
+  const discountPercentage =
+    hasDiscount
+      ? Math.round(
+          ((product.compareAtPrice! -
+            product.price) /
+            product.compareAtPrice!) *
+            100,
+        )
+      : 0;
+
   useEffect(() => {
-    router.prefetch(
-      productHref,
-    );
+    router.prefetch(productHref);
   }, [
     router,
     productHref,
@@ -73,8 +101,9 @@ export default function HomeProductGalleryCard({
 
   return (
     <motion.article
-      whileHover={{
-        y: -4,
+      initial={false}
+      animate={{
+        y: isHovered ? -4 : 0,
       }}
       transition={{
         duration: 0.25,
@@ -85,6 +114,12 @@ export default function HomeProductGalleryCard({
           1,
         ],
       }}
+      onHoverStart={() =>
+        setIsHovered(true)
+      }
+      onHoverEnd={() =>
+        setIsHovered(false)
+      }
       className="
         group
         relative
@@ -98,6 +133,7 @@ export default function HomeProductGalleryCard({
       <Link
         href={productHref}
         prefetch
+        aria-label={`View details for ${product.name}`}
         onClick={(event) => {
           event.preventDefault();
 
@@ -107,9 +143,7 @@ export default function HomeProductGalleryCard({
 
           setLoading(true);
 
-          router.push(
-            productHref,
-          );
+          router.push(productHref);
         }}
         className="
           block
@@ -117,40 +151,39 @@ export default function HomeProductGalleryCard({
           focus:outline-none
           focus-visible:ring-2
           focus-visible:ring-[var(--primary)]
+          focus-visible:ring-offset-2
+          focus-visible:ring-offset-[var(--product-gallery-bg)]
           sm:rounded-[19px]
         "
       >
         <div
           className="
+            relative
             overflow-hidden
             rounded-[17px]
             border
             border-[var(--product-gallery-border)]
             bg-[var(--product-gallery-card-bg)]
-            p-1.5
             shadow-[var(--product-gallery-card-shadow)]
-            transition-shadow
+            transition-[border-color,box-shadow]
             duration-300
-            hover:shadow-[var(--product-gallery-card-shadow-hover)]
+            group-hover:border-[var(--primary)]
+            group-hover:shadow-[var(--product-gallery-card-shadow-hover)]
             sm:rounded-[19px]
-            sm:p-2
           "
         >
+          {/* Product image */}
           <div
             className="
               relative
               aspect-[1/1.02]
               overflow-hidden
-              rounded-[12px]
               bg-[var(--product-gallery-image-bg)]
-              sm:rounded-[15px]
             "
           >
             {primaryImage?.imageUrl ? (
               <Image
-                src={
-                  primaryImage.imageUrl
-                }
+                src={primaryImage.imageUrl}
                 alt={
                   primaryImage.altText ??
                   product.name
@@ -163,13 +196,13 @@ export default function HomeProductGalleryCard({
                   265px
                 "
                 className="
+                  select-none
                   object-cover
                   object-center
-                  select-none
                   transition-transform
                   duration-500
                   ease-[cubic-bezier(0.22,1,0.36,1)]
-                  group-hover:scale-[1.035]
+                  group-hover:scale-[1.045]
                 "
               />
             ) : (
@@ -188,79 +221,249 @@ export default function HomeProductGalleryCard({
                 No image
               </div>
             )}
+
+            {/* Discount badge */}
+            {hasDiscount && (
+              <span
+                className="
+                  absolute
+                  right-2
+                  top-2
+                  z-[2]
+                  inline-flex
+                  items-center
+                  gap-1
+                  rounded-full
+                  bg-red-600
+                  px-2
+                  py-1
+                  text-[9px]
+                  font-extrabold
+                  leading-none
+                  text-white
+                  shadow-[0_3px_10px_rgba(0,0,0,0.18)]
+                  sm:right-2.5
+                  sm:top-2.5
+                  sm:px-2.5
+                  sm:py-1.5
+                  sm:text-[10px]
+                "
+              >
+                <span aria-hidden="true">
+                  ↓
+                </span>
+                -{discountPercentage}%
+              </span>
+            )}
+
+            {/* Desktop hover cue */}
+            <div
+              className="
+                pointer-events-none
+                absolute
+                inset-x-0
+                bottom-0
+                z-[1]
+                hidden
+                h-20
+                bg-gradient-to-t
+                from-black/45
+                to-transparent
+                opacity-0
+                transition-opacity
+                duration-300
+                group-hover:opacity-100
+                sm:block
+              "
+            />
+
+            <span
+              className="
+                pointer-events-none
+                absolute
+                bottom-3
+                left-1/2
+                z-[2]
+                hidden
+                -translate-x-1/2
+                items-center
+                gap-1.5
+                whitespace-nowrap
+                rounded-full
+                bg-[#5658EC]
+                px-4
+                py-2.5
+                text-[11px]
+                font-bold
+                text-white
+                shadow-[0_6px_20px_rgba(86,88,236,0.35)]
+                opacity-0
+                transition-all
+                duration-300
+                group-hover:bottom-4
+                group-hover:opacity-100
+                sm:inline-flex
+              "
+            >
+              View item
+              <ArrowRight
+                size={13}
+                strokeWidth={2.3}
+              />
+            </span>
           </div>
 
+          {/* Product details */}
           <div
             className="
-              px-1
-              pb-0.5
+              px-2
+              pb-2.5
               pt-2.5
-              sm:px-1.5
-              sm:pb-1
+              sm:px-3
+              sm:pb-3
               sm:pt-3
             "
           >
-            {category && (
-              <p
+            {/* Rating */}
+            <div
+              className="
+                flex
+                min-w-0
+                items-center
+                gap-1
+                sm:gap-1.5
+              "
+              aria-label="Product rating"
+            >
+              <div
+                className="
+                  flex
+                  shrink-0
+                  items-center
+                  gap-[1px]
+                  text-amber-400
+                  sm:gap-0.5
+                "
+                aria-hidden="true"
+              >
+                {[0, 1, 2, 3, 4].map(
+                  (index) => (
+                    <Star
+                      key={index}
+                      size={11}
+                      strokeWidth={1.8}
+                      fill={
+                        index < 4
+                          ? "currentColor"
+                          : "none"
+                      }
+                      className="
+                        sm:h-[13px]
+                        sm:w-[13px]
+                      "
+                    />
+                  ),
+                )}
+              </div>
+
+              <span
                 className="
                   truncate
                   text-[9px]
-                  font-bold
-                  uppercase
-                  tracking-[0.12em]
-                  text-[var(--product-gallery-category)]
+                  leading-none
+                  text-[var(--foreground-muted)]
                   sm:text-[10px]
-                  sm:tracking-[0.14em]
                 "
               >
-                {category}
-              </p>
-            )}
+                4.0
+              </span>
+            </div>
 
-            <h3
-              className="
-                mt-1
-                truncate
-                text-[12px]
-                font-semibold
-                leading-4
-                text-[var(--foreground)]
-                sm:mt-1.5
-                sm:text-[14px]
-                sm:leading-5
-              "
-            >
-              {product.name}
-            </h3>
-
+            {/* Product name */}
             <div
               className="
                 mt-1.5
-                flex
-                items-baseline
-                gap-1.5
+                min-h-[32px]
                 sm:mt-2
-                sm:gap-2
+                sm:min-h-[40px]
               "
             >
-              <span
+              {category && (
+                <p
+                  className="
+                    mb-0.5
+                    truncate
+                    text-[8px]
+                    font-bold
+                    uppercase
+                    tracking-[0.1em]
+                    text-[var(--product-gallery-category)]
+                    sm:text-[9px]
+                    sm:tracking-[0.12em]
+                  "
+                >
+                  {category}
+                </p>
+              )}
+
+              <h3
                 className="
-                  text-[12px]
-                  font-extrabold
-                  leading-none
-                  text-[var(--product-gallery-price)]
-                  sm:text-[15px]
+                  line-clamp-2
+                  text-[11px]
+                  font-semibold
+                  leading-[1.4]
+                  text-[var(--foreground)]
+                  transition-colors
+                  duration-200
+                  group-hover:text-[var(--primary)]
+                  sm:text-[13px]
+                  sm:leading-[1.45]
                 "
               >
-                {formatPrice(
-                  product.price,
-                )}
-              </span>
+                {product.name}
+              </h3>
+            </div>
 
-              {product.compareAtPrice !==
-                null &&
-                product.compareAtPrice >
-                  product.price && (
+            {/* Price and mobile details cue */}
+            <div
+              className="
+                mt-2
+                flex
+                min-w-0
+                items-center
+                justify-between
+                gap-1
+                border-t
+                border-[var(--product-gallery-border)]
+                pt-2
+                sm:mt-2.5
+                sm:pt-2.5
+              "
+            >
+              <div
+                className="
+                  flex
+                  min-w-0
+                  flex-wrap
+                  items-baseline
+                  gap-x-1.5
+                  gap-y-1
+                  sm:gap-x-2
+                "
+              >
+                <span
+                  className="
+                    text-[12px]
+                    font-extrabold
+                    leading-none
+                    text-[var(--product-gallery-price)]
+                    sm:text-[15px]
+                  "
+                >
+                  {formatPrice(product.price)}
+                </span>
+
+                {hasDiscount && (
                   <span
                     className="
                       truncate
@@ -273,14 +476,66 @@ export default function HomeProductGalleryCard({
                     "
                   >
                     {formatPrice(
-                      product.compareAtPrice,
+                      product.compareAtPrice!,
                     )}
                   </span>
                 )}
+              </div>
+
+              {/* Compact action for touch screens */}
+              <span
+                className="
+                  flex
+                  h-7
+                  w-7
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-[var(--primary)]/40
+                  bg-[var(--primary)]/10
+                  text-[var(--primary)]
+                  transition-all
+                  duration-200
+                  group-hover:border-[var(--primary)]
+                  group-hover:bg-[var(--primary)]
+                  group-hover:text-white
+                  sm:hidden
+                "
+                aria-hidden="true"
+              >
+                <ChevronRight
+                  size={16}
+                  strokeWidth={2.2}
+                />
+              </span>
+
+              {/* Explicit action on desktop */}
+              <span
+                className="
+                  hidden
+                  shrink-0
+                  items-center
+                  gap-1
+                  whitespace-nowrap
+                  text-[10px]
+                  font-bold
+                  text-[var(--foreground)]
+                  transition-colors
+                  duration-200
+                  group-hover:text-[var(--primary)]
+                  md:group-hover:hidden
+                "
+              >
+                View Details
+                <ArrowRight size={12} />
+              </span>
             </div>
           </div>
         </div>
 
+        {/* Loading transition */}
         {loading && (
           <motion.div
             initial={{
@@ -297,7 +552,7 @@ export default function HomeProductGalleryCard({
               items-center
               justify-center
               rounded-[17px]
-              bg-black/45
+              bg-black/50
               backdrop-blur-md
               sm:rounded-[19px]
             "
@@ -318,7 +573,7 @@ export default function HomeProductGalleryCard({
                   text-white
                 "
               >
-                Please wait
+                Opening product details
               </p>
 
               <div
@@ -326,7 +581,7 @@ export default function HomeProductGalleryCard({
                   h-1.5
                   overflow-hidden
                   rounded-full
-                  bg-white/10
+                  bg-white/15
                 "
               >
                 <motion.div
@@ -334,8 +589,8 @@ export default function HomeProductGalleryCard({
                     h-full
                     w-1/2
                     rounded-full
-                    bg-[var(--primary)]
-                    shadow-[0_0_12px_var(--primary)]
+                    bg-[#5658EC]
+                    shadow-[0_0_12px_rgba(86,88,236,0.8)]
                   "
                   initial={{
                     x: "-120%",

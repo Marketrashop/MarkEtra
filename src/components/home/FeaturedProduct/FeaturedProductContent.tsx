@@ -180,7 +180,7 @@ export default function FeaturedProductContent({
         </p>
       </div>
 
-      {/* Static CTA */}
+      {/* Desktop CTA: preserve its existing placement */}
       <Link
         href={href}
         onClick={(event) => {
@@ -191,7 +191,7 @@ export default function FeaturedProductContent({
           router.push(href);
         }}
         className="
-          inline-flex
+          hidden
           h-[42px]
           items-center
           justify-center
@@ -212,6 +212,8 @@ export default function FeaturedProductContent({
           focus-visible:ring-2
           focus-visible:ring-[#5B5EF7]/30
 
+          lg:inline-flex
+
           sm:h-auto
           sm:px-7
           sm:py-3
@@ -221,6 +223,7 @@ export default function FeaturedProductContent({
           borderRadius: FEATURED_BUTTON_RADIUS,
           background: "var(--featured-accent)",
           color: "#FFFFFF",
+          height: undefined,
         }}
       >
         Buy Now

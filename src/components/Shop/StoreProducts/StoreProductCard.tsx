@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -14,6 +15,11 @@ import {
 import {
   motion,
 } from "framer-motion";
+
+import {
+  ArrowRight,
+  ChevronRight,
+} from "lucide-react";
 
 import type {
   ProductCard,
@@ -42,21 +48,16 @@ import StoreProductRating from "./StoreProductRating";
 
 type StoreProductCardProps = {
   product: ProductCard;
-
   environment?: AppEnvironment;
-
   variant?: "default" | "compact";
 };
 
 export default function StoreProductCard({
   product,
-
   environment = "public",
-
   variant = "default",
 }: StoreProductCardProps) {
-  const router =
-    useRouter();
+  const router = useRouter();
 
   const [
     loading,
@@ -64,9 +65,7 @@ export default function StoreProductCard({
   ] = useState(false);
 
   const styles =
-    STORE_PRODUCT_VARIANTS[
-      variant
-    ];
+    STORE_PRODUCT_VARIANTS[variant];
 
   const truncateTitle = (
     title: string,
@@ -82,9 +81,7 @@ export default function StoreProductCard({
       : `/Product/${product.slug}`;
 
   useEffect(() => {
-    router.prefetch(
-      productHref,
-    );
+    router.prefetch(productHref);
   }, [
     router,
     productHref,
@@ -94,6 +91,7 @@ export default function StoreProductCard({
     <Link
       href={productHref}
       prefetch
+      aria-label={`View details for ${product.name}`}
       onClick={(event) => {
         event.preventDefault();
 
@@ -101,20 +99,19 @@ export default function StoreProductCard({
           return;
         }
 
-        setLoading(
-          true,
-        );
+        setLoading(true);
 
-        router.push(
-          productHref,
-        );
+        router.push(productHref);
       }}
       className="
+        group
         block
         rounded-[20px]
         focus:outline-none
         focus-visible:ring-2
         focus-visible:ring-[var(--primary)]
+        focus-visible:ring-offset-2
+        focus-visible:ring-offset-[var(--background)]
       "
     >
       <motion.article
@@ -129,28 +126,27 @@ export default function StoreProductCard({
           border
           border-[#5658EC]
           bg-[var(--surface-card)]
+          transition-colors
+          duration-300
+          hover:border-[var(--primary)]
         "
-style={{
-  borderRadius:
-    STORE_CARD_RADIUS,
-  borderTopLeftRadius: 22,
-  borderTopRightRadius: 22,
-}}
+        style={{
+          borderRadius: STORE_CARD_RADIUS,
+          borderTopLeftRadius: 22,
+          borderTopRightRadius: 22,
+        }}
         variants={{
           rest: {
             y: 0,
-            boxShadow:
-              STORE_CARD_REST_SHADOW,
+            boxShadow: STORE_CARD_REST_SHADOW,
           },
           hover: {
             y: STORE_CARD_HOVER_Y,
-            boxShadow:
-              STORE_CARD_HOVER_SHADOW,
+            boxShadow: STORE_CARD_HOVER_SHADOW,
           },
         }}
         transition={{
-          duration:
-            STORE_CARD_TRANSITION,
+          duration: STORE_CARD_TRANSITION,
           ease: [
             0.22,
             1,
@@ -165,6 +161,7 @@ style={{
           variant={variant}
         />
 
+        {/* Loading transition */}
         {loading && (
           <motion.div
             initial={{
@@ -200,7 +197,7 @@ style={{
                   text-white
                 "
               >
-                Please wait
+                Opening product details
               </p>
 
               <div
@@ -236,29 +233,30 @@ style={{
           </motion.div>
         )}
 
+        {/* Product information */}
         <motion.div
           variants={{
             rest: {
               y: 0,
             },
             hover: {
-              y:
-                STORE_CONTENT_HOVER_Y,
+              y: STORE_CONTENT_HOVER_Y,
             },
           }}
           transition={{
             duration: 0.25,
           }}
-className={`
-  rounded-b-[20px]
-  bg-[var(--surface-card)]
-  ${
-variant === "compact"
-  ? "min-h-[72px] sm:min-h-[76px]"
-  : "min-h-[88px] sm:min-h-[96px] lg:min-h-[100px]"
-  }
-  ${styles.contentPadding}
-`}
+          className={`
+            relative
+            rounded-b-[20px]
+            bg-[var(--surface-card)]
+            ${
+              variant === "compact"
+                ? "min-h-[80px] sm:min-h-[82px]"
+                : "min-h-[96px] sm:min-h-[104px] lg:min-h-[108px]"
+            }
+            ${styles.contentPadding}
+          `}
         >
           <StoreProductRating
             product={product}
@@ -268,34 +266,111 @@ variant === "compact"
           <motion.h3
             variants={{
               rest: {
-                color:
-                  "var(--foreground)",
+                color: "var(--foreground)",
               },
               hover: {
-                color:
-                  "var(--primary)",
+                color: "var(--primary)",
               },
             }}
             transition={{
               duration: 0.25,
             }}
-className={`
-  mt-0.5
-  overflow-hidden
-  whitespace-nowrap
-  leading-[1.3]
-  ${styles.title}
-`}
+            className={`
+              mt-0.5
+              overflow-hidden
+              whitespace-nowrap
+              leading-[1.3]
+              ${styles.title}
+            `}
           >
-            {truncateTitle(
-              product.name,
-            )}
+            {truncateTitle(product.name)}
           </motion.h3>
 
-          <StoreProductPrice
-            product={product}
-            variant={variant}
-          />
+          {/* Price and always-visible details action */}
+          <div
+            className="
+              mt-1.5
+              flex
+              min-w-0
+              items-center
+              justify-between
+              gap-2
+              sm:mt-2
+            "
+          >
+            <div className="min-w-0">
+              <StoreProductPrice
+                product={product}
+                variant={variant}
+              />
+            </div>
+
+{/* Always-visible mobile details button */}
+<span
+  className="
+    flex
+    h-8
+    w-8
+    shrink-0
+    items-center
+    justify-center
+    rounded-full
+    border
+    border-[#7778FF]
+    bg-[#5658EC]
+    text-white
+    shadow-[0_3px_10px_rgba(86,88,236,0.25)]
+    transition-all
+    duration-200
+    group-hover:bg-[#6B6DFF]
+    group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.4)]
+    sm:hidden
+  "
+  aria-hidden="true"
+>
+  <ChevronRight
+    size={17}
+    strokeWidth={2.2}
+  />
+</span>
+
+{/* Always-visible desktop details button */}
+<span
+  className="
+    hidden
+    shrink-0
+    items-center
+    gap-1
+    rounded-full
+    border
+    border-[#7778FF]
+    bg-[#5658EC]
+    px-2.5
+    py-1.5
+    text-[9px]
+    font-bold
+    text-white
+    shadow-[0_3px_9px_rgba(86,88,236,0.22)]
+    transition-all
+    duration-200
+    group-hover:bg-[#6B6DFF]
+    group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.35)]
+    sm:inline-flex
+    sm:px-3
+  "
+>
+  View Details
+  <ArrowRight
+    size={10}
+    strokeWidth={2.3}
+    className="
+      transition-transform
+      duration-200
+      group-hover:translate-x-0.5
+    "
+  />
+</span>
+          </div>
         </motion.div>
       </motion.article>
     </Link>
