@@ -305,12 +305,13 @@ export default function StoreProductCard({
               />
             </div>
 
+
 {/* Always-visible mobile details button */}
 <span
   className="
     flex
-    h-9
-    w-9
+    h-8
+    w-8
     shrink-0
     items-center
     justify-center
@@ -329,47 +330,41 @@ export default function StoreProductCard({
   aria-hidden="true"
 >
   <ChevronRight
-    size={19}
+    size={17}
     strokeWidth={2.2}
   />
 </span>
 
-{/* Always-visible desktop details button */}
+
+{/* Always-visible desktop arrow button */}
 <span
   className="
     hidden
+    h-8
+    w-8
     shrink-0
     items-center
-    gap-1
+    justify-center
     rounded-full
     border
     border-[#7778FF]
     bg-[#5658EC]
-    px-2.5
-    py-1.5
-    text-[9px]
-    font-bold
     text-white
-    shadow-[0_3px_9px_rgba(86,88,236,0.22)]
+    shadow-[0_3px_10px_rgba(86,88,236,0.25)]
     transition-all
     duration-200
     group-hover:bg-[#6B6DFF]
-    group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.35)]
-    sm:inline-flex
-    sm:px-3
+    group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.4)]
+    sm:flex
   "
+  aria-hidden="true"
 >
-  View Details
-  <ArrowRight
-    size={10}
-    strokeWidth={2.3}
-    className="
-      transition-transform
-      duration-200
-      group-hover:translate-x-0.5
-    "
+  <ChevronRight
+    size={16}
+    strokeWidth={2.2}
   />
 </span>
+
           </div>
         </motion.div>
       </motion.article>

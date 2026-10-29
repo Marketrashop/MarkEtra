@@ -14,7 +14,7 @@ import type {
   ProductCard,
 } from "@/lib/products/product.types";
 
-import StoreProductCard from "@/components/Shop/StoreProducts/StoreProductCard";
+import HomeStoreProductCard from "./HomeStoreProductCard";
 
 type HomeStoreProductsProps = {
   products: ProductCard[];
@@ -435,11 +435,11 @@ export default function HomeStoreProducts({
         >
           {displayedProducts.map(
             (product) => (
-              <StoreProductCard
-                key={product.id}
-                product={product}
-                environment="public"
-              />
+<HomeStoreProductCard
+  key={product.id}
+  product={product}
+  environment="public"
+/>
             ),
           )}
         </div>
