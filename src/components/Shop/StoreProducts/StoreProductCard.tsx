@@ -309,8 +309,8 @@ export default function StoreProductCard({
 <span
   className="
     flex
-    h-8
-    w-8
+    h-9
+    w-9
     shrink-0
     items-center
     justify-center
@@ -329,7 +329,7 @@ export default function StoreProductCard({
   aria-hidden="true"
 >
   <ChevronRight
-    size={17}
+    size={19}
     strokeWidth={2.2}
   />
 </span>
