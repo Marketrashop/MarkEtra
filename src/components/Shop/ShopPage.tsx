@@ -36,7 +36,7 @@ export default function ShopPage({
           environment="user"
           items={[
             {
-              label: "Store",
+              label: "Market-Place",
             },
           ]}
         />

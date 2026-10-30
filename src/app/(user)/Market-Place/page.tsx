@@ -8,7 +8,7 @@ import {
 } from "@/services/category.service";
 
 export const metadata: Metadata = {
-  title: "Store | MarkEtra",
+  title: "Market-Place | MarkEtra",
   description:
     "Browse products, discover new arrivals, and shop directly from your MarkEtra account.",
 };
