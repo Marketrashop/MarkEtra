@@ -39,6 +39,26 @@ const sizeOptions = [
   "XXL",
 ] as const;
 
+const footwearSizeOptions = [
+  "EU 36",
+  "EU 37",
+  "EU 38",
+  "EU 39",
+  "EU 40",
+  "EU 41",
+  "EU 42",
+  "EU 43",
+  "EU 44",
+  "EU 45",
+  "EU 46",
+  "EU 47",
+  "EU 48",
+  "EU 49",
+  "EU 50",
+  "EU 51",
+  "EU 52",
+] as const;
+
 const variantTypeOptions = [
   {
     value: "COLOR",
@@ -109,6 +129,25 @@ function isFashionCategory(
   );
 }
 
+function isFootwearCategory(
+  categorySlug?: string,
+) {
+  const normalized = categorySlug
+    ?.trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, "-");
+
+  return Boolean(
+    normalized &&
+      (
+        normalized === "shoes" ||
+        normalized === "footwear" ||
+        normalized.includes("shoe") ||
+        normalized.includes("footwear")
+      ),
+  );
+}
+
 function isFashionColorVariant(
   categorySlug:
     | string
@@ -121,6 +160,13 @@ function isFashionColorVariant(
     ) &&
     type === "COLOR"
   );
+}
+
+function isFootwearColorVariant(
+  categorySlug: string | undefined,
+  type: VariantType,
+) {
+  return isFootwearCategory(categorySlug) && type === "COLOR";
 }
 
 function getVariantTypeOption(
@@ -167,6 +213,12 @@ function createFashionSizes() {
   );
 }
 
+function createFootwearSizes() {
+  return footwearSizeOptions.map((size) =>
+    createEmptySize(size),
+  );
+}
+
 function createGenericInventory() {
   return [
     createEmptySize(),
@@ -188,10 +240,9 @@ function createEmptyVariant(
 
     images: [],
 
-    sizes:
-      isFashionCategory(
-        categorySlug,
-      )
+    sizes: isFootwearCategory(categorySlug)
+      ? createFootwearSizes()
+      : isFashionCategory(categorySlug)
         ? createFashionSizes()
         : createGenericInventory(),
   };
@@ -409,11 +460,10 @@ export default function ProductVariants({
       return;
     }
 
+    const useFootwearSizes =
+      isFootwearColorVariant(categorySlug, type);
     const useFashionSizes =
-      isFashionColorVariant(
-        categorySlug,
-        type,
-      );
+      isFashionColorVariant(categorySlug, type);
 
     updateVariant(
       variantIndex,
@@ -422,8 +472,9 @@ export default function ProductVariants({
 
         label: "",
 
-        sizes:
-          useFashionSizes
+        sizes: useFootwearSizes
+          ? createFootwearSizes()
+          : useFashionSizes
             ? createFashionSizes()
             : createGenericInventory(),
       },
@@ -804,6 +855,13 @@ export default function ProductVariants({
                 categorySlug,
                 type,
               );
+            const footwearColor =
+              isFootwearColorVariant(
+                categorySlug,
+                type,
+              );
+            const sizeStockVariant =
+              fashionColor || footwearColor;
 
             const valueLabel =
               getVariantValueLabel(
@@ -1339,7 +1397,7 @@ export default function ProductVariants({
                   )}
                 </div>
 
-                {fashionColor ? (
+                {sizeStockVariant ? (
                   <div className="mt-2.5 sm:mt-3">
                     <div
                       className="
@@ -1355,7 +1413,7 @@ export default function ProductVariants({
                           sm:text-[10px]
                         "
                       >
-                        Size Stock
+                        {footwearColor ? "Footwear Size Stock" : "Size Stock"}
                       </p>
 
                       <p
@@ -1366,8 +1424,9 @@ export default function ProductVariants({
                           sm:text-[9px]
                         "
                       >
-                        Set available stock for
-                        each size in this color.
+                        {footwearColor
+                          ? "Set available stock for each shoe size in this color."
+                          : "Set available stock for each size in this color."}
                       </p>
                     </div>
 
