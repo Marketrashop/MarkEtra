@@ -326,9 +326,6 @@ export default function ProductVariantPicker({
           (item) => item.id === selectedInventoryId,
         );
 
-        // Footwear sizes can be stored under a COLOR variant,
-        // for example, Black with EU 36 through EU 52 inventory.
-        // Identify footwear by the canonical EU size range, not variant type.
         const footwearInventory =
           inventory.length > 0 &&
           inventory.every((item) => {

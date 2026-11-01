@@ -1537,7 +1537,9 @@ async function handleSharePdf() {
               <div className="absolute -right-10 -top-16 h-48 w-48 rounded-full border-[28px] border-white/10" />
               <div className="relative flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">Affiliate marketplace</p>
+<p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">
+  {isAffiliateReceipt ? "MarkEtra Affiliate Receipt" : "MarkEtra Buyer Receipt"}
+</p>
                   <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Receipt</h2>
                   <p className="mt-1 text-xs text-white/80">{isAffiliateReceipt ? "Offer record and affiliate transaction summary" : "Buyer copy of the offer and transaction summary"}</p>
                 </div>
