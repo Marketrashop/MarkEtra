@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { LogIn } from "lucide-react";
+
 import {
   useRouter,
 } from "next/navigation";
@@ -135,6 +137,11 @@ const [
   const [
     isModalOpen,
     setIsModalOpen,
+  ] = useState(false);
+
+  const [
+    isWishlistLoginDialogOpen,
+    setIsWishlistLoginDialogOpen,
   ] = useState(false);
 
 const {
@@ -289,32 +296,7 @@ async function handleWishlistToggle() {
   }
 
   if (!user) {
-    toast.info(
-      "Sign in to save this product to your wishlist.",
-    );
-
-    const params =
-      new URLSearchParams({
-        redirect:
-          "/wishlist",
-
-        wishlistProduct:
-          productId,
-      });
-
-    if (
-      selectedVariantSizeId
-    ) {
-      params.set(
-        "wishlistVariantSize",
-        selectedVariantSizeId,
-      );
-    }
-
-    router.push(
-      `/Auth?${params.toString()}`,
-    );
-
+    setIsWishlistLoginDialogOpen(true);
     return;
   }
 
@@ -352,6 +334,25 @@ await addToWishlist(
   setWishlistActionLoading(false);
 }
 }
+
+
+
+  const handleWishlistLoginConfirm = () => {
+    const params = new URLSearchParams({
+      redirect: "/wishlist",
+      wishlistProduct: productId,
+    });
+
+    if (selectedVariantSizeId) {
+      params.set(
+        "wishlistVariantSize",
+        selectedVariantSizeId,
+      );
+    }
+
+    setIsWishlistLoginDialogOpen(false);
+    router.push(`/Auth?${params.toString()}`);
+  };
 
   return (
     <>
@@ -614,6 +615,142 @@ wishlistActionLoading ? (
           </button>
         </div>
       </div>
+
+
+
+{isWishlistLoginDialogOpen && (
+  <div
+    role="presentation"
+    className="
+      fixed
+      inset-0
+      z-[100]
+      flex
+      items-center
+      justify-center
+      bg-black/45
+      px-4
+    "
+    onClick={() =>
+      setIsWishlistLoginDialogOpen(false)
+    }
+  >
+<div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="wishlist-login-dialog-title"
+  onClick={(event) =>
+    event.stopPropagation()
+  }
+  className="
+    w-full
+    max-w-[360px]
+    rounded-2xl
+    border
+    border-[var(--border)]
+    bg-[var(--background)]
+    p-5
+    shadow-2xl
+  "
+>
+<h2
+  id="wishlist-login-dialog-title"
+  className="
+    flex
+    items-center
+    justify-center
+    gap-2
+    border-b
+    border-[var(--border)]
+    pb-3
+    text-base
+    font-semibold
+    text-[var(--foreground)]
+  "
+>
+  <LogIn
+    size={18}
+    strokeWidth={2}
+    className="text-[var(--primary)]"
+    aria-hidden="true"
+  />
+
+  Login required
+</h2>
+
+<p
+  className="
+    mt-4
+    text-sm
+    leading-5
+    text-[var(--foreground-muted)]
+  "
+>
+  Please log in to save items to your wishlist.
+</p>
+
+  <p
+    className="
+      mt-4
+      border-t
+      border-[var(--border)]
+      pt-3
+      text-sm
+      font-medium
+      text-[var(--foreground)]
+    "
+  >
+    Would you like to log in now?
+  </p>
+
+      <div className="mt-5 space-y-2">
+        <button
+          type="button"
+          onClick={handleWishlistLoginConfirm}
+          className="
+            flex
+            w-full
+            items-center
+            justify-center
+            rounded-xl
+            bg-[var(--foreground)]
+            px-4
+            py-2.5
+            text-sm
+            font-medium
+            text-[var(--background)]
+            transition
+            hover:opacity-90
+          "
+        >
+          Yes, log in
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            setIsWishlistLoginDialogOpen(false)
+          }
+          className="
+            w-full
+            rounded-xl
+            border
+            border-[var(--border)]
+            px-4
+            py-2.5
+            text-sm
+            font-medium
+            text-[var(--foreground)]
+            transition
+            hover:bg-[var(--muted)]
+          "
+        >
+          No, keep browsing
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       <ProductImageModal
         open={
