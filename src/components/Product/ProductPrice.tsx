@@ -28,99 +28,72 @@ function RollingAmount({
 }) {
   const characters = Array.from(amount);
 
-  const digitCount = characters.filter(
-    (character) => /\d/.test(character),
-  ).length;
-
   let digitsToRight = 0;
 
-  const digitDelays = characters.map(
-    (character) => {
-      if (!/\d/.test(character)) {
-        return null;
-      }
+  const digitDelays = characters.map((character) => {
+    if (!/\d/.test(character)) {
+      return null;
+    }
 
-      const delay = digitsToRight * 65;
+    const delay = digitsToRight * 65;
 
-      digitsToRight += 1;
+    digitsToRight += 1;
 
-      return delay;
-    },
-  );
+    return delay;
+  });
 
   return (
-    <span
-      className="
-        inline-flex
-        items-baseline
-        whitespace-nowrap
-        tabular-nums
-      "
-    >
+    <span className="inline-block whitespace-nowrap">
       <span>$</span>
 
-      {characters.map(
-        (character, index) => {
-          if (!/\d/.test(character)) {
-            return (
-              <span key={`${character}-${index}`}>
-                {character}
-              </span>
-            );
-          }
-
-          const digit = Number(character);
-
-          const delay =
-            digitDelays[index] ?? 0;
-
+      {characters.map((character, index) => {
+        if (!/\d/.test(character)) {
           return (
-            <span
-              key={`digit-${index}`}
-              className="
-                relative
-                inline-block
-                h-[1em]
-                overflow-hidden
-                align-bottom
-              "
-              aria-hidden="true"
-            >
-              <span
-                className="
-                  flex
-                  flex-col
-                  will-change-transform
-                "
-                style={{
-                  transform: animate
-                    ? `translateY(-${digit}em)`
-                    : "translateY(0)",
-                  transition: animate
-                    ? `transform 900ms cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`
-                    : "none",
-                }}
-              >
-                {Array.from(
-                  { length: 10 },
-                  (_, number) => (
-                    <span
-                      key={number}
-                      className="
-                        block
-                        h-[1em]
-                        leading-[1em]
-                      "
-                    >
-                      {number}
-                    </span>
-                  ),
-                )}
-              </span>
+            <span key={`${character}-${index}`}>
+              {character}
             </span>
           );
-        },
-      )}
+        }
+
+        const digit = Number(character);
+        const delay = digitDelays[index] ?? 0;
+
+        return (
+          <span
+            key={`digit-${index}`}
+            className="relative inline-block h-[1em] align-bottom leading-[1em]"
+            style={{ clipPath: "inset(0 -0.15em)" }}
+            aria-hidden="true"
+          >
+            {/* Invisible copy of the real digit: sets the column width */}
+            <span className="invisible block h-[1em] leading-[1em]">
+              {digit}
+            </span>
+
+            {/* Rolling reel, overlaid on top of the sizer */}
+            <span
+              className="absolute left-0 top-0 flex w-full flex-col items-center will-change-transform"
+              style={{
+                transform: animate
+                  ? `translateY(-${digit}em)`
+                  : "translateY(0)",
+                transition: animate
+                  ? `transform 900ms cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`
+                  : "none",
+              }}
+            >
+              {Array.from({ length: 10 }, (_, number) => (
+                <span
+                  key={number}
+                  className="block h-[1em] leading-[1em]"
+                >
+                  {number}
+                </span>
+              ))}
+            </span>
+          </span>
+        );
+      })}
     </span>
   );
 }
