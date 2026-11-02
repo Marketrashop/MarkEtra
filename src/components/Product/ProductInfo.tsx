@@ -576,7 +576,7 @@ async function handleAffiliate() {
 
 <div
   className="
-    mt-2
+    mt-1
     lg:mt-5
   "
 >
