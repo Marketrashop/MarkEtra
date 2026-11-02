@@ -3,6 +3,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -216,6 +217,63 @@ const inWishlist = isInWishlist(
     }
   };
 
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    touchStartX.current = event.touches[0].clientX;
+    touchStartY.current = event.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    if (
+      touchStartX.current === null ||
+      touchStartY.current === null ||
+      galleryImages.length < 2
+    ) {
+      return;
+    }
+
+    const deltaX =
+      event.changedTouches[0].clientX -
+      touchStartX.current;
+
+    const deltaY =
+      event.changedTouches[0].clientY -
+      touchStartY.current;
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+
+    // Ignore vertical movement and short horizontal gestures.
+    if (
+      Math.abs(deltaX) < 50 ||
+      Math.abs(deltaX) <= Math.abs(deltaY)
+    ) {
+      return;
+    }
+
+    const activeIndex = galleryImages.findIndex(
+      (image) => image.id === activeImage.id,
+    );
+
+    if (activeIndex === -1) {
+      return;
+    }
+
+    const nextIndex =
+      deltaX < 0
+        ? (activeIndex + 1) % galleryImages.length
+        : (activeIndex - 1 + galleryImages.length) %
+          galleryImages.length;
+
+    handleImageChange(galleryImages[nextIndex]);
+  };
+
 async function handleWishlistToggle() {
   if (
     wishlistLoading ||
@@ -321,10 +379,17 @@ await addToWishlist(
                   }
                   type="button"
                   onClick={() =>
-                    handleImageChange(
-                      image,
-                    )
+                    handleImageChange(image)
                   }
+                  onMouseEnter={() => {
+                    if (
+                      window.matchMedia(
+                        "(hover: hover) and (pointer: fine)",
+                      ).matches
+                    ) {
+                      handleImageChange(image);
+                    }
+                  }}
                   className={`
                     relative
 h-[58px]
@@ -373,7 +438,10 @@ sm:w-[68px]
             )}
         </div>
 
-        <div
+<div
+onTouchStart={handleTouchStart}
+onTouchEnd={handleTouchEnd}
+
 className="
   group
   relative
@@ -391,7 +459,7 @@ className="
   sm:rounded-3xl
   lg:max-w-[520px]
 "
-        >
+>
           <Image
             src={
               activeImage.imageUrl ??
