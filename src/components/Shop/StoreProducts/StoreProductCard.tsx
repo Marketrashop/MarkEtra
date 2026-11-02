@@ -17,7 +17,6 @@ import {
 } from "framer-motion";
 
 import {
-  ArrowRight,
   ChevronRight,
 } from "lucide-react";
 
@@ -310,8 +309,8 @@ export default function StoreProductCard({
 <span
   className="
     flex
-    h-8
-    w-8
+    h-6
+    w-6
     shrink-0
     items-center
     justify-center
@@ -330,7 +329,7 @@ export default function StoreProductCard({
   aria-hidden="true"
 >
   <ChevronRight
-    size={17}
+    size={13}
     strokeWidth={2.2}
   />
 </span>
@@ -340,8 +339,8 @@ export default function StoreProductCard({
 <span
   className="
     hidden
-    h-8
-    w-8
+    h-7
+    w-7
     shrink-0
     items-center
     justify-center
@@ -360,7 +359,7 @@ export default function StoreProductCard({
   aria-hidden="true"
 >
   <ChevronRight
-    size={16}
+    size={15}
     strokeWidth={2.2}
   />
 </span>

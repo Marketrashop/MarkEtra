@@ -49,7 +49,10 @@ function getPrimaryImage(
 function formatPrice(
   price: number,
 ) {
-  return `$${price.toFixed(2)}`;
+  return `$${price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 export default function HomeProductGalleryCard({

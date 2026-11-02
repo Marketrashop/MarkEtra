@@ -145,7 +145,7 @@ function SpotlightCard({ product }: { product: DashboardFeaturedProduct }) {
   return (
     <NavigationLink
       href={`/Market-Place/${encodeURIComponent(product.slug)}`}
-      className={`group relative block aspect-[5/3] overflow-hidden rounded-lg sm:aspect-[16/10] sm:rounded-xl border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[360px] ${cardFocus}`}
+      className={`group relative block aspect-[1.714/1] overflow-hidden rounded-lg sm:aspect-[16/10] sm:rounded-xl border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[360px] ${cardFocus}`}
     >
       {product.imageUrl ? (
         <Image
@@ -209,7 +209,7 @@ function ProductTile({ product }: { product: DashboardFeaturedProduct }) {
       href={`/Market-Place/${encodeURIComponent(product.slug)}`}
       className={`group flex min-w-0 flex-col overflow-hidden rounded-lg border border-[var(--user-card-border)] bg-[var(--user-stat-bg)] transition duration-200 sm:rounded-xl hover:border-[var(--primary)] ${cardFocus}`}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-[var(--user-card-bg)] sm:aspect-square">
+      <div className="relative aspect-[1.905/1] overflow-hidden bg-[var(--user-card-bg)] sm:aspect-square">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}

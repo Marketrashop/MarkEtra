@@ -16,9 +16,13 @@ export default function StoreProductPrice({
       variant
     ];
 
-  const formatPrice = (
-    price: number,
-  ) => `$${price.toFixed(2)}`;
+const formatPrice = (
+  price: number,
+) =>
+  `$${price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
   return (
     <div

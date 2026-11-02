@@ -90,39 +90,36 @@ export default async function DashboardPage() {
       },
     }),
 
-    prisma.product.findMany({
-      // The component shows 7 at a time and rotates through the rest,
-      // so a bigger pool means more variety between rotations.
-      take: 24,
+prisma.product.findMany({
+  where: {
+    featured: true,
+    status: "ACTIVE",
+  },
+  orderBy: [
+    {
+      publishedAt: "desc",
+    },
+    {
+      createdAt: "desc",
+    },
+  ],
+  select: {
+    id: true,
+    name: true,
+    slug: true,
+    price: true,
+    compareAtPrice: true,
+    images: {
       where: {
-        featured: true,
-        status: "ACTIVE",
+        isPrimary: true,
       },
-      orderBy: [
-        {
-          publishedAt: "desc",
-        },
-        {
-          createdAt: "desc",
-        },
-      ],
+      take: 1,
       select: {
-        id: true,
-        name: true,
-        slug: true,
-        price: true,
-        compareAtPrice: true,
-        images: {
-          where: {
-            isPrimary: true,
-          },
-          take: 1,
-          select: {
-            imageKey: true,
-          },
-        },
+        imageKey: true,
       },
-    }),
+    },
+  },
+}),
 
     prisma.productCategory.findMany({
       take: 12,

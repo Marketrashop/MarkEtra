@@ -25,7 +25,10 @@ const FEATURED_NAME_MAX_LENGTH = 25;
 const FEATURED_DESCRIPTION_MAX_LENGTH = 165;
 
 function formatPrice(price: number) {
-  return `$${price.toFixed(2)}`;
+  return `$${price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 function truncateText(text: string, maxLength: number) {

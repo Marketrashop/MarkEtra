@@ -526,10 +526,11 @@ async function handleAffiliate() {
           lg:block
         "
       >
-        <ProductPrice
-          price={activePrice}
-          oldPrice={oldPrice ?? undefined}
-        />
+<ProductPrice
+  price={activePrice}
+  oldPrice={oldPrice ?? undefined}
+  animateOnMount
+/>
       </div>
 
       <div
@@ -539,10 +540,11 @@ async function handleAffiliate() {
         "
       >
         <div className="lg:hidden [zoom:0.76]">
-          <ProductPrice
-            price={activePrice}
-            oldPrice={oldPrice ?? undefined}
-          />
+<ProductPrice
+  price={activePrice}
+  oldPrice={oldPrice ?? undefined}
+  animateOnMount
+/>
         </div>
 
         <div
