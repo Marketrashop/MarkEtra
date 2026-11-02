@@ -630,80 +630,89 @@ wishlistActionLoading ? (
       justify-center
       bg-black/45
       px-4
+      animate-in
+      fade-in
+      duration-200
     "
     onClick={() =>
       setIsWishlistLoginDialogOpen(false)
     }
   >
-<div
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="wishlist-login-dialog-title"
-  onClick={(event) =>
-    event.stopPropagation()
-  }
-  className="
-    w-full
-    max-w-[360px]
-    rounded-2xl
-    border
-    border-[var(--border)]
-    bg-[var(--background)]
-    p-5
-    shadow-2xl
-  "
->
-<h2
-  id="wishlist-login-dialog-title"
-  className="
-    flex
-    items-center
-    justify-center
-    gap-2
-    border-b
-    border-[var(--border)]
-    pb-3
-    text-base
-    font-semibold
-    text-[var(--foreground)]
-  "
->
-  <LogIn
-    size={18}
-    strokeWidth={2}
-    className="text-[var(--primary)]"
-    aria-hidden="true"
-  />
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="wishlist-login-dialog-title"
+      onClick={(event) =>
+        event.stopPropagation()
+      }
+      className="
+        w-full
+        max-w-[320px]
+        rounded-xl
+        border
+        border-[var(--border)]
+        bg-[var(--background)]
+        p-4
+        shadow-2xl
+        animate-in
+        fade-in
+        zoom-in-95
+        slide-in-from-bottom-2
+        duration-200
+        ease-out
+      "
+    >
+      <h2
+        id="wishlist-login-dialog-title"
+        className="
+          flex
+          items-center
+          justify-center
+          gap-1.5
+          border-b
+          border-[var(--border)]
+          pb-2.5
+          text-sm
+          font-semibold
+          text-[var(--foreground)]
+        "
+      >
+        <LogIn
+          size={16}
+          strokeWidth={2}
+          className="text-[var(--primary)]"
+          aria-hidden="true"
+        />
 
-  Login required
-</h2>
+        Authentication Required
+      </h2>
 
-<p
-  className="
-    mt-4
-    text-sm
-    leading-5
-    text-[var(--foreground-muted)]
-  "
->
-  Please log in to save items to your wishlist.
-</p>
+      <p
+        className="
+          mt-3
+          text-xs
+          leading-5
+          text-[var(--foreground-muted)]
+        "
+      >
+        Please log in to save items to your wishlist.
+      </p>
 
-  <p
-    className="
-      mt-4
-      border-t
-      border-[var(--border)]
-      pt-3
-      text-sm
-      font-medium
-      text-[var(--foreground)]
-    "
-  >
-    Would you like to log in now?
-  </p>
+      <p
+        className="
+          mt-2
+          border-t
+          border-[var(--border)]
+          pt-2
+          text-xs
+          font-medium
+          text-[var(--foreground)]
+        "
+      >
+        Would you like to continue to your account?
+      </p>
 
-      <div className="mt-5 space-y-2">
+      <div className="mt-4 space-y-2">
         <button
           type="button"
           onClick={handleWishlistLoginConfirm}
@@ -712,18 +721,18 @@ wishlistActionLoading ? (
             w-full
             items-center
             justify-center
-            rounded-xl
+            rounded-lg
             bg-[var(--foreground)]
-            px-4
-            py-2.5
-            text-sm
+            px-3
+            py-2
+            text-xs
             font-medium
             text-[var(--background)]
             transition
             hover:opacity-90
           "
         >
-          Yes, log in
+          Yes, continue
         </button>
 
         <button
@@ -733,19 +742,19 @@ wishlistActionLoading ? (
           }
           className="
             w-full
-            rounded-xl
+            rounded-lg
             border
             border-[var(--border)]
-            px-4
-            py-2.5
-            text-sm
+            px-3
+            py-2
+            text-xs
             font-medium
             text-[var(--foreground)]
             transition
             hover:bg-[var(--muted)]
           "
         >
-          No, keep browsing
+          No, please
         </button>
       </div>
     </div>

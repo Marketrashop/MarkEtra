@@ -1,7 +1,12 @@
 "use client";
 
 import {
+  useState,
+} from "react";
+
+import {
   Heart,
+  LogIn,
   Search,
   ShoppingCart,
 } from "lucide-react";
@@ -28,10 +33,6 @@ import {
   cn,
 } from "@/lib/utils";
 
-import {
-  toast,
-} from "sonner";
-
 type HeaderIconsProps = {
   className?: string;
 };
@@ -42,24 +43,36 @@ const buttonClass =
 export default function HeaderIcons({
   className,
 }: HeaderIconsProps) {
-  const router =
-    useRouter();
+  const router = useRouter();
 
-  const { user } =
-    useAuth();
+  const { user } = useAuth();
 
   const {
     itemCount,
     cartOpen,
     openCart,
     closeCart,
-  } =
-    useCartContext();
+  } = useCartContext();
 
-  const {
-    openSearch,
-  } =
-    useSearchContext();
+  const { openSearch } = useSearchContext();
+
+  const [
+    isWishlistLoginDialogOpen,
+    setIsWishlistLoginDialogOpen,
+  ] = useState(false);
+
+  const handleWishlistClick = () => {
+    if (user) {
+      router.push("/wishlist");
+      return;
+    }
+
+    setIsWishlistLoginDialogOpen(true);
+  };
+
+  const handleWishlistLoginConfirm = () => {
+    router.push("/Auth?redirect=/wishlist");
+  };
 
   return (
     <>
@@ -130,23 +143,7 @@ export default function HeaderIcons({
           type="button"
           aria-label="Wishlist"
           className={buttonClass}
-          onClick={() => {
-            if (user) {
-              router.push(
-                "/wishlist",
-              );
-
-              return;
-            }
-
-            toast.info(
-              "Sign in to save products and access your wishlist.",
-            );
-
-            router.push(
-              "/Auth?redirect=/wishlist",
-            );
-          }}
+          onClick={handleWishlistClick}
         >
           <Heart
             size={19}
@@ -160,6 +157,149 @@ export default function HeaderIcons({
         onClose={closeCart}
         environment="public"
       />
+
+{isWishlistLoginDialogOpen && (
+  <div
+    role="presentation"
+    className="
+      fixed
+      inset-0
+      z-[100]
+      flex
+      items-center
+      justify-center
+      bg-black/45
+      px-4
+      animate-in
+      fade-in
+      duration-200
+    "
+    onClick={() =>
+      setIsWishlistLoginDialogOpen(false)
+    }
+  >
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="wishlist-login-dialog-title"
+      onClick={(event) =>
+        event.stopPropagation()
+      }
+      className="
+        w-full
+        max-w-[320px]
+        rounded-xl
+        border
+        border-[var(--border)]
+        bg-[var(--background)]
+        p-4
+        shadow-2xl
+        animate-in
+        fade-in
+        zoom-in-95
+        slide-in-from-bottom-2
+        duration-200
+        ease-out
+      "
+    >
+      <h2
+        id="wishlist-login-dialog-title"
+        className="
+          flex
+          items-center
+          justify-center
+          gap-1.5
+          border-b
+          border-[var(--border)]
+          pb-2.5
+          text-sm
+          font-semibold
+          text-[var(--foreground)]
+        "
+      >
+        <LogIn
+          size={16}
+          strokeWidth={2}
+          className="text-[var(--primary)]"
+          aria-hidden="true"
+        />
+
+        Authentication Required
+      </h2>
+
+      <p
+        className="
+          mt-3
+          text-xs
+          leading-5
+          text-[var(--foreground-muted)]
+        "
+      >
+        Please log in or create an account to view and add items to your wishlist.
+      </p>
+
+      <p
+        className="
+          mt-2
+          border-t
+          border-[var(--border)]
+          pt-2
+          text-xs
+          font-medium
+          text-[var(--foreground)]
+        "
+      >
+        Would you like to continue to your account?
+      </p>
+
+      <div className="mt-4 space-y-2">
+        <button
+          type="button"
+          onClick={handleWishlistLoginConfirm}
+          className="
+            flex
+            w-full
+            items-center
+            justify-center
+            rounded-lg
+            bg-[var(--foreground)]
+            px-3
+            py-2
+            text-xs
+            font-medium
+            text-[var(--background)]
+            transition
+            hover:opacity-90
+          "
+        >
+          Yes, continue
+        </button>
+
+        <button
+          type="button"
+          onClick={() =>
+            setIsWishlistLoginDialogOpen(false)
+          }
+          className="
+            w-full
+            rounded-lg
+            border
+            border-[var(--border)]
+            px-3
+            py-2
+            text-xs
+            font-medium
+            text-[var(--foreground)]
+            transition
+            hover:bg-[var(--muted)]
+          "
+        >
+          No, please
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </>
   );
 }
