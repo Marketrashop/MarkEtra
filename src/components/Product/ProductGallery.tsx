@@ -115,6 +115,11 @@ export default function ProductGallery({
       );
     }, [galleryImages]);
 
+const [
+  wishlistActionLoading,
+  setWishlistActionLoading,
+] = useState(false);
+
   const [
     internalImage,
     setInternalImage,
@@ -276,6 +281,7 @@ const inWishlist = isInWishlist(
 
 async function handleWishlistToggle() {
   if (
+    wishlistActionLoading ||
     wishlistLoading ||
     authLoading
   ) {
@@ -312,6 +318,8 @@ async function handleWishlistToggle() {
     return;
   }
 
+setWishlistActionLoading(true);
+
 try {
   if (inWishlist) {
 await removeFromWishlist(
@@ -335,12 +343,14 @@ await addToWishlist(
     );
   }
 } catch (error) {
-    toast.error(
-      error instanceof Error
-        ? error.message
-        : "Unable to update wishlist.",
-    );
-  }
+  toast.error(
+    error instanceof Error
+      ? error.message
+      : "Unable to update wishlist.",
+  );
+} finally {
+  setWishlistActionLoading(false);
+}
 }
 
   return (
@@ -494,9 +504,10 @@ className="
             aria-pressed={
               inWishlist
             }
-            disabled={
-              wishlistLoading
-            }
+disabled={
+  wishlistLoading ||
+  wishlistActionLoading
+}
             onClick={
               handleWishlistToggle
             }
@@ -526,7 +537,8 @@ className="
               disabled:opacity-70
             "
           >
-            {wishlistLoading ? (
+{wishlistLoading ||
+wishlistActionLoading ? (
               <Loader2
                 size={
                   18

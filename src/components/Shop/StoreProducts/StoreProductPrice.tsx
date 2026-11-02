@@ -8,7 +8,6 @@ import type {
 
 export default function StoreProductPrice({
   product,
-
   variant = "default",
 }: StoreProductPriceProps) {
   const styles =
@@ -16,23 +15,20 @@ export default function StoreProductPrice({
       variant
     ];
 
-const formatPrice = (
-  price: number,
-) =>
-  `$${price.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  const formatPrice = (
+    price: number,
+  ) =>
+    `$${price.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
 
   return (
     <div
       className="
         mt-2
-
         inline-flex
-
         items-center
-
         gap-1.5
       "
     >
@@ -41,18 +37,15 @@ const formatPrice = (
         <span
           className={`
             ${styles.oldPrice}
-
             font-semibold
-
             leading-none
-
             line-through
-
             text-[#5658EC]
           `}
         >
           {formatPrice(
-            product.compareAtPrice,
+            product.compareAtPrice +
+              product.price,
           )}
         </span>
       )}
@@ -60,11 +53,8 @@ const formatPrice = (
       <span
         className={`
           ${styles.price}
-
           font-extrabold
-
           leading-none
-
           text-[#5658EC]
         `}
       >

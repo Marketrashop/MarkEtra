@@ -80,10 +80,7 @@ export default function HomeProductGalleryCard({
   const productHref =
     `/Product/${product.slug}`;
 
-  const hasDiscount =
-    product.compareAtPrice !== null &&
-    product.compareAtPrice >
-      product.price;
+const hasDiscount = product.compareAtPrice !== null;
 
   const discountPercentage =
     hasDiscount
@@ -443,47 +440,47 @@ export default function HomeProductGalleryCard({
                 sm:pt-2.5
               "
             >
-              <div
-                className="
-                  flex
-                  min-w-0
-                  flex-wrap
-                  items-baseline
-                  gap-x-1.5
-                  gap-y-1
-                  sm:gap-x-2
-                "
-              >
-                <span
-                  className="
-                    text-[12px]
-                    font-extrabold
-                    leading-none
-                    text-[var(--product-gallery-price)]
-                    sm:text-[15px]
-                  "
-                >
-                  {formatPrice(product.price)}
-                </span>
+<div
+  className="
+    flex
+    min-w-0
+    flex-wrap
+    items-baseline
+    gap-x-1.5
+    gap-y-1
+    sm:gap-x-2
+  "
+>
+  {hasDiscount && (
+    <span
+      className="
+        truncate
+        text-[9px]
+        font-medium
+        leading-none
+        text-[var(--product-gallery-old-price)]
+        line-through
+        sm:text-[11px]
+      "
+    >
+      {formatPrice(
+        product.compareAtPrice! + product.price,
+      )}
+    </span>
+  )}
 
-                {hasDiscount && (
-                  <span
-                    className="
-                      truncate
-                      text-[9px]
-                      font-medium
-                      leading-none
-                      text-[var(--product-gallery-old-price)]
-                      line-through
-                      sm:text-[11px]
-                    "
-                  >
-                    {formatPrice(
-                      product.compareAtPrice!,
-                    )}
-                  </span>
-                )}
-              </div>
+  <span
+    className="
+      text-[12px]
+      font-extrabold
+      leading-none
+      text-[var(--product-gallery-price)]
+      sm:text-[15px]
+    "
+  >
+    {formatPrice(product.price)}
+  </span>
+</div>
 
               {/* Compact action for touch screens */}
               <span

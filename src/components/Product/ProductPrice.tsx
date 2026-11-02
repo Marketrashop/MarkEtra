@@ -154,20 +154,24 @@ export default function ProductPrice({
           gap-3
         "
       >
-        {hasDiscount && (
-          <span
-            className="
-              text-[17px]
-              font-semibold
-              text-[var(--foreground-muted)]
-              line-through
-              sm:text-[19px]
-              lg:text-[22px]
-            "
-          >
-            ${oldPrice.toFixed(2)}
-          </span>
-        )}
+{hasDiscount && (
+  <span
+    className="
+      text-[17px]
+      font-semibold
+      text-[var(--foreground-muted)]
+      line-through
+      sm:text-[19px]
+      lg:text-[22px]
+    "
+  >
+    $
+    {new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(oldPrice + activePrice)}
+  </span>
+)}
 
         <span
           className="

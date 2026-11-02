@@ -17,13 +17,16 @@ import type {
 
 type AppSearchResultsProps = {
   loading: boolean;
-
   query: string;
-
   results: ProductCard[];
-
   onSelect: () => void;
 };
+
+const formatPrice = (price: number) =>
+  price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 export default function AppSearchResults({
   loading,
@@ -222,7 +225,11 @@ export default function AppSearchResults({
                         sm:text-[12px]
                       "
                     >
-                      ${compareAtPrice.toFixed(2)}
+                      $
+                      {formatPrice(
+                        compareAtPrice +
+                          product.price,
+                      )}
                     </span>
                   )}
 
@@ -234,7 +241,10 @@ export default function AppSearchResults({
                       sm:text-[15px]
                     "
                   >
-                    ${product.price.toFixed(2)}
+                    $
+                    {formatPrice(
+                      product.price,
+                    )}
                   </span>
                 </div>
               </div>

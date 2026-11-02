@@ -94,10 +94,7 @@ function Price({
   large?: boolean;
   onImage?: boolean;
 }) {
-  // Follow ProductPrice.tsx: price is the current selling price and
-  // compareAtPrice is the original price shown when it is provided.
   const hasDiscount = compareAtPrice !== null;
-  const savings = hasDiscount ? compareAtPrice - price : null;
 
   return (
     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
@@ -107,7 +104,7 @@ function Price({
             large ? "text-sm" : "text-[11px] sm:text-xs"
           } ${onImage ? "text-white/60" : "text-[var(--user-text-muted)]"}`}
         >
-          {currency.format(compareAtPrice)}
+          {currency.format(compareAtPrice + price)}
         </span>
       )}
 
@@ -118,8 +115,6 @@ function Price({
       >
         {currency.format(price)}
       </span>
-
-
     </div>
   );
 }

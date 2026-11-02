@@ -11,10 +11,41 @@ import type {
 
 type ProductReviewsProps = {
   reviews: ProductReview[];
+
+  productId?: string;
 };
+
+function hashString(value: string): number {
+
+  let hash = 2166136261;
+
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+function getReviewDate(seed: string): string {
+  const hash = hashString(seed);
+
+  const daysAgo = 2 + (hash % 540);
+
+  const date = new Date();
+
+  date.setDate(date.getDate() - daysAgo);
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export default function ProductReviews({
   reviews,
+  productId = "",
 }: ProductReviewsProps) {
   if (reviews.length === 0) {
     return (
@@ -159,11 +190,13 @@ export default function ProductReviews({
                   className="
                     mt-0.5
                     text-[10px]
-                    text-[var(--foreground-muted)]
+                    font-medium
+                    text-blue-400
                     lg:text-[11px]
                   "
                 >
-                  {review.createdAt.toLocaleDateString()}
+                  Product feedback ·{" "}
+                  {getReviewDate(`${productId}-${review.id}`)}
                 </p>
               </div>
             </div>
@@ -178,18 +211,18 @@ export default function ProductReviews({
             >
               {Array.from({
                 length: 5,
-              }).map((_, index) => (
+              }).map((_, starIndex) => (
                 <Star
-                  key={index}
+                  key={starIndex}
                   size={12}
                   strokeWidth={2}
                   fill={
-                    index < review.rating
+                    starIndex < review.rating
                       ? "currentColor"
                       : "none"
                   }
                   className={
-                    index < review.rating
+                    starIndex < review.rating
                       ? "text-yellow-400"
                       : "text-yellow-300"
                   }

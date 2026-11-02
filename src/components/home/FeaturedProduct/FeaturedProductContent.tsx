@@ -130,24 +130,26 @@ export default function FeaturedProductContent({
             sm:gap-3
           "
         >
-          {product.compareAtPrice !== null && (
-            <span
-              className="
-                text-[12px]
-                font-semibold
-                leading-none
-                text-[var(--featured-text)]
-                line-through
-                opacity-60
+{product.compareAtPrice !== null && (
+  <span
+    className="
+      text-[12px]
+      font-semibold
+      leading-none
+      text-[var(--featured-text)]
+      line-through
+      opacity-60
 
-                sm:text-[14px]
-                md:text-[15px]
-                xl:text-[16px]
-              "
-            >
-              {formatPrice(product.compareAtPrice)}
-            </span>
-          )}
+      sm:text-[14px]
+      md:text-[15px]
+      xl:text-[16px]
+    "
+  >
+    {formatPrice(
+      product.compareAtPrice + product.price,
+    )}
+  </span>
+)}
 
           <span
             className="

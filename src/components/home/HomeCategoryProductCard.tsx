@@ -212,49 +212,44 @@ export default function HomeCategoryProductCard({
               {product.name}
             </h3>
 
-            <div
-              className="
-                mt-1.5
-                flex
-                items-baseline
-                gap-1.5
-              "
-            >
-              <span
-                className="
-                  text-[12px]
-                  font-extrabold
-                  leading-none
-                  text-[var(--home-category-price)]
-                  sm:text-[14px]
-                "
-              >
-                {formatPrice(
-                  product.price,
-                )}
-              </span>
+<div
+  className="
+    mt-1.5
+    flex
+    items-baseline
+    gap-1.5
+  "
+>
+  {product.compareAtPrice !== null && (
+    <span
+      className="
+        truncate
+        text-[9px]
+        font-medium
+        leading-none
+        text-[var(--home-category-old-price)]
+        line-through
+        sm:text-[10px]
+      "
+    >
+      {formatPrice(
+        product.compareAtPrice + product.price,
+      )}
+    </span>
+  )}
 
-              {product.compareAtPrice !==
-                null &&
-                product.compareAtPrice >
-                  product.price && (
-                  <span
-                    className="
-                      truncate
-                      text-[9px]
-                      font-medium
-                      leading-none
-                      text-[var(--home-category-old-price)]
-                      line-through
-                      sm:text-[10px]
-                    "
-                  >
-                    {formatPrice(
-                      product.compareAtPrice,
-                    )}
-                  </span>
-                )}
-            </div>
+  <span
+    className="
+      text-[12px]
+      font-extrabold
+      leading-none
+      text-[var(--home-category-price)]
+      sm:text-[14px]
+    "
+  >
+    {formatPrice(product.price)}
+  </span>
+</div>
           </div>
         </div>
 

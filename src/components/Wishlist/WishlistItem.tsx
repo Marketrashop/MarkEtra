@@ -10,7 +10,7 @@ import {
   Heart,
   Loader2,
   ShoppingCart,
-  Trash2,
+  Minus,
 } from "lucide-react";
 
 import type {
@@ -307,7 +307,7 @@ export default function WishlistItem({
               "
             />
           ) : (
-            <Trash2
+            <Minus
               size={11}
               className="sm:hidden"
             />
@@ -323,7 +323,7 @@ export default function WishlistItem({
               "
             />
           ) : (
-            <Trash2
+            <Minus
               size={12}
               className="hidden sm:block"
             />
@@ -370,41 +370,49 @@ export default function WishlistItem({
             sm:gap-2
           "
         >
-          <div className="min-w-0">
-            {product.compareAtPrice && (
-              <p
-                className="
-                  text-[9px]
-                  leading-3
-                  text-[var(--user-text-muted)]
-                  line-through
-                  sm:text-[10px]
-                  sm:leading-3.5
-                "
-              >
-                $
-                {product.compareAtPrice.toFixed(
-                  2,
-                )}
-              </p>
-            )}
+<div className="min-w-0">
+  {product.compareAtPrice !== null &&
+    product.compareAtPrice !== undefined && (
+      <p
+        className="
+          text-[9px]
+          leading-3
+          text-[var(--user-text-muted)]
+          line-through
+          sm:text-[10px]
+          sm:leading-3.5
+        "
+      >
+        $
+        {(
+          product.compareAtPrice +
+          (variantSize?.price ?? product.price)
+        ).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
+      </p>
+    )}
 
-            <p
-              className="
-                text-[12px]
-                font-bold
-                leading-4
-                text-[var(--user-title)]
-                sm:text-[13px]
-              "
-            >
-              $
-              {(
-                variantSize?.price ??
-                product.price
-              ).toFixed(2)}
-            </p>
-          </div>
+  <p
+    className="
+      text-[12px]
+      font-bold
+      leading-4
+      text-[var(--user-title)]
+      sm:text-[13px]
+    "
+  >
+    $
+    {(variantSize?.price ?? product.price).toLocaleString(
+      "en-US",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      },
+    )}
+  </p>
+</div>
 
           <span
             className={`

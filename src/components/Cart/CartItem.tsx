@@ -342,31 +342,39 @@ src={
   {item.product.name}
 </NavigationLink>
 
-            <div className="shrink-0 text-right">
-              {item.product.compareAtPrice !==
-                null && (
-                <span
-                  className="
-                    mr-1
-                    text-[9px]
-                    line-through
-                    sm:text-[10px]
-                  "
-                  style={{
-                    color:
-                      "var(--text-secondary)",
-                  }}
-                >
-                  $
-                  {item.product.compareAtPrice.toLocaleString()}
-                </span>
-              )}
+<div className="shrink-0 text-right">
+  {item.product.compareAtPrice !== null &&
+    item.product.compareAtPrice !== undefined && (
+      <span
+        className="
+          mr-1
+          text-[9px]
+          line-through
+          sm:text-[10px]
+        "
+        style={{
+          color: "var(--text-secondary)",
+        }}
+      >
+        $
+        {(item.product.compareAtPrice + price).toLocaleString(
+          "en-US",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          },
+        )}
+      </span>
+    )}
 
-              <span className="text-[11px] font-semibold">
-                $
-                {price.toLocaleString()}
-              </span>
-            </div>
+  <span className="text-[11px] font-semibold">
+    $
+    {price.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}
+  </span>
+</div>
           </div>
 
           <div
