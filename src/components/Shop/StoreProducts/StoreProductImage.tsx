@@ -18,11 +18,24 @@ import type {
 import StoreProductActions from "./StoreProductActions";
 import StoreProductBadge from "./StoreProductBadge";
 
+type CartActionHandler = (
+  event: React.MouseEvent<HTMLButtonElement>,
+) => void;
+
+type StoreProductImageWithCartActionProps =
+  StoreProductImageProps & {
+    onCartActionReady?: (
+      handler: CartActionHandler,
+      isLoading: boolean,
+    ) => void;
+  };
+
 export default function StoreProductImage({
   product,
   environment = "public",
   variant = "default",
-}: StoreProductImageProps) {
+  onCartActionReady,
+}: StoreProductImageWithCartActionProps) {
   const styles =
     STORE_PRODUCT_VARIANTS[
       variant
@@ -45,21 +58,21 @@ export default function StoreProductImage({
     hoverImage?.imageUrl;
 
   return (
-<div
-  className="
-    relative
-    overflow-hidden
-    rounded-t-[20px]
-    aspect-[var(--mobile-image-aspect-ratio)]
-    sm:aspect-[var(--image-aspect-ratio)]
-  "
-  style={{
-    "--mobile-image-aspect-ratio":
-      styles.mobileImageAspectRatio,
-    "--image-aspect-ratio":
-      styles.imageAspectRatio,
-  } as React.CSSProperties}
->
+    <div
+      className="
+        relative
+        overflow-hidden
+        rounded-t-[20px]
+        aspect-[var(--mobile-image-aspect-ratio)]
+        sm:aspect-[var(--image-aspect-ratio)]
+      "
+      style={{
+        "--mobile-image-aspect-ratio":
+          styles.mobileImageAspectRatio,
+        "--image-aspect-ratio":
+          styles.imageAspectRatio,
+      } as React.CSSProperties}
+    >
       <StoreProductBadge
         product={product}
         variant={variant}
@@ -69,6 +82,7 @@ export default function StoreProductImage({
         product={product}
         environment={environment}
         variant={variant}
+        onCartActionReady={onCartActionReady}
       />
 
       <motion.div

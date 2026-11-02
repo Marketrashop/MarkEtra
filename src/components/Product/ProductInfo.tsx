@@ -575,19 +575,6 @@ async function handleAffiliate() {
         </div>
       )}
 
-      <p
-        className="
-          mt-3
-          max-w-[560px]
-          text-[12px]
-          leading-5
-          text-[var(--foreground-muted)]
-          lg:hidden
-        "
-      >
-        {description}
-      </p>
-
       <div
         className="
           mt-4
@@ -637,8 +624,7 @@ async function handleAffiliate() {
             !selectedInventory ||
             (
               activeStock <= 0 &&
-              !selectedInventory
-                ?.allowPreorder
+              !selectedInventory?.allowPreorder
             )
           }
           affiliateLabel={
@@ -646,26 +632,27 @@ async function handleAffiliate() {
               ? "Submit for Review"
               : "Become Affiliate"
           }
-          affiliateLoading={
-            affiliateLoading
-          }
-          addingToCart={
-            addingToCart
-          }
-          buyingNow={
-            buyingNow
-          }
-          onAffiliate={
-            handleAffiliate
-          }
-          onAddToCart={
-            handleAddToCart
-          }
-          onBuyNow={
-            handleBuyNow
-          }
+          affiliateLoading={affiliateLoading}
+          addingToCart={addingToCart}
+          buyingNow={buyingNow}
+          onAffiliate={handleAffiliate}
+          onAddToCart={handleAddToCart}
+          onBuyNow={handleBuyNow}
         />
       </div>
+
+      <p
+        className="
+          mt-3
+          max-w-[560px]
+          text-[12px]
+          leading-5
+          text-[var(--foreground-muted)]
+          lg:hidden
+        "
+      >
+        {description}
+      </p>
 
       <div
         className="
@@ -674,15 +661,9 @@ async function handleAffiliate() {
         "
       >
         <ProductShipping
-          shippingMethod={
-            shippingMethod
-          }
-          estimatedDelivery={
-            estimatedDelivery
-          }
-          returnPolicy={
-            returnPolicy
-          }
+          shippingMethod={shippingMethod}
+          estimatedDelivery={estimatedDelivery}
+          returnPolicy={returnPolicy}
         />
       </div>
 

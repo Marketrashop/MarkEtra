@@ -1,6 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
+import { createPortal } from "react-dom";
 
 import { motion } from "framer-motion";
 
@@ -9,6 +15,7 @@ import {
   HandCoins,
   Heart,
   Loader2,
+  LogIn,
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -38,10 +45,18 @@ import {
 
 import { useRouter } from "next/navigation";
 
+type CartActionHandler = (
+  event: React.MouseEvent<HTMLButtonElement>,
+) => void;
+
 type StoreProductActionsProps = {
   product: ProductCard;
   environment?: AppEnvironment;
   variant?: "default" | "compact";
+  onCartActionReady?: (
+    handler: CartActionHandler,
+    isLoading: boolean,
+  ) => void;
 };
 
 type ProductInventoryResponse = {
@@ -138,6 +153,7 @@ export default function StoreProductActions({
   product,
   environment = "public",
   variant = "default",
+  onCartActionReady,
 }: StoreProductActionsProps) {
   const [
     activeIndex,
@@ -152,6 +168,16 @@ export default function StoreProductActions({
   ] = useState<
     "cart" | "wishlist" | "affiliate" | null
   >(null);
+
+  const [
+    wishlistVariantDialogOpen,
+    setWishlistVariantDialogOpen,
+  ] = useState(false);
+
+  const [
+    wishlistAuthDialogOpen,
+    setWishlistAuthDialogOpen,
+  ] = useState(false);
 
   const router = useRouter();
 
@@ -188,9 +214,10 @@ const {
       ? "Submit for Review"
       : "Become Affiliate";
 
-  async function handleCart(
+const handleCart = useCallback(
+  async (
     event: React.MouseEvent<HTMLButtonElement>,
-  ) {
+  ) => {
     event.preventDefault();
 
     event.stopPropagation();
@@ -285,7 +312,28 @@ openCart();
     } finally {
       setLoadingAction(null);
     }
-  }
+  },
+  [
+    loadingAction,
+    product.id,
+    product.slug,
+    environment,
+    addToCart,
+    openCart,
+    router,
+  ],
+);
+
+useEffect(() => {
+  onCartActionReady?.(
+    handleCart,
+    loadingAction === "cart",
+  );
+}, [
+  onCartActionReady,
+  handleCart,
+  loadingAction,
+]);
 
   async function handleWishlist(
     event: React.MouseEvent<HTMLButtonElement>,
@@ -301,24 +349,8 @@ openCart();
       return;
     }
 
-    if (!user) {
-      toast.info(
-        "Sign in to save this product to your wishlist.",
-      );
-
-      router.push(
-        `/Auth?redirect=/wishlist&wishlistProduct=${encodeURIComponent(
-          product.id,
-        )}`,
-      );
-
-      return;
-    }
-
     try {
-      setLoadingAction(
-        "wishlist",
-      );
+      setLoadingAction("wishlist");
 
       const response =
         await fetch(
@@ -327,7 +359,6 @@ openCart();
           )}`,
           {
             method: "GET",
-
             cache: "no-store",
           },
         );
@@ -346,50 +377,45 @@ openCart();
         );
       }
 
-const variants =
-  result.data.variants.filter(
-    (variant) =>
-      variant.sizes.length > 0,
-  );
+      // Keep the exact variant awareness logic used by the cart action.
+      const variants =
+        result.data.variants.filter(
+          (variant) =>
+            variant.sizes.length > 0,
+        );
 
-const hasRealVariants =
-  variants.length > 1 ||
-  variants.some(
-    (variant) =>
-      variant.type !== "DEFAULT",
-  );
+      const hasRealVariants =
+        variants.length > 1 ||
+        variants.some(
+          (variant) =>
+            variant.type !== "DEFAULT",
+        );
 
-if (hasRealVariants) {
-  toast.info(
-    "This product has variants. Please select your preferred option before adding it to your wishlist.",
-  );
+      if (hasRealVariants) {
+        setWishlistVariantDialogOpen(true);
+        return;
+      }
 
-router.push(
-  environment === "user"
-    ? `/Market-Place/${product.slug}`
-    : `/Product/${product.slug}`,
-);
+      if (!user) {
+        setWishlistAuthDialogOpen(true);
+        return;
+      }
 
-  return;
-}
+      const selection =
+        getDefaultInventory(variants);
 
-const selection =
-  getDefaultInventory(
-    variants,
-  );
+      if (!selection) {
+        toast.error(
+          "This product is currently unavailable.",
+        );
 
-if (!selection) {
-  toast.error(
-    "This product is currently unavailable.",
-  );
+        return;
+      }
 
-  return;
-}
-
-await addToWishlist(
-  product.id,
-  selection.inventory.id,
-);
+      await addToWishlist(
+        product.id,
+        selection.inventory.id,
+      );
 
       toast.success(
         "Product saved to wishlist.",
@@ -401,10 +427,28 @@ await addToWishlist(
           : "Failed to update wishlist.",
       );
     } finally {
-      setLoadingAction(
-        null,
-      );
+      setLoadingAction(null);
     }
+  }
+
+  function handleChooseWishlistVariant() {
+    setWishlistVariantDialogOpen(false);
+
+    router.push(
+      environment === "user"
+        ? `/Market-Place/${product.slug}`
+        : `/Product/${product.slug}`,
+    );
+  }
+
+  function handleContinueToAuth() {
+    setWishlistAuthDialogOpen(false);
+
+    router.push(
+      `/Auth?redirect=/wishlist&wishlistProduct=${encodeURIComponent(
+        product.id,
+      )}`,
+    );
   }
 
   async function handleAffiliate(
@@ -437,7 +481,8 @@ await addToWishlist(
   }
 
   return (
-    <motion.div
+    <>
+      <motion.div
       variants={{
         rest: {
           opacity: 0,
@@ -687,5 +732,303 @@ await addToWishlist(
         </div>
       </div>
     </motion.div>
+
+    {typeof document !== "undefined" &&
+      createPortal(
+        <>
+          {wishlistVariantDialogOpen && (
+            <div
+              role="presentation"
+              className="
+                fixed
+                inset-0
+                z-[100]
+                flex
+                items-center
+                justify-center
+                bg-black/45
+                px-4
+                animate-in
+                fade-in
+                duration-200
+              "
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                setWishlistVariantDialogOpen(false);
+              }}
+            >
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="wishlist-variant-dialog-title"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+                className="
+                  w-full
+                  max-w-[320px]
+                  rounded-xl
+                  border
+                  border-[var(--border)]
+                  bg-[var(--background)]
+                  p-4
+                  shadow-2xl
+                  animate-in
+                  fade-in
+                  zoom-in-95
+                  slide-in-from-bottom-2
+                  duration-200
+                  ease-out
+                "
+              >
+                <h2
+                  id="wishlist-variant-dialog-title"
+                  className="
+                    flex
+                    items-center
+                    justify-center
+                    gap-1.5
+                    border-b
+                    border-[var(--border)]
+                    pb-2.5
+                    text-sm
+                    font-semibold
+                    text-[var(--foreground)]
+                  "
+                >
+                  Choose a variant
+                </h2>
+
+                <p
+                  className="
+                    mt-3
+                    text-xs
+                    leading-5
+                    text-[var(--foreground-muted)]
+                  "
+                >
+                  This product has different options.
+                  Please choose your preferred variant
+                  before adding it to your wishlist.
+                </p>
+
+                <div className="mt-4 space-y-2">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      handleChooseWishlistVariant();
+                    }}
+                    className="
+                      flex
+                      w-full
+                      items-center
+                      justify-center
+                      rounded-lg
+                      bg-[var(--foreground)]
+                      px-3
+                      py-2
+                      text-xs
+                      font-medium
+                      text-[var(--background)]
+                      transition
+                      hover:opacity-90
+                    "
+                  >
+                    Choose variant
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      setWishlistVariantDialogOpen(false);
+                    }}
+                    className="
+                      w-full
+                      rounded-lg
+                      border
+                      border-[var(--border)]
+                      px-3
+                      py-2
+                      text-xs
+                      font-medium
+                      text-[var(--foreground)]
+                      transition
+                      hover:bg-[var(--muted)]
+                    "
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {wishlistAuthDialogOpen && (
+            <div
+              role="presentation"
+              className="
+                fixed
+                inset-0
+                z-[100]
+                flex
+                items-center
+                justify-center
+                bg-black/45
+                px-4
+                animate-in
+                fade-in
+                duration-200
+              "
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                setWishlistAuthDialogOpen(false);
+              }}
+            >
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="wishlist-login-dialog-title"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+                className="
+                  w-full
+                  max-w-[320px]
+                  rounded-xl
+                  border
+                  border-[var(--border)]
+                  bg-[var(--background)]
+                  p-4
+                  shadow-2xl
+                  animate-in
+                  fade-in
+                  zoom-in-95
+                  slide-in-from-bottom-2
+                  duration-200
+                  ease-out
+                "
+              >
+                <h2
+                  id="wishlist-login-dialog-title"
+                  className="
+                    flex
+                    items-center
+                    justify-center
+                    gap-1.5
+                    border-b
+                    border-[var(--border)]
+                    pb-2.5
+                    text-sm
+                    font-semibold
+                    text-[var(--foreground)]
+                  "
+                >
+                  <LogIn
+                    size={16}
+                    strokeWidth={2}
+                    className="text-[var(--primary)]"
+                    aria-hidden="true"
+                  />
+
+                  Authentication Required
+                </h2>
+
+                <p
+                  className="
+                    mt-3
+                    text-xs
+                    leading-5
+                    text-[var(--foreground-muted)]
+                  "
+                >
+                  Please log in to save items to your wishlist.
+                </p>
+
+                <p
+                  className="
+                    mt-2
+                    border-t
+                    border-[var(--border)]
+                    pt-2
+                    text-xs
+                    font-medium
+                    text-[var(--foreground)]
+                  "
+                >
+                  Would you like to continue to your account?
+                </p>
+
+                <div className="mt-4 space-y-2">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      handleContinueToAuth();
+                    }}
+                    className="
+                      flex
+                      w-full
+                      items-center
+                      justify-center
+                      rounded-lg
+                      bg-[var(--foreground)]
+                      px-3
+                      py-2
+                      text-xs
+                      font-medium
+                      text-[var(--background)]
+                      transition
+                      hover:opacity-90
+                    "
+                  >
+                    Yes, continue
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+
+                      setWishlistAuthDialogOpen(false);
+                    }}
+                    className="
+                      w-full
+                      rounded-lg
+                      border
+                      border-[var(--border)]
+                      px-3
+                      py-2
+                      text-xs
+                      font-medium
+                      text-[var(--foreground)]
+                      transition
+                      hover:bg-[var(--muted)]
+                    "
+                  >
+                    No, please
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>,
+        document.body,
+      )}
+    </>
   );
 }

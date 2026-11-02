@@ -1,10 +1,11 @@
-
 "use client";
 
 import Link from "next/link";
 
 import {
+  useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -17,7 +18,8 @@ import {
 } from "framer-motion";
 
 import {
-  ChevronRight,
+  ShoppingCart,
+  Loader2,
 } from "lucide-react";
 
 import type {
@@ -51,12 +53,36 @@ type StoreProductCardProps = {
   variant?: "default" | "compact";
 };
 
+type CartActionHandler = (
+  event: React.MouseEvent<HTMLButtonElement>,
+) => void;
+
 export default function StoreProductCard({
   product,
   environment = "public",
   variant = "default",
 }: StoreProductCardProps) {
   const router = useRouter();
+
+  const cartActionRef = useRef<
+    CartActionHandler | null
+  >(null);
+
+  const [
+    cartLoading,
+    setCartLoading,
+  ] = useState(false);
+
+  const registerCartAction = useCallback(
+    (
+      handler: CartActionHandler,
+      isLoading: boolean,
+    ) => {
+      cartActionRef.current = handler;
+      setCartLoading(isLoading);
+    },
+    [],
+  );
 
   const [
     loading,
@@ -158,6 +184,7 @@ export default function StoreProductCard({
           product={product}
           environment={environment}
           variant={variant}
+          onCartActionReady={registerCartAction}
         />
 
         {/* Loading transition */}
@@ -285,7 +312,7 @@ export default function StoreProductCard({
             {truncateTitle(product.name)}
           </motion.h3>
 
-          {/* Price and always-visible details action */}
+          {/* Price and always-visible cart action */}
           <div
             className="
               mt-1.5
@@ -304,66 +331,99 @@ export default function StoreProductCard({
               />
             </div>
 
+            {/* Always-visible mobile cart button */}
+            <button
+              type="button"
+              aria-label={
+                cartLoading
+                  ? "Adding to cart"
+                  : "Add to cart"
+              }
+              disabled={cartLoading}
+              onClick={(event) => {
+                cartActionRef.current?.(event);
+              }}
+              className="
+                flex
+                h-6
+                w-6
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-[#7778FF]
+                bg-[#5658EC]
+                text-white
+                shadow-[0_3px_10px_rgba(86,88,236,0.25)]
+                transition-all
+                duration-200
+                group-hover:bg-[#6B6DFF]
+                group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.4)]
+                disabled:cursor-not-allowed
+                sm:hidden
+              "
+            >
+              {cartLoading ? (
+                <Loader2
+                  size={13}
+                  strokeWidth={2.2}
+                  className="animate-spin"
+                />
+              ) : (
+                <ShoppingCart
+                  size={13}
+                  strokeWidth={2.2}
+                />
+              )}
+            </button>
 
-{/* Always-visible mobile details button */}
-<span
-  className="
-    flex
-    h-6
-    w-6
-    shrink-0
-    items-center
-    justify-center
-    rounded-full
-    border
-    border-[#7778FF]
-    bg-[#5658EC]
-    text-white
-    shadow-[0_3px_10px_rgba(86,88,236,0.25)]
-    transition-all
-    duration-200
-    group-hover:bg-[#6B6DFF]
-    group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.4)]
-    sm:hidden
-  "
-  aria-hidden="true"
->
-  <ChevronRight
-    size={13}
-    strokeWidth={2.2}
-  />
-</span>
-
-
-{/* Always-visible desktop arrow button */}
-<span
-  className="
-    hidden
-    h-7
-    w-7
-    shrink-0
-    items-center
-    justify-center
-    rounded-full
-    border
-    border-[#7778FF]
-    bg-[#5658EC]
-    text-white
-    shadow-[0_3px_10px_rgba(86,88,236,0.25)]
-    transition-all
-    duration-200
-    group-hover:bg-[#6B6DFF]
-    group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.4)]
-    sm:flex
-  "
-  aria-hidden="true"
->
-  <ChevronRight
-    size={15}
-    strokeWidth={2.2}
-  />
-</span>
-
+            {/* Always-visible desktop cart button */}
+            <button
+              type="button"
+              aria-label={
+                cartLoading
+                  ? "Adding to cart"
+                  : "Add to cart"
+              }
+              disabled={cartLoading}
+              onClick={(event) => {
+                cartActionRef.current?.(event);
+              }}
+              className="
+                hidden
+                h-7
+                w-7
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-[#7778FF]
+                bg-[#5658EC]
+                text-white
+                shadow-[0_3px_10px_rgba(86,88,236,0.25)]
+                transition-all
+                duration-200
+                group-hover:bg-[#6B6DFF]
+                group-hover:shadow-[0_5px_14px_rgba(86,88,236,0.4)]
+                disabled:cursor-not-allowed
+                sm:flex
+              "
+            >
+              {cartLoading ? (
+                <Loader2
+                  size={15}
+                  strokeWidth={2.2}
+                  className="animate-spin"
+                />
+              ) : (
+                <ShoppingCart
+                  size={15}
+                  strokeWidth={2.2}
+                />
+              )}
+            </button>
           </div>
         </motion.div>
       </motion.article>
