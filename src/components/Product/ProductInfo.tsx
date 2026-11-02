@@ -535,7 +535,6 @@ async function handleAffiliate() {
 
       <div
         className="
-          mt-2
           lg:mt-4
         "
       >
@@ -575,13 +574,13 @@ async function handleAffiliate() {
         </div>
       )}
 
-      <div
-        className="
-          mt-4
-          lg:mt-5
-        "
-      >
-        <ProductQuantity
+<div
+  className="
+    mt-2
+    lg:mt-5
+  "
+>
+  <ProductQuantity
           quantity={
             quantity
           }
@@ -643,7 +642,7 @@ async function handleAffiliate() {
 
       <p
         className="
-          mt-3
+          mt-4
           max-w-[560px]
           text-[12px]
           leading-5
