@@ -2,6 +2,9 @@ import {
   DashboardBreadcrumb,
 } from "@/components/dashboard";
 
+import { getStorefrontCategoriesService } from "@/services/category.service";
+
+import MobileShopFilters from "./MobileShopFilters";
 import ShopHero from "./ShopHero";
 import ShopProducts from "./ShopProducts";
 import ShopSidebar from "./ShopSidebar";
@@ -16,10 +19,13 @@ type ShopPageProps = {
   categoryId?: string | null;
 };
 
-export default function ShopPage({
+export default async function ShopPage({
   environment = "public",
   categoryId = null,
 }: ShopPageProps) {
+  const categories =
+    await getStorefrontCategoriesService();
+
   return (
     <main
       data-shop-environment={
@@ -42,67 +48,87 @@ export default function ShopPage({
         />
       )}
 
-<section
-  className={
-    environment === "public"
-      ? `
-          bg-[var(--background)]
-          pt-6
-          pb-8
-          transition-colors
-          duration-300
-          sm:pt-8
-          sm:pb-10
-          lg:pt-10
-          lg:pb-12
-        `
-      : `
-          bg-[var(--background)]
-          pt-8
-          pb-16
-          transition-colors
-          duration-300
-          sm:pb-20
-          lg:pb-24
-        `
-  }
->
+      <section
+        className={
+          environment === "public"
+            ? `
+                bg-[var(--background)]
+                pt-6
+                pb-8
+                transition-colors
+                duration-300
+                sm:pt-8
+                sm:pb-10
+                lg:pt-10
+                lg:pb-12
+              `
+            : `
+                bg-[var(--background)]
+                pt-8
+                pb-16
+                transition-colors
+                duration-300
+                sm:pb-20
+                lg:pb-24
+              `
+        }
+      >
         <div
           className="
             mx-auto
-
-            grid
-
-            items-start
 
             w-full
 
             max-w-7xl
 
-            gap-8
-
             px-5
-
-            lg:grid-cols-[minmax(0,1fr)_280px]
 
             lg:px-8
           "
         >
-          <ShopProducts
-            environment={
-              environment
-            }
-
-            categoryId={
-              categoryId
-            }
-          />
-
-          <ShopSidebar
+          {/* Mobile only (hidden on lg inside the component).
+              Must sit outside the grid so its sticky bar spans the full list. */}
+          <MobileShopFilters
+            categories={categories}
             selectedCategoryId={
               categoryId
             }
           />
+
+          <div
+            className="
+              mt-5
+
+              grid
+
+              items-start
+
+              gap-8
+
+              lg:mt-0
+
+              lg:grid-cols-[minmax(0,1fr)_280px]
+            "
+          >
+            <ShopProducts
+              environment={
+                environment
+              }
+
+              categoryId={
+                categoryId
+              }
+            />
+
+            <ShopSidebar
+              categories={
+                categories
+              }
+              selectedCategoryId={
+                categoryId
+              }
+            />
+          </div>
         </div>
       </section>
     </main>
