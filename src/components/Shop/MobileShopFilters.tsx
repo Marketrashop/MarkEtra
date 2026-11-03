@@ -302,8 +302,6 @@ export default function MobileShopFilters({
     setOpen(false);
   }, [selectedCategoryId]);
 
-  // Hide the button while scrolling down, bring it back on scroll up or
-  // when scrolling stops.
   useEffect(() => {
     if (!HIDE_ON_SCROLL) return;
 
@@ -353,10 +351,8 @@ export default function MobileShopFilters({
     const viewportHeight = window.innerHeight;
 
     const topSafeZone = 70;
+    const bottomSafeZone = 100;
     const sidePadding = 8;
-    const bottomPadding = 8;
-
-    const bottomZoneHeight = 110;
 
     const spring = {
       type: "spring",
@@ -384,24 +380,16 @@ export default function MobileShopFilters({
     }
 
     const maxLeft = viewportWidth - rect.width - sidePadding;
-    const bottomTop = viewportHeight - rect.height - bottomPadding;
+    const maxTop = viewportHeight - rect.height - bottomSafeZone;
 
-    // Dropped anywhere along the bottom: keep its horizontal position,
-    // settle flush on the bottom edge.
-    const inBottomZone = rect.bottom >= viewportHeight - bottomZoneHeight;
-
-    if (inBottomZone) {
-      const targetLeft = Math.min(Math.max(rect.left, sidePadding), maxLeft);
-
-      lastValidPosition.current = moveTo(targetLeft, bottomTop);
-      return;
-    }
-
-    // Otherwise: snap to the nearest side.
+    // Snap to the nearest side and keep the button clear of the bottom zone.
     const centerX = rect.left + rect.width / 2;
     const snapToLeft = centerX < viewportWidth / 2;
 
-    const targetTop = Math.min(Math.max(rect.top, topSafeZone), bottomTop);
+    const targetTop = Math.min(
+      Math.max(rect.top, topSafeZone),
+      maxTop,
+    );
     const targetLeft = snapToLeft ? sidePadding : maxLeft;
 
     lastValidPosition.current = moveTo(targetLeft, targetTop);
@@ -462,27 +450,27 @@ export default function MobileShopFilters({
                   handleDragEnd();
                 }}
                 whileTap={{ scale: 0.95 }}
-                className="
-                  fixed
-                  bottom-1
-                  left-1/2
-                  -ml-[22px]
-                  will-change-transform
-                  flex
-                  h-11
-                  w-11
-                  touch-none
-                  items-center
-                  justify-center
-                  rounded-full
-                  border-2
-                  border-[#7778FF]
-                  bg-[#5658EC]
-                  text-white
-                  shadow-[0_3px_10px_rgba(86,88,236,0.25)]
-                  cursor-grab
-                  active:cursor-grabbing
-                "
+className="
+  fixed
+  top-1/2
+  right-2
+  -mt-[22px]
+  will-change-transform
+  flex
+  h-11
+  w-11
+  touch-none
+  items-center
+  justify-center
+  rounded-full
+  border-2
+  border-white
+  bg-[#5658EC]
+  text-white
+  shadow-[0_8px_24px_rgba(0,0,0,0.4),0_3px_10px_rgba(86,88,236,0.5)]
+  cursor-grab
+  active:cursor-grabbing
+"
               >
                 <SlidersIcon />
 
