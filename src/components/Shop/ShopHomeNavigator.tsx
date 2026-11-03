@@ -21,17 +21,12 @@ const SHOW_AFTER_IDLE_MS = 450;
 const SCROLL_THRESHOLD = 6;
 const NEAR_TOP = 80;
 
-/* ---------- preloader handshake ---------- */
-
-// AppPreloader sets <html data-preloader="exited"> and dispatches this event
-// once its overlay has fully faded out.
 const PRELOADER_EXITED_EVENT = "marketra:preloader-exited";
-const PRELOADER_FALLBACK_MS = 6000; // safety net if no preloader is on the page
+const PRELOADER_FALLBACK_MS = 6000;
 
-/* ---------- discovery intro ---------- */
-
-const INTRO_KEY = "shopNavigatorIntroSeen";
-const ENTRANCE_DELAY_MS = 500; // measured from the moment the preloader is gone
+const INTRO_KEY = "shopNavigatorIntroLastSeen";
+const INTRO_RESET_MS = 24 * 60 * 60 * 1000;
+const ENTRANCE_DELAY_MS = 500;
 const LABEL_SHOW_AT_MS = 1000;
 const LABEL_HIDE_AT_MS = 5500;
 const INTRO_END_FULL_MS = 6500;
@@ -75,7 +70,7 @@ function StoreIcon() {
 
 export default function ShopHomeNavigator() {
   const [mounted, setMounted] = useState(false);
-  const [started, setStarted] = useState(false); // preloader is gone
+  const [started, setStarted] = useState(false);
   const [ready, setReady] = useState(false);
   const [hidden, setHidden] = useState(false);
 
@@ -99,9 +94,8 @@ export default function ShopHomeNavigator() {
     setMounted(true);
   }, []);
 
-  // Wait for the app preloader to finish before anything starts.
   useEffect(() => {
-    // Already finished (client-side navigation, or we mounted late).
+
     if (document.documentElement.dataset.preloader === "exited") {
       setStarted(true);
       return;
@@ -111,7 +105,6 @@ export default function ShopHomeNavigator() {
 
     window.addEventListener(PRELOADER_EXITED_EVENT, start, { once: true });
 
-    // If this page has no preloader at all, don't wait forever.
     const fallback = window.setTimeout(start, PRELOADER_FALLBACK_MS);
 
     return () => {
@@ -120,28 +113,27 @@ export default function ShopHomeNavigator() {
     };
   }, []);
 
-  // Pop-in and intro timeline. Only runs once the preloader is gone, so the
-  // first-visit intro is never used up behind the overlay.
   useEffect(() => {
     if (!started) return;
 
-    let nextPhase: IntroPhase = "none";
+let nextPhase: IntroPhase = "none";
 
-    try {
-      const seenEver = localStorage.getItem(INTRO_KEY) === "1";
-      const seenThisSession = sessionStorage.getItem(INTRO_KEY) === "1";
+try {
+  const lastSeen = Number(localStorage.getItem(INTRO_KEY));
+  const now = Date.now();
 
-      if (!seenEver) {
-        nextPhase = "full";
-      } else if (!seenThisSession) {
-        nextPhase = "pulse";
-      }
+  const shouldShowIntro =
+    !Number.isFinite(lastSeen) ||
+    lastSeen <= 0 ||
+    now - lastSeen >= INTRO_RESET_MS;
 
-      localStorage.setItem(INTRO_KEY, "1");
-      sessionStorage.setItem(INTRO_KEY, "1");
-    } catch {
-      // Storage blocked (private mode, etc.): skip the intro quietly.
-    }
+  if (shouldShowIntro) {
+    nextPhase = "full";
+    localStorage.setItem(INTRO_KEY, String(now));
+  }
+} catch {
+
+}
 
     const timers: number[] = [];
 
@@ -336,7 +328,7 @@ export default function ShopHomeNavigator() {
                 active:cursor-grabbing
               "
             >
-              {/* Soft pulse ring: plays a few times, then stops for good. */}
+
               {phase !== "none" && !reduceMotion && (
                 <motion.span
                   aria-hidden="true"
@@ -353,8 +345,6 @@ export default function ShopHomeNavigator() {
                 />
               )}
 
-              {/* Label: slides out beside the button on the first visit,
-                  with a small tail pointing at the button. */}
               <AnimatePresence>
                 {showLabel && (
                   <span
@@ -378,7 +368,7 @@ export default function ShopHomeNavigator() {
                       }}
                       transition={{ duration: 0.25, ease: "easeOut" }}
                     >
-                      {/* Gentle nudge toward the button while visible. */}
+
                       <motion.span
                         animate={
                           reduceMotion
