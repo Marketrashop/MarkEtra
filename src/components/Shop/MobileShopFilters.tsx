@@ -453,7 +453,7 @@ export default function MobileShopFilters({
 className="
   fixed
   top-1/2
-  right-2
+  right-6
   -mt-[22px]
   will-change-transform
   flex
@@ -467,7 +467,7 @@ className="
   border-white
   bg-[#5658EC]
   text-white
-  shadow-[0_8px_24px_rgba(0,0,0,0.4),0_3px_10px_rgba(86,88,236,0.5)]
+  shadow-[0_6px_18px_rgba(0,0,0,0.28),0_2px_6px_rgba(86,88,236,0.35)]
   cursor-grab
   active:cursor-grabbing
 "
