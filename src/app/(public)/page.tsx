@@ -13,15 +13,11 @@ import FAQ from "@/components/home/FAQ";
 import Testimonials from "@/components/home/Testimonials";
 import Blog from "@/components/home/Blog";
 
+import ShopHomeNavigator from "@/components/Shop/ShopHomeNavigator";
 import NewsletterGate from "@/components/newsletter/NewsletterGate";
 
-import {
-  getPublishedProducts,
-} from "@/lib/products/product.service";
-
-import {
-  listCategoryOptionsService,
-} from "@/services/category.service";
+import { getPublishedProducts } from "@/lib/products/product.service";
+import { listCategoryOptionsService } from "@/services/category.service";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -30,24 +26,22 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [
-    products,
-    categories,
-  ] = await Promise.all([
+  const [products, categories] = await Promise.all([
     getPublishedProducts(),
     listCategoryOptionsService(),
   ]);
 
-  const featuredProducts =
-    products.filter(
-      (product) =>
-        product.featured &&
-        product.status === "ACTIVE",
-    );
+  const featuredProducts = products.filter(
+    (product) =>
+      product.featured &&
+      product.status === "ACTIVE",
+  );
 
   return (
     <>
       <NewsletterGate />
+
+      <ShopHomeNavigator />
 
       <Hero />
 
@@ -56,14 +50,12 @@ export default async function HomePage() {
         categories={categories}
       />
 
-<FeaturedProduct
-  products={featuredProducts}
-/>
+      <FeaturedProduct
+        products={featuredProducts}
+      />
 
       <HomeStoreProducts
-        products={
-          featuredProducts
-        }
+        products={featuredProducts}
       />
 
       <SectionDivider />
