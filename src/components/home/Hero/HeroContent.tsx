@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ShoppingBasket } from "lucide-react";
 
 import { useNavigationLoader } from "@/components/ui/Preloader";
 
@@ -123,7 +123,7 @@ export default function HeroContent() {
         >
           {heroData.primaryButton.label}
 
-          <ArrowRight size={18} strokeWidth={2.2} />
+          <ShoppingBasket size={18} strokeWidth={2.2} />
         </Link>
 
         <HeroVideoButton />
