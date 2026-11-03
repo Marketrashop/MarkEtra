@@ -24,6 +24,14 @@ type MobileShopFiltersProps = {
   productCount?: number;
 };
 
+/* ---------- floating button: scroll behavior ---------- */
+
+const HIDE_ON_SCROLL = true; // set to false to keep it always visible
+const SHOW_AFTER_IDLE_MS = 450; // how long after scrolling stops it returns
+const SCROLL_THRESHOLD = 6; // ignores tiny scroll jitter
+const NEAR_TOP = 80; // never hide near the top of the page
+
+/* ---------- icons ---------- */
 
 function SlidersIcon() {
   return (
@@ -80,6 +88,7 @@ function CloseIcon() {
   );
 }
 
+/* ---------- bottom sheet ---------- */
 
 function FilterSheet({
   open,
@@ -264,6 +273,7 @@ function FilterSheet({
   );
 }
 
+/* ---------- main component ---------- */
 
 export default function MobileShopFilters({
   categories,
@@ -271,6 +281,7 @@ export default function MobileShopFilters({
 }: MobileShopFiltersProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   const constraintsRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -281,6 +292,7 @@ export default function MobileShopFilters({
   const lastValidPosition = useRef({ x: 0, y: 0 });
 
   const wasDragged = useRef(false);
+  const isDragging = useRef(false);
 
   useEffect(() => {
     setMounted(true);
@@ -290,66 +302,110 @@ export default function MobileShopFilters({
     setOpen(false);
   }, [selectedCategoryId]);
 
-const handleDragEnd = () => {
-  const button = buttonRef.current;
-  if (!button) return;
+  // Hide the button while scrolling down, bring it back on scroll up or
+  // when scrolling stops.
+  useEffect(() => {
+    if (!HIDE_ON_SCROLL) return;
 
-  const rect = button.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+    let lastY = window.scrollY;
+    let idleTimer: number | undefined;
+    let ticking = false;
 
-  const topSafeZone = 70;
-  const sidePadding = 8;
-  const bottomPadding = 8;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
 
-  if (rect.top < topSafeZone) {
-    animate(x, lastValidPosition.current.x, {
+      requestAnimationFrame(() => {
+        ticking = false;
+
+        const currentY = window.scrollY;
+        const delta = currentY - lastY;
+        lastY = currentY;
+
+        if (isDragging.current) return;
+
+        if (Math.abs(delta) > SCROLL_THRESHOLD) {
+          setHidden(delta > 0 && currentY > NEAR_TOP);
+        }
+
+        window.clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(
+          () => setHidden(false),
+          SHOW_AFTER_IDLE_MS,
+        );
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(idleTimer);
+    };
+  }, []);
+
+  const handleDragEnd = () => {
+    const button = buttonRef.current;
+    if (!button) return;
+
+    const rect = button.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const topSafeZone = 70;
+    const sidePadding = 8;
+    const bottomPadding = 8;
+
+    const bottomZoneHeight = 110;
+
+    const spring = {
       type: "spring",
       stiffness: 420,
       damping: 32,
-    });
+    } as const;
 
-    animate(y, lastValidPosition.current.y, {
-      type: "spring",
-      stiffness: 420,
-      damping: 32,
-    });
+    const moveTo = (left: number, top: number) => {
+      const target = {
+        x: x.get() + left - rect.left,
+        y: y.get() + top - rect.top,
+      };
 
-    return;
-  }
+      animate(x, target.x, spring);
+      animate(y, target.y, spring);
 
-  const centerX = rect.left + rect.width / 2;
-  const snapToLeft = centerX < viewportWidth / 2;
+      return target;
+    };
 
-  const maxY = viewportHeight - rect.height - bottomPadding;
-  const targetY = Math.min(
-    Math.max(rect.top, topSafeZone),
-    maxY,
-  );
+    // Dropped in the top zone: glide back to the last good spot.
+    if (rect.top < topSafeZone) {
+      animate(x, lastValidPosition.current.x, spring);
+      animate(y, lastValidPosition.current.y, spring);
+      return;
+    }
 
-  const targetX = snapToLeft
-    ? sidePadding
-    : viewportWidth - rect.width - sidePadding;
+    const maxLeft = viewportWidth - rect.width - sidePadding;
+    const bottomTop = viewportHeight - rect.height - bottomPadding;
 
-  const targetPosition = {
-    x: x.get() + targetX - rect.left,
-    y: y.get() + targetY - rect.top,
+    // Dropped anywhere along the bottom: keep its horizontal position,
+    // settle flush on the bottom edge.
+    const inBottomZone = rect.bottom >= viewportHeight - bottomZoneHeight;
+
+    if (inBottomZone) {
+      const targetLeft = Math.min(Math.max(rect.left, sidePadding), maxLeft);
+
+      lastValidPosition.current = moveTo(targetLeft, bottomTop);
+      return;
+    }
+
+    // Otherwise: snap to the nearest side.
+    const centerX = rect.left + rect.width / 2;
+    const snapToLeft = centerX < viewportWidth / 2;
+
+    const targetTop = Math.min(Math.max(rect.top, topSafeZone), bottomTop);
+    const targetLeft = snapToLeft ? sidePadding : maxLeft;
+
+    lastValidPosition.current = moveTo(targetLeft, targetTop);
   };
-
-  animate(x, targetPosition.x, {
-    type: "spring",
-    stiffness: 420,
-    damping: 32,
-  });
-
-  animate(y, targetPosition.y, {
-    type: "spring",
-    stiffness: 420,
-    damping: 32,
-  });
-
-  lastValidPosition.current = targetPosition;
-};
 
   return (
     <>
@@ -369,35 +425,49 @@ const handleDragEnd = () => {
               <motion.button
                 ref={buttonRef}
                 type="button"
-onPointerDown={() => {
-  wasDragged.current = false;
-}}
-onClick={() => {
-  if (wasDragged.current) {
-    wasDragged.current = false;
-    return;
-  }
+                onPointerDown={() => {
+                  wasDragged.current = false;
+                }}
+                onClick={() => {
+                  if (wasDragged.current) {
+                    wasDragged.current = false;
+                    return;
+                  }
 
-  setOpen(true);
-}}
+                  setOpen(true);
+                }}
                 aria-label="Open filters"
                 aria-haspopup="dialog"
                 drag
                 dragMomentum={false}
                 dragConstraints={constraintsRef}
                 dragElastic={0.08}
-                style={{ x, y }}
-onDragStart={() => {
-  wasDragged.current = true;
-}}                
-                onDragEnd={handleDragEnd}
+                style={{
+                  x,
+                  y,
+                  pointerEvents: hidden ? "none" : "auto",
+                }}
+                animate={{
+                  opacity: hidden ? 0 : 1,
+                  scale: hidden ? 0.8 : 1,
+                }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                onDragStart={() => {
+                  wasDragged.current = true;
+                  isDragging.current = true;
+                  setHidden(false);
+                }}
+                onDragEnd={() => {
+                  isDragging.current = false;
+                  handleDragEnd();
+                }}
                 whileTap={{ scale: 0.95 }}
                 className="
-                  pointer-events-auto
                   fixed
                   bottom-1
                   left-1/2
-                  -translate-x-1/2
+                  -ml-[22px]
+                  will-change-transform
                   flex
                   h-11
                   w-11
