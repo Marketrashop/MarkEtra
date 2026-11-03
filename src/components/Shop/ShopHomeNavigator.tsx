@@ -2,19 +2,44 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, useMotionValue, animate } from "framer-motion";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+} from "framer-motion";
 import { NavigationLink } from "@/components/ui/Preloader";
 
 const TOP_SAFE_ZONE = 80;
 const BOTTOM_SAFE_ZONE = 100;
 const LEFT_SAFE_ZONE = 24;
 const RIGHT_SAFE_ZONE = 24;
-const SIDE_PADDING = 8;
 
 const HIDE_ON_SCROLL = true;
 const SHOW_AFTER_IDLE_MS = 450;
 const SCROLL_THRESHOLD = 6;
 const NEAR_TOP = 80;
+
+/* ---------- preloader handshake ---------- */
+
+// AppPreloader sets <html data-preloader="exited"> and dispatches this event
+// once its overlay has fully faded out.
+const PRELOADER_EXITED_EVENT = "marketra:preloader-exited";
+const PRELOADER_FALLBACK_MS = 6000; // safety net if no preloader is on the page
+
+/* ---------- discovery intro ---------- */
+
+const INTRO_KEY = "shopNavigatorIntroSeen";
+const ENTRANCE_DELAY_MS = 500; // measured from the moment the preloader is gone
+const LABEL_SHOW_AT_MS = 1000;
+const LABEL_HIDE_AT_MS = 5500;
+const INTRO_END_FULL_MS = 6500;
+const INTRO_END_PULSE_MS = 3000;
+const LABEL_TEXT = "Explore Store";
+
+type IntroPhase = "none" | "pulse" | "full";
+type Side = "left" | "right";
 
 const SPRING = {
   type: "spring",
@@ -50,7 +75,15 @@ function StoreIcon() {
 
 export default function ShopHomeNavigator() {
   const [mounted, setMounted] = useState(false);
+  const [started, setStarted] = useState(false); // preloader is gone
+  const [ready, setReady] = useState(false);
   const [hidden, setHidden] = useState(false);
+
+  const [phase, setPhase] = useState<IntroPhase>("none");
+  const [showLabel, setShowLabel] = useState(false);
+  const [side, setSide] = useState<Side>("right");
+
+  const reduceMotion = useReducedMotion();
 
   const constraintsRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -65,6 +98,90 @@ export default function ShopHomeNavigator() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Wait for the app preloader to finish before anything starts.
+  useEffect(() => {
+    // Already finished (client-side navigation, or we mounted late).
+    if (document.documentElement.dataset.preloader === "exited") {
+      setStarted(true);
+      return;
+    }
+
+    const start = () => setStarted(true);
+
+    window.addEventListener(PRELOADER_EXITED_EVENT, start, { once: true });
+
+    // If this page has no preloader at all, don't wait forever.
+    const fallback = window.setTimeout(start, PRELOADER_FALLBACK_MS);
+
+    return () => {
+      window.removeEventListener(PRELOADER_EXITED_EVENT, start);
+      window.clearTimeout(fallback);
+    };
+  }, []);
+
+  // Pop-in and intro timeline. Only runs once the preloader is gone, so the
+  // first-visit intro is never used up behind the overlay.
+  useEffect(() => {
+    if (!started) return;
+
+    let nextPhase: IntroPhase = "none";
+
+    try {
+      const seenEver = localStorage.getItem(INTRO_KEY) === "1";
+      const seenThisSession = sessionStorage.getItem(INTRO_KEY) === "1";
+
+      if (!seenEver) {
+        nextPhase = "full";
+      } else if (!seenThisSession) {
+        nextPhase = "pulse";
+      }
+
+      localStorage.setItem(INTRO_KEY, "1");
+      sessionStorage.setItem(INTRO_KEY, "1");
+    } catch {
+      // Storage blocked (private mode, etc.): skip the intro quietly.
+    }
+
+    const timers: number[] = [];
+
+    timers.push(window.setTimeout(() => setReady(true), ENTRANCE_DELAY_MS));
+
+    if (nextPhase !== "none") {
+      setPhase(nextPhase);
+
+      if (nextPhase === "full") {
+        timers.push(
+          window.setTimeout(
+            () => setShowLabel(true),
+            ENTRANCE_DELAY_MS + LABEL_SHOW_AT_MS,
+          ),
+          window.setTimeout(
+            () => setShowLabel(false),
+            ENTRANCE_DELAY_MS + LABEL_HIDE_AT_MS,
+          ),
+          window.setTimeout(
+            () => setPhase("none"),
+            ENTRANCE_DELAY_MS + INTRO_END_FULL_MS,
+          ),
+        );
+      } else {
+        timers.push(
+          window.setTimeout(
+            () => setPhase("none"),
+            ENTRANCE_DELAY_MS + INTRO_END_PULSE_MS,
+          ),
+        );
+      }
+    }
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [started]);
+
+  const endIntro = () => {
+    setShowLabel(false);
+    setPhase("none");
+  };
 
   useEffect(() => {
     if (!HIDE_ON_SCROLL) return;
@@ -106,55 +223,53 @@ export default function ShopHomeNavigator() {
     };
   }, []);
 
-const handleDragEnd = () => {
-  const button = buttonRef.current;
-  if (!button) return;
+  const handleDragEnd = () => {
+    const button = buttonRef.current;
+    if (!button) return;
 
-  const rect = button.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+    const rect = button.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
 
-  const minLeft = LEFT_SAFE_ZONE;
-  const maxLeft =
-    viewportWidth - rect.width - RIGHT_SAFE_ZONE;
+    const minLeft = LEFT_SAFE_ZONE;
+    const maxLeft = viewportWidth - rect.width - RIGHT_SAFE_ZONE;
 
-  const maxTop =
-    viewportHeight - rect.height - BOTTOM_SAFE_ZONE;
+    const maxTop = viewportHeight - rect.height - BOTTOM_SAFE_ZONE;
 
-  const moveTo = (left: number, top: number) => {
-    const target = {
-      x: x.get() + left - rect.left,
-      y: y.get() + top - rect.top,
+    const moveTo = (left: number, top: number) => {
+      const target = {
+        x: x.get() + left - rect.left,
+        y: y.get() + top - rect.top,
+      };
+
+      animate(x, target.x, SPRING);
+      animate(y, target.y, SPRING);
+
+      return target;
     };
 
-    animate(x, target.x, SPRING);
-    animate(y, target.y, SPRING);
+    if (
+      rect.top < TOP_SAFE_ZONE ||
+      rect.left < minLeft ||
+      rect.right > viewportWidth - RIGHT_SAFE_ZONE
+    ) {
+      animate(x, lastValidPosition.current.x, SPRING);
+      animate(y, lastValidPosition.current.y, SPRING);
+      return;
+    }
 
-    return target;
+    const centerX = rect.left + rect.width / 2;
+    const snapToLeft = centerX < viewportWidth / 2;
+
+    const targetTop = Math.min(Math.max(rect.top, TOP_SAFE_ZONE), maxTop);
+
+    const targetLeft = snapToLeft ? minLeft : maxLeft;
+
+    setSide(snapToLeft ? "left" : "right");
+    lastValidPosition.current = moveTo(targetLeft, targetTop);
   };
 
-  if (
-    rect.top < TOP_SAFE_ZONE ||
-    rect.left < minLeft ||
-    rect.right > viewportWidth - RIGHT_SAFE_ZONE
-  ) {
-    animate(x, lastValidPosition.current.x, SPRING);
-    animate(y, lastValidPosition.current.y, SPRING);
-    return;
-  }
-
-  const centerX = rect.left + rect.width / 2;
-  const snapToLeft = centerX < viewportWidth / 2;
-
-  const targetTop = Math.min(
-    Math.max(rect.top, TOP_SAFE_ZONE),
-    maxTop,
-  );
-
-  const targetLeft = snapToLeft ? minLeft : maxLeft;
-
-  lastValidPosition.current = moveTo(targetLeft, targetTop);
-};
+  const visible = ready && !hidden;
 
   return (
     <>
@@ -173,13 +288,17 @@ const handleDragEnd = () => {
               style={{
                 x,
                 y,
-                pointerEvents: hidden ? "none" : "auto",
+                pointerEvents: visible ? "auto" : "none",
               }}
+              initial={{ opacity: 0, scale: 0.6 }}
               animate={{
-                opacity: hidden ? 0 : 1,
-                scale: hidden ? 0.8 : 1,
+                opacity: visible ? 1 : 0,
+                scale: ready ? (hidden ? 0.8 : 1) : 0.6,
               }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              transition={{
+                opacity: { duration: 0.2, ease: "easeOut" },
+                scale: { type: "spring", stiffness: 380, damping: 22 },
+              }}
               onPointerDown={() => {
                 wasDragged.current = false;
               }}
@@ -187,6 +306,7 @@ const handleDragEnd = () => {
                 wasDragged.current = true;
                 isDragging.current = true;
                 setHidden(false);
+                endIntro();
               }}
               onDragEnd={() => {
                 isDragging.current = false;
@@ -216,20 +336,119 @@ const handleDragEnd = () => {
                 active:cursor-grabbing
               "
             >
-<NavigationLink
-  href="/Shop"
-  aria-label="Go to shop"
-  draggable={false}
-  onClick={(event) => {
-    if (wasDragged.current) {
-      event.preventDefault();
-      wasDragged.current = false;
-    }
-  }}
-  className="flex h-full w-full items-center justify-center rounded-full"
->
-  <StoreIcon />
-</NavigationLink>
+              {/* Soft pulse ring: plays a few times, then stops for good. */}
+              {phase !== "none" && !reduceMotion && (
+                <motion.span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -inset-[2px] -z-10 rounded-full bg-[#5658EC]"
+                  initial={{ scale: 1, opacity: 0 }}
+                  animate={{ scale: [1, 1.9], opacity: [0.45, 0] }}
+                  transition={{
+                    duration: 1.4,
+                    ease: "easeOut",
+                    delay: 0.3,
+                    repeat: phase === "full" ? 2 : 0,
+                    repeatDelay: 0.4,
+                  }}
+                />
+              )}
+
+              {/* Label: slides out beside the button on the first visit,
+                  with a small tail pointing at the button. */}
+              <AnimatePresence>
+                {showLabel && (
+                  <span
+                    key="label"
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute inset-y-0 flex items-center ${
+                      side === "right" ? "right-full mr-2.5" : "left-full ml-2.5"
+                    }`}
+                  >
+                    <motion.span
+                      initial={{
+                        opacity: 0,
+                        x: side === "right" ? 10 : -10,
+                        scale: 0.92,
+                      }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{
+                        opacity: 0,
+                        x: side === "right" ? 10 : -10,
+                        scale: 0.92,
+                      }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                    >
+                      {/* Gentle nudge toward the button while visible. */}
+                      <motion.span
+                        animate={
+                          reduceMotion
+                            ? undefined
+                            : { x: [0, side === "right" ? 3 : -3, 0] }
+                        }
+                        transition={{
+                          duration: 1.2,
+                          ease: "easeInOut",
+                          repeat: Infinity,
+                          delay: 0.4,
+                        }}
+                        className="
+                          relative
+                          block
+                          whitespace-nowrap
+                          rounded-full
+                          border
+                          border-white/15
+                          bg-[var(--surface)]
+                          px-3
+                          py-1.5
+                          text-[12px]
+                          font-medium
+                          text-[var(--foreground)]
+                          shadow-[0_6px_20px_-8px_rgba(0,0,0,0.5)]
+                        "
+                      >
+                        {LABEL_TEXT}
+
+                        {/* Tail */}
+                        <span
+                          className={`
+                            absolute
+                            top-1/2
+                            h-2.5
+                            w-2.5
+                            -translate-y-1/2
+                            rotate-45
+                            bg-[var(--surface)]
+                            ${
+                              side === "right"
+                                ? "-right-[5px] border-r border-t border-white/15"
+                                : "-left-[5px] border-b border-l border-white/15"
+                            }
+                          `}
+                        />
+                      </motion.span>
+                    </motion.span>
+                  </span>
+                )}
+              </AnimatePresence>
+
+              <NavigationLink
+                href="/Shop"
+                aria-label="Go to shop"
+                draggable={false}
+                onClick={(event) => {
+                  if (wasDragged.current) {
+                    event.preventDefault();
+                    wasDragged.current = false;
+                    return;
+                  }
+
+                  endIntro();
+                }}
+                className="flex h-full w-full items-center justify-center rounded-full"
+              >
+                <StoreIcon />
+              </NavigationLink>
             </motion.div>
           </div>,
           document.body,

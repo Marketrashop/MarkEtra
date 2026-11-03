@@ -54,7 +54,18 @@ export default function AppPreloader({
 
   return (
     <>
-      <AnimatePresence>
+      <AnimatePresence
+        onExitComplete={() => {
+          document.documentElement.dataset.preloader =
+            "exited";
+
+          window.dispatchEvent(
+            new CustomEvent(
+              "marketra:preloader-exited",
+            ),
+          );
+        }}
+      >
         {!done && (
           <motion.div
             initial={{
