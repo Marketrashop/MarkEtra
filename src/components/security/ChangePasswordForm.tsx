@@ -81,6 +81,12 @@ export default function ChangePasswordForm() {
     setResetSent,
   ] = useState(false);
 
+const [showChangeErrorDialog, setShowChangeErrorDialog] =
+  useState(false);
+
+const [changeErrorMessage, setChangeErrorMessage] =
+  useState("");
+
   const currentPasswordRef =
     useRef<HTMLDivElement>(null);
 
@@ -280,7 +286,7 @@ async function handlePasswordResetRequest(
     setResetEmail("");
 
     toast.success(
-      "If an account with that email exists, a reset email has been sent.",
+      "If an account with this email exists, a reset email has been sent.",
     );
   } catch (error) {
     setResetEmail("");
@@ -324,43 +330,44 @@ async function handlePasswordResetRequest(
         error instanceof
         ChangePasswordError
       ) {
-        if (
-          error.code ===
-          "CURRENT_PASSWORD_INCORRECT"
-        ) {
-          setRemainingAttempts(
-            error.remainingAttempts ??
-              null,
-          );
+if (
+  error.code === "CURRENT_PASSWORD_INCORRECT"
+) {
+  setRemainingAttempts(
+    error.remainingAttempts ?? null,
+  );
 
-          shakeField(
-            "currentPassword",
-          );
+  setChangeErrorMessage(
+    error.remainingAttempts === 1
+      ? "Your current password is incorrect. You have 1 attempt left."
+      : `Your current password is incorrect. You have ${
+          error.remainingAttempts ?? "a limited number of"
+        } attempts left.`,
+  );
 
-          toast.error(
-            "Your current password is incorrect.",
-          );
+  setShowChangeErrorDialog(true);
 
-          return;
-        }
+  shakeField("currentPassword");
 
-        if (
-          error.code ===
-          "PASSWORD_CHANGE_ATTEMPTS_EXCEEDED"
-        ) {
-          setRemainingAttempts(0);
-          setAttemptsExceeded(true);
+  return;
+}
 
-          shakeField(
-            "currentPassword",
-          );
+if (
+  error.code === "PASSWORD_CHANGE_ATTEMPTS_EXCEEDED"
+) {
+  setRemainingAttempts(0);
+  setAttemptsExceeded(true);
 
-          toast.error(
-            "Password change is temporarily locked. Please reset your password to continue.",
-          );
+  setChangeErrorMessage(
+    "Password change is temporarily locked. Reset your password to continue.",
+  );
 
-          return;
-        }
+  setShowChangeErrorDialog(true);
+
+  shakeField("currentPassword");
+
+  return;
+}
       }
 
       console.error(
@@ -465,118 +472,6 @@ async function handlePasswordResetRequest(
           />
         </div>
 
-        {showRecoveryPrompt && (
-          <div
-            className="
-              flex
-              items-start
-              gap-2.5
-              rounded-lg
-              border
-              border-red-500/35
-              bg-red-500/[0.09]
-              px-3
-              py-2.5
-              sm:gap-3
-              sm:px-3.5
-              sm:py-3
-            "
-          >
-            <div
-              className="
-                mt-0.5
-                flex
-                h-6
-                w-6
-                shrink-0
-                items-center
-                justify-center
-                rounded-full
-                bg-red-500/15
-                text-red-400
-              "
-            >
-              {attemptsExceeded ? (
-                <LockKeyhole
-                  size={13}
-                  strokeWidth={2.2}
-                />
-              ) : (
-                <AlertTriangle
-                  size={13}
-                  strokeWidth={2.2}
-                />
-              )}
-            </div>
-
-            <div
-              className="
-                min-w-0
-                flex-1
-              "
-            >
-              <p
-className="
-  text-[10px]
-  font-medium
-  leading-4
-  text-red-700
-  dark:text-red-300
-  sm:text-[11px]
-  sm:leading-5
-"
-              >
-                {attemptsExceeded
-                  ? "Password change temporarily locked."
-                  : "Your current password is incorrect."}
-              </p>
-
-              <p
-className="
-  mt-0.5
-  text-[9px]
-  leading-4
-  text-red-600
-  dark:text-red-200/80
-  sm:text-[10px]
-  sm:leading-4
-"
-              >
-                {attemptsExceeded
-                  ? "You have used all 3 attempts. Reset your password to continue."
-                  : isLastAttempt
-                    ? "You have 1 attempt left. If you do not remember your current password, we recommend resetting it now."
-                    : `You have ${remainingAttempts} attempts left. If you have forgotten your current password, you can reset it instead.`}
-              </p>
-
-              <button
-                type="button"
-                onClick={
-                  openResetDialog
-                }
-className="
-  mt-1.5
-  inline-flex
-  items-center
-  gap-1
-  text-[9px]
-  font-semibold
-  text-orange-600
-  transition-colors
-  hover:text-orange-700
-  sm:text-[10px]
-"
-              >
-                Reset password
-                <ArrowRight
-                  size={11}
-                  strokeWidth={2.5}
-                />
-              </button>
-            </div>
-          </div>
-        )}
-
         <button
           type="submit"
           disabled={
@@ -609,6 +504,134 @@ className="
               : "Update Password"}
         </button>
       </form>
+
+{showChangeErrorDialog && (
+  <div
+    className="
+      fixed
+      inset-0
+      z-[110]
+      flex
+      items-center
+      justify-center
+      bg-black/55
+      px-3
+      backdrop-blur-[2px]
+    "
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="change-password-error-title"
+  >
+    <div
+      className="
+        w-full
+        max-w-[280px]
+        rounded-xl
+        border
+        border-red-500/25
+        bg-[var(--user-card-bg)]
+        p-3.5
+        shadow-[0_16px_45px_rgba(0,0,0,0.3)]
+      "
+    >
+      <div className="flex items-start gap-2.5">
+        <div
+          className="
+            flex
+            h-7
+            w-7
+            shrink-0
+            items-center
+            justify-center
+            rounded-full
+            bg-red-500/10
+            text-red-500
+          "
+        >
+          {attemptsExceeded ? (
+            <LockKeyhole size={14} />
+          ) : (
+            <AlertTriangle size={14} />
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <h3
+            id="change-password-error-title"
+            className="
+              text-[11px]
+              font-semibold
+              text-[var(--user-title)]
+            "
+          >
+            {attemptsExceeded
+              ? "Password Change Locked"
+              : "Incorrect Password"}
+          </h3>
+
+          <p
+            className="
+              mt-1
+              text-[10px]
+              leading-4
+              text-[var(--user-text-muted)]
+            "
+          >
+            {changeErrorMessage}
+          </p>
+        </div>
+      </div>
+
+<div className="mt-3 flex flex-col gap-2">
+  {!attemptsExceeded && (
+    <button
+      type="button"
+      onClick={() =>
+        setShowChangeErrorDialog(false)
+      }
+      className="
+        h-8
+        w-full
+        rounded-lg
+        border
+        border-[var(--user-card-border)]
+        px-2
+        text-[10px]
+        font-medium
+        text-[var(--user-title)]
+        transition-colors
+        hover:bg-[var(--user-button-bg)]/5
+      "
+    >
+      Try Again
+    </button>
+  )}
+
+  <button
+    type="button"
+    onClick={() => {
+      setShowChangeErrorDialog(false);
+      openResetDialog();
+    }}
+    className="
+      h-8
+      w-full
+      rounded-lg
+      bg-[var(--user-button-bg)]
+      px-2
+      text-[10px]
+      font-semibold
+      text-[var(--user-button-text)]
+      transition-colors
+      hover:bg-[var(--user-button-hover)]
+    "
+  >
+    Reset Password
+  </button>
+</div>
+    </div>
+  </div>
+)}      
 
       {showResetDialog && (
         <div
@@ -820,7 +843,7 @@ className="
         sm:text-[10px]
       "
     >
-      If an account with that email exists, a password
+      If an account with this email exists, a password
       reset link has been sent.
     </p>
   </div>
@@ -847,7 +870,7 @@ className="
     sm:text-[11px]
   "
 >
-  Done
+  Ok
 </button>
 </div>
 ) : (

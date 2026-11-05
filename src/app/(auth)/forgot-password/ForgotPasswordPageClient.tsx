@@ -89,7 +89,7 @@ if (remaining === 0) {
   );
 } else {
   toast.success(
-    "If an account with that email exists, a password reset email has been sent.",
+    "If an account with this email exists, a password reset email has been sent.",
   );
 }
 
