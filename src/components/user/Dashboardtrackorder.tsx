@@ -359,8 +359,7 @@ export default function DashboardTrackOrder({
         <span className="relative mr-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--user-card-border)] bg-transparent text-[var(--user-title)]">
           <PackageSearch size={14} strokeWidth={1.8} aria-hidden="true" />
         </span>
-        {/* The "!" suffix makes these win over any global unlayered
-            `input { ... }` / `::placeholder` rule in globals.css. */}
+
         <input
           type="text"
           name="mobileOrderReference"

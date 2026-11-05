@@ -2,8 +2,7 @@ import DashboardPageLayout from "@/components/dashboard/DashboardPage";
 
 import {
   HelpPage,
-  TawkChat,
-  ChatLauncher,
+  LiveChat,
 } from "@/components/help";
 
 export default function HelpCenterPage() {
@@ -16,11 +15,7 @@ export default function HelpCenterPage() {
         },
       ]}
     >
-      <TawkChat
-        key="help-center-chat"
-      />
-
-      <ChatLauncher />
+      <LiveChat />
 
       <HelpPage />
     </DashboardPageLayout>
