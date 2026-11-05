@@ -122,29 +122,29 @@ function TrackOrderForm({
       >
         {error}
       </p>
-{!isGlass && (
-  <button
-    type="submit"
-    disabled={isPending}
-    className="group mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#5b5ef7] px-4 text-sm font-semibold text-white transition duration-200 hover:bg-[#4f52e6] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
-  >
-    {isPending ? (
-      <>
-        <Loader2 size={16} className="animate-spin" />
-        Looking it up…
-      </>
-    ) : (
-      <>
-        Track order
-        <ArrowRight
-          size={16}
-          strokeWidth={2.25}
-          className="transition-transform duration-200 group-hover:translate-x-0.5"
-        />
-      </>
-    )}
-  </button>
-)}
+      {!isGlass && (
+        <button
+          type="submit"
+          disabled={isPending}
+          className="group mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#5b5ef7] px-4 text-sm font-semibold text-white transition duration-200 hover:bg-[#4f52e6] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {isPending ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Looking it up…
+            </>
+          ) : (
+            <>
+              Track order
+              <ArrowRight
+                size={16}
+                strokeWidth={2.25}
+                className="transition-transform duration-200 group-hover:translate-x-0.5"
+              />
+            </>
+          )}
+        </button>
+      )}
     </form>
   );
 }
@@ -194,17 +194,17 @@ function TrackOrderSheet({
         onClick={onClose}
         className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200 motion-reduce:transition-none ${shown ? "opacity-100" : "opacity-0"}`}
       />
-<div
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="track-order-sheet-title"
-  className={`absolute left-1/2 top-1/2 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-3xl border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-4 py-5 shadow-2xl transition-all duration-300 ease-out motion-reduce:transition-none ${
-    shown
-      ? "-translate-y-1/2 opacity-100"
-      : "-translate-y-[45%] opacity-0"
-  }`}
-  style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
->
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="track-order-sheet-title"
+        className={`absolute left-1/2 top-1/2 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-3xl border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-4 py-5 shadow-2xl transition-all duration-300 ease-out motion-reduce:transition-none ${
+          shown
+            ? "-translate-y-1/2 opacity-100"
+            : "-translate-y-[45%] opacity-0"
+        }`}
+        style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
+      >
         <div aria-hidden="true" className="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--user-card-border)]" />
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -311,44 +311,44 @@ export default function DashboardTrackOrder({
       </section>
 
       <form
-onSubmit={async (event) => {
-  event.preventDefault();
+        onSubmit={async (event) => {
+          event.preventDefault();
 
-  const form = event.currentTarget;
-  const input = form.elements.namedItem(
-    "mobileOrderReference",
-  ) as HTMLInputElement | null;
+          const form = event.currentTarget;
+          const input = form.elements.namedItem(
+            "mobileOrderReference",
+          ) as HTMLInputElement | null;
 
-  const reference = input?.value.trim().replace(/^#/, "") ?? "";
+          const reference = input?.value.trim().replace(/^#/, "") ?? "";
 
-  if (!reference) {
-    input?.setCustomValidity("Enter your order reference.");
-    input?.reportValidity();
-    input?.focus();
-    return;
-  }
+          if (!reference) {
+            input?.setCustomValidity("Enter your order reference.");
+            input?.reportValidity();
+            input?.focus();
+            return;
+          }
 
-  input?.setCustomValidity("");
-  setIsMobileTracking(true);
+          input?.setCustomValidity("");
+          setIsMobileTracking(true);
 
-  try {
-    const message = await handleTrackOrder(reference);
+          try {
+            const message = await handleTrackOrder(reference);
 
-    if (typeof message === "string" && message) {
-      input?.setCustomValidity(message);
-      input?.reportValidity();
-      input?.focus();
-    }
-  } catch {
-    input?.setCustomValidity(
-      "Unable to connect right now. Please try again.",
-    );
-    input?.reportValidity();
-    input?.focus();
-  } finally {
-    setIsMobileTracking(false);
-  }
-}}
+            if (typeof message === "string" && message) {
+              input?.setCustomValidity(message);
+              input?.reportValidity();
+              input?.focus();
+            }
+          } catch {
+            input?.setCustomValidity(
+              "Unable to connect right now. Please try again.",
+            );
+            input?.reportValidity();
+            input?.focus();
+          } finally {
+            setIsMobileTracking(false);
+          }
+        }}
         className="group relative flex h-10 w-full items-center overflow-hidden rounded-full border border-[var(--user-card-border)] bg-[var(--user-card-bg)] px-2.5 text-left shadow-[0_4px_18px_rgba(0,0,0,0.08)] transition duration-200 sm:hidden"
         aria-label="Track an order"
       >
@@ -359,6 +359,8 @@ onSubmit={async (event) => {
         <span className="relative mr-2 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--user-card-border)] bg-transparent text-[var(--user-title)]">
           <PackageSearch size={14} strokeWidth={1.8} aria-hidden="true" />
         </span>
+        {/* The "!" suffix makes these win over any global unlayered
+            `input { ... }` / `::placeholder` rule in globals.css. */}
         <input
           type="text"
           name="mobileOrderReference"
@@ -368,7 +370,7 @@ onSubmit={async (event) => {
           autoCorrect="off"
           spellCheck={false}
           enterKeyHint="search"
-          className="relative min-w-0 flex-1 bg-transparent text-[11px] text-[var(--user-title)] outline-none placeholder:text-[var(--user-text-muted)]"
+          className="relative h-7 min-w-0 flex-1 rounded-full border border-[var(--user-card-border)]! bg-[var(--user-stat-bg)]! px-3 text-[11px] text-[var(--user-title)] shadow-[inset_0_1px_2px_rgba(0,0,0,0.18)] outline-none placeholder:text-[var(--user-text-muted)]! placeholder:opacity-100 focus:border-[var(--primary)]!"
         />
         <button
           type="submit"
@@ -383,13 +385,6 @@ onSubmit={async (event) => {
           )}
         </button>
       </form>
-
-      {/* Mobile tracking now uses the inline input; the centered dialog is intentionally disabled. */}
-      {/* <TrackOrderSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        onTrack={handleTrackOrder}
-      /> */}
     </>
   );
 }
