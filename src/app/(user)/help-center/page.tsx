@@ -1,9 +1,6 @@
 import DashboardPageLayout from "@/components/dashboard/DashboardPage";
 
-import {
-  HelpPage,
-  LiveChat,
-} from "@/components/help";
+import { HelpPage } from "@/components/help";
 
 export default function HelpCenterPage() {
   return (
@@ -15,8 +12,6 @@ export default function HelpCenterPage() {
         },
       ]}
     >
-      <LiveChat />
-
       <HelpPage />
     </DashboardPageLayout>
   );

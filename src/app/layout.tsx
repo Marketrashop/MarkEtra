@@ -16,7 +16,7 @@ import { SITE } from "@/constants/site";
 import { cn } from "@/lib/utils";
 import NavigationLoaderProvider from "@/components/ui/Preloader/NavigationLoaderProvider";
 import MetaPixel from "@/components/MetaPixel";
-
+import LiveChat from "@/components/help/LiveChat";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -109,6 +109,7 @@ export default function RootLayout({
 
             <AppPreloader>
               {children}
+              <LiveChat />
             </AppPreloader>
 
             <AppToaster />
