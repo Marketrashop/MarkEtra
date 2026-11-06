@@ -458,7 +458,7 @@ export default function SessionItem({
               className="hidden sm:block"
             />
 
-            Remove this device
+            Revoke this session
           </button>
         )}
       </div>
