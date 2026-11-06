@@ -213,7 +213,7 @@ export default async function ProfilePage() {
                 },
                 {
                   icon: CalendarDays,
-                  label: "Member Since",
+                  label: "Registered Since",
                   value: formatDate(
                     user.createdAt,
                   ),
