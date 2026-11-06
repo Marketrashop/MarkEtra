@@ -297,7 +297,7 @@ export function ProfileOverview({
                   />
                 </>
               }
-              label="Member Since"
+              label="Registered Since"
               value={new Date(
                 createdAt,
               ).toLocaleDateString(
