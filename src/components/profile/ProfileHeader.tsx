@@ -6,7 +6,9 @@ import {
   Mail,
   MapPin,
   Phone,
+  Smartphone,
   UserCircle2,
+  type LucideIcon,
 } from "lucide-react";
 
 import {
@@ -16,6 +18,128 @@ import {
 import type {
   ProfileHeaderProps,
 } from "./profile.types";
+
+function DetailTile({
+  icon: Icon,
+  label,
+  value,
+  onAdd,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value?: string | null;
+  /** Shown as an "Add" action when the value is empty. */
+  onAdd?: () => void;
+}) {
+  const hasValue = Boolean(value && value.trim());
+
+  return (
+    <div
+      className="
+        flex
+        min-w-0
+        items-center
+        gap-2.5
+        rounded-lg
+        border
+        border-[var(--user-card-border)]
+        p-2.5
+        sm:gap-3
+        sm:rounded-2xl
+        sm:p-3.5
+      "
+      style={{
+        background:
+          "rgba(255,255,255,.03)",
+      }}
+    >
+      <span
+        className="
+          flex
+          h-8
+          w-8
+          shrink-0
+          items-center
+          justify-center
+          rounded-lg
+          border
+          border-[var(--user-card-border)]
+          text-[var(--user-primary)]
+          sm:h-10
+          sm:w-10
+          sm:rounded-xl
+        "
+      >
+        <Icon
+          size={15}
+          strokeWidth={1.8}
+          className="sm:h-[18px] sm:w-[18px]"
+          aria-hidden="true"
+        />
+      </span>
+
+      <div className="min-w-0 flex-1">
+        <p
+          className="
+            text-[9px]
+            font-semibold
+            uppercase
+            tracking-[0.08em]
+            text-[var(--user-text-muted)]
+            sm:text-[10px]
+          "
+        >
+          {label}
+        </p>
+
+        {hasValue ? (
+          <p
+            title={value ?? undefined}
+            className="
+              mt-0.5
+              truncate
+              text-[11px]
+              font-semibold
+              text-[var(--user-title)]
+              sm:text-sm
+            "
+          >
+            {value}
+          </p>
+        ) : (
+          <div className="mt-0.5 flex items-center gap-2">
+            <span
+              className="
+                text-[11px]
+                text-[var(--user-text-muted)]
+                sm:text-sm
+              "
+            >
+              Not added
+            </span>
+
+            {onAdd && (
+              <button
+                type="button"
+                onClick={onAdd}
+                className="
+                  text-[10px]
+                  font-semibold
+                  text-[var(--user-primary)]
+                  transition
+                  hover:underline
+                  sm:text-xs
+                "
+              >
+                Add
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function ProfileHeader({
   user,
@@ -29,6 +153,7 @@ export default function ProfileHeader({
 
   return (
     <section
+      aria-label="Account overview"
       className="
         relative
         overflow-hidden
@@ -57,32 +182,22 @@ export default function ProfileHeader({
         }}
       />
 
-      <div
-        className="
-          relative
-          flex
-          flex-col
-          gap-4
-          lg:flex-row
-          lg:items-center
-          lg:justify-between
-          sm:gap-5
-        "
-      >
+      <div className="relative">
+        {/* Header: avatar, name, edit */}
         <div
           className="
             flex
-            items-start
-            gap-2.5
-            sm:gap-4
+            items-center
+            gap-3
+            sm:gap-5
           "
         >
           <div
             className="
               relative
               flex
-              h-16
-              w-16
+              h-14
+              w-14
               shrink-0
               items-center
               justify-center
@@ -109,7 +224,7 @@ export default function ProfileHeader({
             ) : (
               <>
                 <UserCircle2
-                  size={42}
+                  size={40}
                   className="sm:hidden"
                   color="var(--user-icon-muted)"
                 />
@@ -123,7 +238,7 @@ export default function ProfileHeader({
             )}
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p
               className="
                 text-[9px]
@@ -151,141 +266,84 @@ export default function ProfileHeader({
             >
               {user.firstName} {user.lastName}
             </h2>
-
-            <div
-              className="
-                mt-3
-                grid
-                gap-2.5
-                text-[11px]
-                sm:mt-5
-                sm:gap-3
-                sm:text-sm
-              "
-            >
-              <div className="flex items-start gap-2 sm:gap-3">
-                <Mail
-                  size={14}
-                  className="
-                    mt-0.5
-                    shrink-0
-                    text-[var(--user-icon-muted)]
-                    sm:h-[17px]
-                    sm:w-[17px]
-                  "
-                />
-
-                <div className="min-w-0">
-                  <p className="text-[9px] text-[var(--user-text-muted)] sm:text-xs">
-                    Email
-                  </p>
-
-                  <p className="break-all font-medium text-[var(--user-title)] sm:text-sm">
-                    {user.email}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 sm:gap-3">
-                <Phone
-                  size={14}
-                  className="
-                    mt-0.5
-                    shrink-0
-                    text-[var(--user-icon-muted)]
-                    sm:h-[17px]
-                    sm:w-[17px]
-                  "
-                />
-
-                <div>
-                  <p className="text-[9px] text-[var(--user-text-muted)] sm:text-xs">
-                    Primary Phone
-                  </p>
-
-                  <p className="font-medium text-[var(--user-title)] sm:text-sm">
-                    {user.phoneNumber}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 sm:gap-3">
-                <Phone
-                  size={14}
-                  className="
-                    mt-0.5
-                    shrink-0
-                    text-[var(--user-icon-muted)]
-                    sm:h-[17px]
-                    sm:w-[17px]
-                  "
-                />
-
-                <div>
-                  <p className="text-[9px] text-[var(--user-text-muted)] sm:text-xs">
-                    Secondary Phone
-                  </p>
-
-                  <p className="font-medium text-[var(--user-title)] sm:text-sm">
-                    {user.secondaryPhoneNumber ??
-                      "Not added"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 sm:gap-3">
-                <MapPin
-                  size={14}
-                  className="
-                    mt-0.5
-                    shrink-0
-                    text-[var(--user-icon-muted)]
-                    sm:h-[17px]
-                    sm:w-[17px]
-                  "
-                />
-
-                <div>
-                  <p className="text-[9px] text-[var(--user-text-muted)] sm:text-xs">
-                    Country
-                  </p>
-
-                  <p className="font-medium text-[var(--user-title)] sm:text-sm">
-                    {user.country}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
+
+          <button
+            type="button"
+            onClick={onEdit}
+            className="
+              h-8
+              shrink-0
+              rounded-full
+              border
+              border-[var(--user-card-border)]
+              bg-[color:rgba(255,255,255,.06)]
+              px-3.5
+              text-[10px]
+              font-medium
+              text-[var(--user-title)]
+              backdrop-blur-sm
+              transition-all
+              duration-300
+              hover:border-[var(--user-primary)]
+              hover:bg-[color:rgba(255,255,255,.10)]
+              sm:h-10
+              sm:px-6
+              sm:text-sm
+            "
+          >
+            Edit Profile
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={onEdit}
+        {/* Divider */}
+        <div
+          aria-hidden="true"
           className="
-            h-8
-            self-start
-            rounded-full
-            border
-            border-[var(--user-card-border)]
-            bg-[color:rgba(255,255,255,.06)]
-            px-3.5
-            text-[10px]
-            font-medium
-            text-[var(--user-title)]
-            backdrop-blur-sm
-            transition-all
-            duration-300
-            hover:border-[var(--user-primary)]
-            hover:bg-[color:rgba(255,255,255,.10)]
-            sm:h-10
-            sm:self-auto
-            sm:px-6
-            sm:text-sm
+            my-3
+            h-px
+            bg-[var(--user-card-border)]
+            sm:my-5
+          "
+        />
+
+        {/* Details */}
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-2
+            sm:grid-cols-2
+            sm:gap-3
           "
         >
-          Edit Profile
-        </button>
+          <DetailTile
+            icon={Mail}
+            label="Email"
+            value={user.email}
+          />
+
+          <DetailTile
+            icon={Phone}
+            label="Primary Phone"
+            value={user.phoneNumber}
+            onAdd={onEdit}
+          />
+
+          <DetailTile
+            icon={Smartphone}
+            label="Secondary Phone"
+            value={user.secondaryPhoneNumber}
+            onAdd={onEdit}
+          />
+
+          <DetailTile
+            icon={MapPin}
+            label="Country"
+            value={user.country}
+            onAdd={onEdit}
+          />
+        </div>
       </div>
     </section>
   );
